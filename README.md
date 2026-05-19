@@ -6,6 +6,8 @@ SIFT-Bench measures evidence quality, false-positive handling, negative assertio
 
 Solo submission to the [Find Evil! hackathon](https://findevil.devpost.com) (Apr 15 – Jun 15, 2026).
 
+[![tests](https://github.com/aksoni/sift-bench/actions/workflows/tests.yml/badge.svg)](https://github.com/aksoni/sift-bench/actions/workflows/tests.yml)
+
 ---
 
 ## Why this is interesting
