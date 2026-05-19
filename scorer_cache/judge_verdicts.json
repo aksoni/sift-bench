@@ -1,0 +1,562 @@
+{
+  "00c4d59047a4527c4f5543f21c788bb24a507752c7c38eb40562fff003039b83": {
+    "_meta": {
+      "agent_id": "F06",
+      "gt_id": "F001",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same process (p.exe, PID 8260) and the same specific malfind observation: a 481-page RWX memory region at address range 0x2be0000-0x2dc0fff indicating a packed or injected payload. The agent finding is more specific about the VAD details and page-out status, while the GT finding provides broader context about the staging directory and prefetch evidence. The core observation \u2014 the large private RWX memory region in p.exe \u2014 is identical."
+  },
+  "0d10c69e69b9bd9d9232655a06c98992ece43a4cc71fce512117aeb172e89ca5": {
+    "_meta": {
+      "agent_id": "F17",
+      "gt_id": "F008",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "The GT finding describes the full attack chain process tree from svchost.exe through WmiPrvSE.exe, two PowerShell instances, cmd.exe, to p.exe. The agent finding describes conhost.exe (PID 1740) spawning as a child of powershell.exe (PID 8712) as evidence of an interactive console session. While both reference powershell.exe PID 8712, they describe different observations: GT is about the complete attack chain/process lineage, while the agent finding is about conhost.exe spawning to confirm a human operator session. Different subjects (process tree vs. conhost.exe interactive session) and different mechanisms."
+  },
+  "1a39b376bccb1c527bd40e5694dcaa575f77182b508c2e113e9bd380fa193a26": {
+    "_meta": {
+      "agent_id": "F10",
+      "gt_id": "F009",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is a negative finding about the absence of registry-based persistence mechanisms (empty Run keys, no malicious services). Agent finding is about a private RWX memory region in p.exe suggesting code injection. Completely different subjects and mechanisms \u2014 one is about persistence infrastructure (or lack thereof), the other is about memory injection artifacts. No meaningful overlap."
+  },
+  "1b0e46ccaf854734992de8ceae422836be1d7d791a28303f697cfb1a297d99cf": {
+    "_meta": {
+      "agent_id": "F08",
+      "gt_id": "F007",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: outbound lateral movement from this host to 172.16.7.15:445 (SMB ESTABLISHED) and 172.16.4.5:3389 (RDP CLOSED). The agent finding is more detailed, including additional connections (inbound SMB, LDAP, WinRM, and an extra SMB to 172.16.4.5:445), but it fully encompasses the two specific connections described in the ground truth with matching IPs, ports, protocols, and states. The primary subject \u2014 lateral movement via SMB and RDP to those two internal hosts \u2014 is identical."
+  },
+  "214ab96a0aa6d3083336a4710fceaf6ce84fb3b1277d215ffa55582e9db3036b": {
+    "_meta": {
+      "agent_id": "F10",
+      "gt_id": "F006",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT describes six short-lived rundll32.exe processes spawned by PowerShell PID 5848 over a 6-hour period, indicating staged DLL execution. Agent finding describes Active Directory enumeration via System.DirectoryServices.ni.dll loaded in a different PowerShell process (PID 8712) with an LDAP connection to a domain controller. Completely different subjects, mechanisms, and PIDs \u2014 no overlap in the primary observation."
+  },
+  "228655f5bf5b84889dddfc367dc47b2cbddc003915bfb67b6c6cc96d1021b919": {
+    "_meta": {
+      "agent_id": "F04",
+      "gt_id": "F006",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 4,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: six rundll32.exe processes spawned from PowerShell PID 5848 with short lifespans (5-31 seconds). The agent finding is broader (includes 3 additional rundll32 instances from p.exe 8260, totaling 9), but the six from PS 5848 are explicitly called out as a subset. The mechanism described (spawning short-lived rundll32 children from PowerShell C2 shell) is the same. The agent frames it as shellcode injection while GT frames it as staged DLL execution/reconnaissance, but these are compatible interpretations of the same behavioral pattern. The shared specifics (PID 5848, count of 6, duration range 5-31 seconds) confirm this is the same observation."
+  },
+  "2465b6cc1eb4194ec7272dadc9ddd9f02bf0274ac16d76aafba52bb2222a952d": {
+    "_meta": {
+      "agent_id": "F07",
+      "gt_id": "F008",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "The GT finding describes the full attack chain process tree (svchost \u2192 WmiPrvSE \u2192 powershell 64-bit \u2192 powershell 32-bit \u2192 cmd.exe \u2192 p.exe), focusing on process lineage, WMI entry point, and the 64-to-32-bit PowerShell transition as key indicators. The agent finding describes the DLL profiles loaded by p.exe (8260) and PS 5848, focusing on network/crypto/credential capabilities and post-launch module activation. While both reference the same processes (p.exe 8260 and PS 5848), they describe entirely different observations \u2014 process ancestry/execution chain vs. loaded DLL capabilities. Different mechanisms and different primary subjects of analysis."
+  },
+  "2d89d723069011386ddb3fab3f57b7deb195dd67c0cadea3fd41654fd7b63d46": {
+    "_meta": {
+      "agent_id": "F06",
+      "gt_id": "F009",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT describes absence of registry-based persistence mechanisms (empty Run keys, no malicious services). Agent finding describes SMB lateral movement network connections to internal hosts. Completely different subjects and observations \u2014 one is about persistence mechanisms, the other about network activity."
+  },
+  "3162bbdbe9ad8caf856d0b1c946faa3132347e4759f6b60fdb7ba90fed311a48": {
+    "_meta": {
+      "agent_id": "FP02",
+      "gt_id": "F010",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same observation: windows.malfind flagging three RWX regions in powershell.exe (PID 8712) and both concluding these are benign .NET CLR allocations, not injection or shellcode. The GT identifies the signature as heap segment headers (0xFFEEFFEE), while the agent references CLR sync structures and clrjit.dll presence \u2014 slightly different characterizations of the same CLR/JIT memory artifacts, but the same process, same PID, same region count, same benign conclusion. The minor difference in how the CLR structures are described does not change that both are describing the same malfind false positive observation."
+  },
+  "31ef7e43d92a40e6c5eedc3243322f3b33a46dbc53e912577217473c153bd6e9": {
+    "_meta": {
+      "agent_id": "F08",
+      "gt_id": "F010",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "The ground truth finding is about PowerShell PID 8712 malfind results being benign .NET CLR heap segments. The agent finding is about an LDAP connection to 172.16.4.4:389 for AD enumeration. Completely different subjects, mechanisms, and observations with no overlap."
+  },
+  "322a2eca28f7602033e0db3bb6e8550643039e0b68c039777bad1c8137e9d92b": {
+    "_meta": {
+      "agent_id": "F05",
+      "gt_id": "F002",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: the attacker's PowerShell process (PID 5848) running under the spsql account with Domain Admin privileges, identified by the same SID (S-1-5-21-3445421715-2530590580-3149308974-1193). The agent finding is more expansive, covering additional processes (PID 8712 and 8260), but it fully encompasses the GT finding. Same account, same SID, same PID 5848, same Domain Admin privilege context."
+  },
+  "3262ddb03c7c90ea1ccf4da980634750844af0aa785dbf883beb31a25c944d6f": {
+    "_meta": {
+      "agent_id": "F06",
+      "gt_id": "F006",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "The GT finding is about six short-lived rundll32.exe processes spawned by a PowerShell C2 shell (PID 5848). The agent finding is about p.exe (PID 8260) and its loaded DLL inventory indicating C2 capability. These are entirely different subjects \u2014 different processes, different PIDs, different mechanisms (spawned child processes vs. DLL loading), and different observations. No meaningful overlap."
+  },
+  "3380341afafc724dac2b1a0152d3e88a6f18e96ce03c30101c33377304b418a7": {
+    "_meta": {
+      "agent_id": "F07",
+      "gt_id": "F005",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 3,
+    "match": false,
+    "reasoning": "Both findings reference PowerShell PID 5848, but they describe different observations. The GT finding focuses on PS 5848 as a C2 shell with stealth flags (-NoLogo, -NoProfile, -s), its 32-bit SysWOW64 architecture, its parent-child relationship, and its behavioral role (spawning rundll32, dropping p.exe). The agent finding focuses on the DLL profile of PS 5848 (wininet, winhttp, msv1_0) as evidence of network/credential capability, and primarily centers on p.exe's DLL loading behavior. The agent finding is about DLL evidence for network/crypto capability, not about the stealth flags, architecture, or behavioral role that define the GT finding. These are different observations about the same process, not the same observation described differently."
+  },
+  "37ce10194aff8f35ff9808c0b6b0e3b7f0b1374d0abb9fd6ab91fbd3bcd3e03e": {
+    "_meta": {
+      "agent_id": "F10",
+      "gt_id": "F007",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 4,
+    "match": true,
+    "reasoning": "Both findings describe the same outbound SMB connection to 172.16.7.15:445 in ESTABLISHED state, interpreted as lateral movement. The agent finding covers only one of the two connections in the GT (missing the RDP connection to 172.16.4.5:3389), but the primary subject \u2014 the SMB connection to 172.16.7.15 \u2014 is identical in both. The agent finding is a more specific (partial) version of the GT observation, which qualifies as a match under the stated criteria."
+  },
+  "39fb29ac1f6138cc6effa04c666c066b2185017b08da746ee1ba6774f2dd2db6": {
+    "_meta": {
+      "agent_id": "F05",
+      "gt_id": "F004",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 4,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: multiple TCP connections from 172.16.6.11 to 172.16.4.10 on port 8080 with ESTABLISHED and CLOSE_WAIT states, orphaned from live PIDs, interpreted as C2 activity. The agent finding includes additional connection states (CLOSED) and a higher total count (9+), but the primary subject, remote endpoint, port, connection states, and behavioral inference are consistent. The discrepancy in connection count is minor and may reflect different analysis scope. Both agree on the PID dissociation and C2 interpretation."
+  },
+  "4247734de99d8275cfefc33c6dde74cd7b088fce922453450c20aafd0228e6ce": {
+    "_meta": {
+      "agent_id": "F10",
+      "gt_id": "F012",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about procdump.exe located in the Dashlane directory, flagged as a potential credential dumping tool. Agent finding is about Active Directory enumeration via PowerShell process 8712 loading System.DirectoryServices.ni.dll and making LDAP connections. Completely different subjects, processes, and mechanisms."
+  },
+  "435cff5273fea0735e37e7694e1ad8245ca820cd6150c2661058cf592c4963fa": {
+    "_meta": {
+      "agent_id": "F01",
+      "gt_id": "F008",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 4,
+    "match": false,
+    "reasoning": "Both findings reference p.exe (PID 8260) but describe different observations. The GT finding describes the complete attack chain process tree from WmiPrvSE through PowerShell transitions to p.exe, with the key indicators being the WMI entry point and 64-to-32-bit PowerShell transition. The agent finding focuses specifically on p.exe's file path, location masquerading as a Perfmon component, and 7-day dwell time. While p.exe is mentioned in both, the GT's primary subject is the full process lineage/chain, whereas the agent's primary subject is the file artifact and persistence characteristics of p.exe itself. These are different observations about different aspects of the attack."
+  },
+  "53036d352f26e2a8309df3d759bfcced080fe0002bd6d9df9dbdb7bee338da3a": {
+    "_meta": {
+      "agent_id": "F02",
+      "gt_id": "F005",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same process: 32-bit PowerShell (PID 5848) spawned by 64-bit PowerShell (PID 8712) from SysWOW64 with identical command-line flags (-Version 5.1 -s -NoLogo -NoProfile). The agent finding frames it as a 'two-stage chain' and emphasizes the remoting server mode aspect, while the GT emphasizes the C2 shell role and downstream activity, but the primary subject and core observation are identical."
+  },
+  "554dcb99779f74f0d6ace6bb7e703c918a1500bd56038bb9ffdf92943c6ee92c": {
+    "_meta": {
+      "agent_id": "F10",
+      "gt_id": "F008",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "The GT finding describes the full attack chain process tree from WMI execution through to p.exe deployment, with the key indicators being the 64-to-32-bit PowerShell transition and WmiPrvSE as entry point. The agent finding describes AD enumeration activity (DLL loading and LDAP connection) performed by PowerShell PID 8712. While both reference PID 8712, they describe entirely different observations \u2014 the GT is about the process lineage/chain, while the agent finding is about AD enumeration behavior. Different subjects and mechanisms."
+  },
+  "5e4a0e4fba6fdacb5eec01faf80e70f428d770443a380f29da800e35e2833219": {
+    "_meta": {
+      "agent_id": "FP01",
+      "gt_id": "F010",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same observation: three PAGE_EXECUTE_READWRITE regions (8, 1, 2 pages) in powershell.exe PID 8712 flagged by malfind, assessed as benign .NET CLR JIT allocations with no PE headers or shellcode. The agent finding is slightly less specific (omits the 0xFFEEFFEE heap signature detail) but reaches the same conclusion about the same process, same PID, same region sizes, and same mechanism."
+  },
+  "600bf5a0077287288c221a479a410b5ed02f9c114585f7e1731298458cdb1fa5": {
+    "_meta": {
+      "agent_id": "F01",
+      "gt_id": "F003",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: WmiPrvSE.exe (PID 2876) spawning powershell.exe (PID 8712) as part of WMI-based lateral movement. The PIDs, process names, and mechanism are identical. The agent finding adds detail about the spsql credentials and cmdline wiping, while the GT adds detail about the 32-bit child PowerShell C2 shell. These are complementary specifics around the same primary observation \u2014 WMI-spawned PowerShell execution on this host."
+  },
+  "643c3f916cd350b1a8f5610f960be764230944dabf8587e3e68992f6b94c7aed": {
+    "_meta": {
+      "agent_id": "F06",
+      "gt_id": "F008",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "The GT finding describes the full attack chain process tree from WMI execution through to p.exe deployment, with the primary subject being the multi-step process lineage and execution chain. The agent finding is about p.exe's loaded DLL inventory and C2 capability inference. While both reference p.exe (PID 8260), they describe entirely different observations \u2014 one is about process ancestry and attack chain, the other is about DLL analysis and network/crypto capability. Different subjects and mechanisms."
+  },
+  "743a1cdeb56316d64244a8162873fee439479420cc4ad0119791b80b900c0939": {
+    "_meta": {
+      "agent_id": "F10",
+      "gt_id": "F013",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "Both findings involve p.exe (PID 8260), but they describe entirely different observations. The GT finding is about the DLL profile of p.exe confirming a network-capable C2 implant (loaded networking and crypto libraries, ASLR status, image base). The agent finding is about a suspicious RWX private memory region detected by malfind, indicating possible code injection or reflective shellcode. These are distinct forensic observations \u2014 one about loaded DLLs and implant capabilities, the other about memory region attributes suggesting injection. Different mechanisms and different evidence."
+  },
+  "74f76bbcea2589a16d0c8ed02c53be3d7195b51a009db6602d7c9dd29b8cd09c": {
+    "_meta": {
+      "agent_id": "FP01",
+      "gt_id": "F008",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT describes the full attack chain process tree from WMI execution through to malware deployment, with WmiPrvSE.exe and PowerShell as key nodes. The agent finding is about malfind memory regions in powershell.exe (PID 8712) being assessed as false positives due to .NET CLR JIT compilation. These are entirely different observations \u2014 one is about process lineage and attack chain reconstruction, the other is about memory artifact analysis of a single process. Sharing PID 8712 as a reference point does not make them the same observation."
+  },
+  "75becd4223190db7a9357ae356e1dcb3a83d0f4f956236c121bb0e45892aa9f7": {
+    "_meta": {
+      "agent_id": "F09",
+      "gt_id": "F002",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 4,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: the attacker operated under the 'spsql' account which holds Domain Admin privileges. The GT provides specific technical evidence (PID 5848, SID, integrity level) while the agent finding is more general and focuses on the impact. The subject (spsql account with Domain Admin membership being used in the attack) is identical. Minor framing difference (GT focuses on the C2 PowerShell shell running under this account; agent focuses on the compromise impact) but the underlying observation is the same."
+  },
+  "7b2159ae0166a043c5458a1934ff7dc5abe3391ab0acd2c460e4ad5d247c7568": {
+    "_meta": {
+      "agent_id": "F11",
+      "gt_id": "F010",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about malfind hits in PowerShell PID 8712 being benign .NET CLR heap segments. Agent finding is about an external HTTPS connection to an IP address. Completely different subjects and mechanisms \u2014 no overlap."
+  },
+  "7bd89016bdb2bc83afc3f1caba5706c4f37fd5a1c602ba4bbb8e96eb109cfa38": {
+    "_meta": {
+      "agent_id": "F13",
+      "gt_id": "F010",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about PowerShell.exe (PID 8712) malfind hits being benign .NET CLR heap segments. Agent finding is about OUTLOOK.EXE (PID 8128) malfind hits being false positives due to Outlook memory allocation signatures. Different processes, different PIDs, different mechanisms/signatures explaining the false positive. No shared subject."
+  },
+  "7cff707fe5539e0684d160f2adbc508db2149e6349049d9aab0e2def1abab7e8": {
+    "_meta": {
+      "agent_id": "F06",
+      "gt_id": "F007",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 3,
+    "match": true,
+    "reasoning": "Both findings describe outbound SMB connections to the same two internal hosts (172.16.7.15 and 172.16.4.5) for lateral movement purposes. However, there are notable discrepancies: the GT identifies the connection to 172.16.4.5 as RDP (port 3389, CLOSED), while the agent describes both connections as SMB (ESTABLISHED). The agent mischaracterizes the 172.16.4.5 connection as SMB rather than RDP, and incorrectly states both are ESTABLISHED when one is CLOSED. Despite these inaccuracies, the core observation \u2014 this host being used as a pivot point for lateral movement to the same two internal IPs \u2014 is shared, warranting a match with reduced confidence."
+  },
+  "815d35dfe0bcb2ce5929ffe7735d0125183c985b151e796a7bd2d00b43a7dcdd": {
+    "_meta": {
+      "agent_id": "F11",
+      "gt_id": "F011",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about the spsql NTUSER.DAT registry hive being loaded in memory, confirming an interactive/network logon session on the host being analyzed. The agent finding is about RDP network connections from 172.16.6.11 to 172.16.4.5, describing lateral movement activity. These are different subjects and different mechanisms \u2014 one is a registry artifact in memory, the other is network connection evidence. While both mention spsql credentials contextually, the primary subjects and observations are entirely different."
+  },
+  "89676da4fc6ae9cc9020046d14d4ea064712be2c5d69650a4f663426c8fb2c5e": {
+    "_meta": {
+      "agent_id": "F17",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about PID 5848's loaded DLLs (amsi.dll and unnamed/reflectively loaded modules). Agent finding is about conhost.exe (PID 1740) spawned as a child of a different PowerShell PID (8712), describing an interactive session mechanism. Different PIDs, different subjects, and different mechanisms \u2014 DLL loading vs. process spawning."
+  },
+  "8c758a5bbe4b1b3d149c79bfd0054dabc0f2d8bc3a51bfb30504019ded3c1a46": {
+    "_meta": {
+      "agent_id": "F09",
+      "gt_id": "F009",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same negative observation: no registry-based or service-based persistence was found. Both reference the same evidence \u2014 empty Run keys for spsql, legitimate entries (OneDrive, Dashlane, DashlanePlugin) for tdungan, and svcscan returning no malicious services. The agent finding is more detailed in specifying exact registry paths and search terms, but the core observation is identical. Both conclude the attacker relied on live session access rather than boot-persistent mechanisms."
+  },
+  "90f311f08318c1c792ff80dc858bf1a48a75334d3793c7812b70b0b03e39d80d": {
+    "_meta": {
+      "agent_id": "F07",
+      "gt_id": "F013",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: p.exe (PID 8260) loaded a full networking and cryptography DLL stack (WININET.dll, WS2_32.dll, DNSAPI.dll, IPHLPAPI.DLL, CRYPTSP.dll, rsaenh.dll, bcrypt.dll, Secur32.dll, SSPICLI.DLL) consistent with a C2 implant, and mpr.dll was loaded approximately 6 days after initial execution indicating continued activity. The agent finding is more specific (adds USER32/GDI32 late-load detail and includes PS 5848 as an additional subject), but the primary subject and evidence for p.exe are identical. The additional PS 5848 content in the agent finding does not disqualify the match since the core p.exe observation is clearly shared."
+  },
+  "938842eaeee3fe91cbdc04bf7d4988f49349fe2f9e3824fda8c293238f061256": {
+    "_meta": {
+      "agent_id": "F07",
+      "gt_id": "F006",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "These describe opposite mechanisms. The GT finding describes PowerShell (PID 5848) as the parent spawning six rundll32.exe child processes. The agent finding describes rundll32.exe (PID 1424) as the host process into which the PowerShell runtime was reflectively loaded. The direction of the relationship is reversed, the PIDs are different, and the mechanisms are distinct (spawning children vs. reflective injection into a host). These are different observations despite sharing the same two process names."
+  },
+  "98715a2b3bec6d19bece97a11b9c1a432b146b6245a09db7b683e321214cc54c": {
+    "_meta": {
+      "agent_id": "F07",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about PID 5848 (a PowerShell process) with amsi.dll loaded and 12 unnamed/reflectively loaded DLLs. Agent finding is about PowerShell runtime being reflectively loaded into rundll32.exe (PIDs 1424 and 7552) as a defense evasion technique. These describe different processes, different PIDs, and different mechanisms \u2014 GT focuses on DLL loading within a PowerShell process, while Agent focuses on PowerShell being injected into rundll32. Different subjects and different observations."
+  },
+  "9b63696db95057881a23f61a19a2ad2f702166efe8a5bc568df170603ff68a39": {
+    "_meta": {
+      "agent_id": "F11",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same observation: PID 5848 (PowerShell) has multiple unnamed DLLs (no name/path) loaded, interpreted as evidence of reflectively loaded modules from an attacker's framework. The agent finding is more specific, noting ~15 entries vs GT's 12, and adds detail about anomalous timestamps as a reflective loading artifact. The core subject (unnamed DLLs in PID 5848 suggesting reflective injection) is identical. The GT also mentions amsi.dll being loaded, which the agent finding doesn't highlight, but the primary observation being matched is the unnamed DLL pattern, which both clearly share."
+  },
+  "a21687a7fc050ce1f944cd105bdef9a3e266d1125f71c6c88ce9af03172f2c3c": {
+    "_meta": {
+      "agent_id": "F03",
+      "gt_id": "F002",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: the attacker operated under the 'spsql' account (same SID S-1-5-21-3445421715-2530590580-3149308974-1193) with Domain Admin privileges at High Mandatory Level integrity. The GT focuses specifically on PID 5848 (the C2 PowerShell shell), while the agent finding is more general, covering all three attacker-controlled processes including PID 5848. The agent finding is a superset of the GT observation but clearly encompasses the same subject, account, SID, privilege set, and integrity level. The additional detail in the agent finding (network logon SID, SQL service account hypothesis, additional PIDs) does not make it a different observation \u2014 it is the same observation with greater specificity and broader scope."
+  },
+  "a3635c02972c42435cdc44a63bda799c4dea72c93800b12566685a0c7e1d8a64": {
+    "_meta": {
+      "agent_id": "F05",
+      "gt_id": "F005",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "The GT finding is about the PowerShell process (PID 5848) itself \u2014 its stealth flags, architecture, C2 role, and persistence over 8+ hours. The agent finding is about the rundll32.exe instances spawned by that PowerShell process, focusing on the injection/hollowing mechanism. While both mention PID 5848 and the six rundll32 instances, the primary subjects are different: GT's subject is the PowerShell C2 shell, while the agent's subject is the rundll32 execution pattern. These are different observations describing different mechanisms/artifacts."
+  },
+  "b0e100f8190c824832f9e1d0063787d0f7034c6fb290ee422a818ffd5a9795a5": {
+    "_meta": {
+      "agent_id": "F03",
+      "gt_id": "F001",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 4,
+    "match": true,
+    "reasoning": "Both findings describe the same primary subject: p.exe staged in c:\\windows\\temp\\perfmon\\. Both identify it as a malicious/attacker payload in an attacker-created staging directory. The agent finding adds detail about rundll32 prefetch hashes and masquerading as Performance Monitor tooling, while the GT focuses on RWX memory regions and cmd.exe launch. The core observation \u2014 malicious p.exe dropped in the perfmon staging directory \u2014 is the same. The rundll32 detail in the agent finding is supplementary context rather than a different mechanism. Confidence is 4 rather than 5 because the agent introduces rundll32 prefetch hashes as corroborating evidence, which is not mentioned in GT and could suggest partial overlap with a different finding, but the primary subject and staging location are clearly the same observation."
+  },
+  "b3186ca5f209908fbac18b9bdcabd1713d4c822c99b2453a83192c0227f16930": {
+    "_meta": {
+      "agent_id": "F04",
+      "gt_id": "F004",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same network observation: multiple TCP connections from 172.16.6.11 to 172.16.4.10 on port 8080 in ESTABLISHED and CLOSE_WAIT states, with no PID association preserved. The core subject (C2 connections to the same remote endpoint with orphaned PIDs) is identical. The agent finding provides more specificity (memory offsets, attribution to p.exe, additional connection count details) but this is the same underlying observation. Minor discrepancies in connection counts (GT says 6 total, agent says 3 ESTABLISHED + 7 CLOSE_WAIT = 10) do not change the fundamental match \u2014 both are describing the same forensic artifact of orphaned C2 connections to 172.16.4.10:8080."
+  },
+  "b404558915d4ce103edfc8b26a2fdae118f620cbefb770802f5cd0183c593904": {
+    "_meta": {
+      "agent_id": "F17",
+      "gt_id": "F009",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about the absence of registry-based persistence mechanisms (empty Run keys, no malicious services). The agent finding is about conhost.exe spawned as a child of powershell.exe confirming an interactive session. These describe entirely different observations \u2014 one is a negative finding about persistence, the other is about process hierarchy confirming human operator activity. Different subjects and mechanisms."
+  },
+  "beedc268eaebb92b03c43f19c573c98c1abb4d0784a2efa9979d4709b1bd04e7": {
+    "_meta": {
+      "agent_id": "F02",
+      "gt_id": "F003",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: WmiPrvSE.exe (PID 2876) spawning a 64-bit PowerShell process (PID 8712) at the same timestamp (2018-08-30T16:43:36Z), which in turn spawned a 32-bit/WOW64 PowerShell C2 shell. The process names, PIDs, architecture details, and timestamps all match exactly. The agent finding is more specific, extending the chain further to cmd.exe and p.exe implant deployment, but the primary subject \u2014 WMI-initiated lateral movement via WmiPrvSE spawning PowerShell \u2014 is identical."
+  },
+  "c43d4c64c75437e66537da9a1e6054a6ca324a262e7f6b9832b56fa4637268ca": {
+    "_meta": {
+      "agent_id": "F06",
+      "gt_id": "F013",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same observation: p.exe (PID 8260) has a DLL profile including WININET.dll, WS2_32.dll, DNSAPI.dll, CRYPTSP.dll, rsaenh.dll, and bcrypt.dll confirming a network-capable C2 implant, with mpr.dll loaded post-launch on 2018-09-05T12:13:26Z. The agent finding is slightly more detailed (adds IPHLPAPI.DLL and USER32.dll) but is clearly describing the same underlying observation with the same process, same DLLs, and same post-launch load event."
+  },
+  "c5edcdd36438139cb4c58ba95e1f1b818077c0f5358056260a4d91d4e9f7e169": {
+    "_meta": {
+      "agent_id": "F07",
+      "gt_id": "F009",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about the absence of registry-based persistence mechanisms (empty Run keys, no malicious services). Agent finding is about a WinRM network connection to a remote host. These describe entirely different observations with no shared subject matter."
+  },
+  "ce6b21c0215307d9e2cb6c53e3b65f2d08125f6f115393aaa90c8972a003f72c": {
+    "_meta": {
+      "agent_id": "F12",
+      "gt_id": "F011",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about the spsql user's NTUSER.DAT registry hive loaded in memory, confirming a logon session. Agent finding is about a WinRM/PowerShell remoting network connection to 172.16.5.21:5985. These are entirely different observations \u2014 one is a registry artifact, the other is a network connection. While both mention spsql, the primary subjects and mechanisms are completely different."
+  },
+  "cfc6df2d719b9d4ee2e9bbf29c7e78c4fee26d3eb3558d0507e61f272715b646": {
+    "_meta": {
+      "agent_id": "F13",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about PowerShell PID 5848 with AMSI and unnamed/reflectively loaded DLLs. Agent finding is about OUTLOOK.EXE PID 8128 with RWX memory regions that were retracted as false positives. Completely different processes, different subjects, different mechanisms, no overlap."
+  },
+  "d1d543173a52bf24f45c6b927ac4b6289fdecb61f97ed05091a4b38884d77890": {
+    "_meta": {
+      "agent_id": "F18",
+      "gt_id": "F010",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same observation: malfind flagging three RWX regions in powershell.exe (PID 8712), and both conclude these are benign .NET CLR managed heap segments based on the 0xFFEEFFEE signature and absence of PE headers or shellcode. The agent finding is slightly less detailed (omits page sizes) but covers the same process, same tool output, same evidence, and reaches the same benign conclusion."
+  },
+  "d62e1b5f91234edc600dcad854dd9509ab27a6b15971fa4cd195a8ee6a2c22be": {
+    "_meta": {
+      "agent_id": "F12",
+      "gt_id": "F006",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT describes six short-lived rundll32.exe processes spawned by PowerShell PID 5848 as children. Agent finding describes a WinRM/PowerShell Remoting network connection to 172.16.5.21:5985. These are entirely different observations \u2014 one is about child process spawning behavior, the other is about a network connection. No shared primary subject."
+  },
+  "d9f8dfd168b3f5e5f170b16acd4e17a86b5f80b0678561950e280115387abf6c": {
+    "_meta": {
+      "agent_id": "F12",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding F014 is about the DLL profile of PowerShell process PID 5848 \u2014 specifically that amsi.dll is loaded and 12 unnamed/reflectively loaded DLLs are present, suggesting C2 framework injection. Agent finding F12 is about a network connection from that same PowerShell process to 172.16.5.21:5985 (WinRM), indicating lateral movement via PowerShell remoting. These are entirely different observations: one is about loaded modules/memory artifacts, the other is about a network connection. Different mechanisms and different subjects despite sharing the PS5848 process context."
+  },
+  "dfe1f17ebf34cc7a1f2b6cd814dc4b00bee5ee22d40f838783654a2e292784ff": {
+    "_meta": {
+      "agent_id": "F12",
+      "gt_id": "F012",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT finding is about procdump.exe found in the Dashlane directory, flagged as a potential credential dumping tool. Agent finding is about subject_srv.exe, the F-Response forensic collection service. These are entirely different processes, different file paths, different mechanisms, and different subjects. No overlap in the primary observation."
+  },
+  "e0eee8e63a8fdf887d27b4d53269cbb3b78e470ddfc0d19e892cf2182da5a4c3": {
+    "_meta": {
+      "agent_id": "F15",
+      "gt_id": "F009",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 4,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: no malicious service-based persistence was found via svcscan. The GT finding is broader (also covers registry Run keys being empty), while the agent finding focuses specifically on the svcscan/service component. However, the agent's finding is a subset of the GT finding, covering the same primary mechanism (service-based persistence via svcscan) with the same conclusion (none found). The shared subject (svcscan results, absence of malicious services) and shared conclusion make this a match, even though the agent doesn't address the registry Run key component of the GT finding."
+  },
+  "e37fde239aba42fe4988435a02d251381513a8ab383d99d06a759d95cda99cbb": {
+    "_meta": {
+      "agent_id": "F07",
+      "gt_id": "F011",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "GT describes the spsql NTUSER.DAT registry hive loaded in memory as evidence of a logon session. The agent finding describes PowerShell being executed inside rundll32.exe as a defense evasion mechanism. While both mention the spsql account incidentally, the primary subjects are entirely different: a registry hive artifact vs. a process execution mechanism. These are distinct observations."
+  },
+  "ea307009f08768f04e557ae11616d5cb883f0d6bce3dadba03ae50abb7f7fd4b": {
+    "_meta": {
+      "agent_id": "F16",
+      "gt_id": "F012",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the exact same artifact: procdump.exe located at the identical file path within the Dashlane application directory. Both note it is a Sysinternals tool used for credential dumping and both treat the finding as inconclusive/requiring investigation. The agent finding slightly disagrees on whether Dashlane ships procdump (GT says it may be legitimate, agent says it doesn't ship it), but this is a minor detail difference that doesn't change the core observation. Same file, same path, same subject, same investigative conclusion."
+  },
+  "f3bccfdc05f36a68c94be29ba3f44175971fa8f6fcfe809e906d1e9d2b99d0fb": {
+    "_meta": {
+      "agent_id": "F05",
+      "gt_id": "F006",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": true,
+    "reasoning": "Both findings describe the same core observation: PowerShell PID 5848 spawning exactly 6 rundll32.exe instances (PIDs 6768, 5452, 5588, 2216, 4108, 8148) that each lived only seconds. The PIDs, parent process, count, and short durations all match precisely. The agent finding adds additional context (p.exe spawning separate rundll32 instances, no command-line arguments) and frames the mechanism slightly differently (process injection/hollowing vs. staged DLL execution), but the primary subject \u2014 the 6 rundll32 children of PowerShell 5848 \u2014 is identical. The mechanism framing difference (injection carrier vs. DLL execution) is a difference in interpretation, not a different observation."
+  },
+  "f5112d850dcbbc46a28cd28d1eb7bd37efc0281379d47cc5cbdf367fba9871c9": {
+    "_meta": {
+      "agent_id": "F16",
+      "gt_id": "F007",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 4,
+    "match": true,
+    "reasoning": "Both findings reference outbound RDP connections to the same target IP (172.16.4.5) on port 3389 in a CLOSED state. The agent finding is more specific about the volume (8+ connections) and adds uncertainty about authentication success, while the GT finding frames it as part of broader lateral movement including SMB. The core observation \u2014 outbound RDP to 172.16.4.5:3389 \u2014 is shared. The agent finding omits the SMB connection to 172.16.7.15, but the RDP component is clearly the same observation. Confidence is 4 rather than 5 because the agent focuses solely on RDP volume/repetition while GT treats it as one of two lateral movement indicators."
+  },
+  "f9e7d7ce0f162ff9b53ec70a889cbcbbe94c75fdeb242d3881174e6526c63c86": {
+    "_meta": {
+      "agent_id": "F10",
+      "gt_id": "F005",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "The GT finding describes PID 5848 (32-bit SysWOW64 PowerShell) as a persistent C2 shell with stealth flags, spawned by PID 8712. The agent finding describes PID 8712 (the parent) performing Active Directory enumeration via System.DirectoryServices.ni.dll and an LDAP connection. These are different processes (5848 vs 8712) and different behaviors (C2 shell persistence vs. AD enumeration). While both involve PowerShell and share the PID 8712 reference, the primary subjects and mechanisms are distinct observations."
+  },
+  "fe164ade7b182e8cd368a376aa45389aec0265dab9017999f006888987ffd1a8": {
+    "_meta": {
+      "agent_id": "F12",
+      "gt_id": "F008",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "match": false,
+    "reasoning": "The GT finding describes the full attack chain process tree from WMI execution through PowerShell stages to p.exe deployment. The agent finding describes a network connection artifact (WinRM/PowerShell remoting to 172.16.5.21:5985). These are entirely different observations \u2014 one is about process lineage/execution chain, the other is about a network pivot connection. No shared primary subject."
+  }
+}
