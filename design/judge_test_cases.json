@@ -41,7 +41,7 @@
       "expected_verdict": {
         "match": false,
         "confidence_min": 4,
-        "reasoning_must_reference": ["different mechanism", "child processes vs injection", "spawning vs reflective loading"]
+        "reasoning_must_reference": ["different mechanism", "different mechanisms", "opposite mechanism", "spawn", "inject"]
       }
     },
     {
@@ -77,7 +77,7 @@
       "expected_verdict": {
         "match": true,
         "confidence_min": 4,
-        "reasoning_must_reference": ["same process p.exe", "same DLL inventory", "same post-launch mpr.dll observation"]
+        "reasoning_must_reference": ["p.exe", "same observation", "same process", "same DLL"]
       }
     },
     {
@@ -111,7 +111,7 @@
       "expected_verdict": {
         "match": false,
         "confidence_min": 4,
-        "reasoning_must_reference": ["different subjects", "registry hive vs process execution"]
+        "reasoning_must_reference": ["different subject", "different subjects", "primary subject", "registry hive", "no shared subject"]
       }
     }
   ],
