@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "sift-bench-enrichment": {
+      "command": "python3",
+      "args": ["-m", "mcp_server"],
+      "cwd": "/home/abhisoni/sift-bench"
+    }
+  }
+}
