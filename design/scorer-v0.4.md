@@ -202,6 +202,18 @@ Mean and σ both move. **The story to tell is not "F1 went up."** It is: "we rep
 
 This is the exact model ID used for all judge calls in v0.4. Per Anthropic's 4.6-generation versioning, dateless IDs are themselves pinned snapshots — weights and configuration behind `claude-sonnet-4-6` are fixed. Pinned here so the cache key has a stable reference and the "committed expectations before measuring" claim is verifiable in git history.
 
+## Pinned prompt template
+
+**SHA-256:** `d6cfae8cabb9286aa5f387490eab4166fad24981b01c4640fe968d14eb48d678`
+**Path:** `scorer/prompts/judge_v0.4.txt`
+
+This is the hash of the exact prompt content used for all v0.4 judge calls.
+Cache entries in `scorer_cache/judge_verdicts.json` reference this hash. Any
+edit to the prompt file produces a new hash and automatically invalidates
+affected entries. Note: literal JSON braces in the worked examples are escaped
+as `{{`/`}}` in the template file so Python's `.format()` does not interpret
+them as placeholders — they render correctly as `{`/`}` in the final prompt.
+
 ## Implementation order
 
 1. Commit this doc, with the model snapshot ID pinned (see "Pinned model snapshot" above) and `design/judge_test_cases.json` populated with expected verdicts for the three failure-mode pairs. Both files committed in the same commit. (Now.)

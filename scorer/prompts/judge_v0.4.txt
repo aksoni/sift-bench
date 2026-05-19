@@ -1,0 +1,61 @@
+You are evaluating whether two findings from a memory forensics analysis
+describe the same underlying observation. They may use different vocabulary,
+different levels of specificity, or different framing.
+
+A match means both findings reference the same process, file, registry key,
+network connection, or behavioral mechanism as the primary subject. Shared
+vocabulary without shared subject is NOT a match. The agent finding being a
+more specific or more general version of the ground truth IS a match.
+
+If two findings describe different mechanisms (spawning vs. injection,
+dropping vs. moving, parent vs. child, etc.) involving the same tool or
+process, they are NOT a match even if they share subject vocabulary.
+
+Severity disagreement between findings (e.g., GT marked "high" vs. agent
+marked "critical") is NOT disqualifying. Judge whether the same observation
+is being described, not whether both parties agree on its impact.
+
+Examples:
+
+EXAMPLE 1 — NOT A MATCH (different mechanisms, shared vocabulary):
+  GT: "Six rundll32.exe processes spawned as children of PowerShell, used as
+       shellcode carriers"
+  Agent: "Reflective PowerShell code loaded into a rundll32 host process"
+  Verdict: {{"match": false, "confidence": 5,
+            "reasoning": "Both involve rundll32 and PowerShell but describe
+            opposite mechanisms — children spawned vs. code injected into host.
+            Different observations."}}
+
+EXAMPLE 2 — MATCH (same observation, different specificity):
+  GT: "p.exe DLL profile shows WININET, crypto, and HTTP stack consistent with
+       C2 client"
+  Agent: "p.exe loaded DLLs include wininet.dll, crypt32.dll, suggesting
+          network beacon capability"
+  Verdict: {{"match": true, "confidence": 5,
+            "reasoning": "Same file (p.exe), same DLL evidence, same inference.
+            Agent finding is slightly less specific but clearly the same
+            observation."}}
+
+EXAMPLE 3 — NOT A MATCH (weak vocabulary overlap, different subjects):
+  GT: "NTUSER.DAT registry hive for spsql account loaded into memory"
+  Agent: "Reflective PowerShell process detected"
+  Verdict: {{"match": false, "confidence": 5,
+            "reasoning": "GT is about a registry artifact for a specific user
+            account. Agent finding is about a PowerShell process. No shared
+            subject."}}
+
+Now evaluate:
+
+GROUND TRUTH FINDING:
+  ID: {gt_id}
+  Title: {gt_title}
+  Description: {gt_description}
+  Evidence: {gt_evidence}
+
+AGENT FINDING:
+  ID: {agent_id}
+  Title: {agent_title}
+  Description: {agent_description}
+  Evidence: {agent_evidence}
+
+Return JSON only, no preamble or markdown: {{"match": bool, "confidence": 1-5, "reasoning": "..."}}
