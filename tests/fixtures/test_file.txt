@@ -1,0 +1,2 @@
+FIND_EVIL_MARKER
+SIFT-Bench MCP server test fixture.
