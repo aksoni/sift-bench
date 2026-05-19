@@ -24,17 +24,19 @@ Most agentic DFIR demos run an agent and show the output. SIFT-Bench does three 
 
 Benchmark: SANS FOR508 Stark Research Labs case SRL-2018, base-rd01 memory image. Ground truth v1.1: 14 findings (5 critical), 3 false-positive traps, 5 negative assertions.
 
+Scored by **scorer v0.4** (LLM-as-judge semantic matching, `claude-sonnet-4-6`, verdicts cached in `scorer_cache/`):
+
 | Run | Config | F1 | Recall | Critical (must-find) | FP traps | Negative assertions |
 |-----|--------|---:|-------:|---------------------:|---------:|---------------------:|
-| 1 | Baseline CLAUDE.md | 0.870 | 0.771 | **5/5** | 3/3 | 3/5 |
-| 2 | + `dlllist` + persistence check | 0.975 | 0.951 | **5/5** | 2/3 | 3/5 |
-| 3 | + output schema pin | 0.966 | 0.934 | **5/5** | 3/3 | 3/5 |
+| 1 | Baseline CLAUDE.md | 0.8704 | 0.7705 | **5/5** | 3/3 | 3/5 |
+| 2 | + `dlllist` + persistence check | 0.8598 | 0.7541 | 4/5 | 2/3 | 3/5 |
+| 3 | + output schema pin | 0.9204 | 0.8525 | **5/5** | 3/3 | 3/5 |
 
-**Post-tuning (N=2): mean F1 = 0.971 ± 0.006, recall = 0.943 ± 0.012.** All 5 critical findings identified in every run.
+**Post-tuning (N=2): mean F1 = 0.890 ± 0.030, recall = 0.803 ± 0.049.** All 5 critical findings identified in runs 1 and 3.
 
-**Tuning impact:** adding two methodology steps to CLAUDE.md improved weighted F1 by **+0.105** and recall by **+0.180** between runs 1 and 2. One false-positive catch regressed in run 2 (McAfee UpdaterUI) but recovered in run 3 — task variance rather than systematic failure. This is the kind of feedback-loop signal a tuned detection system should expose, and we document it rather than hide it.
+v0.4 numbers are lower than v0.3 (0.971 post-tuning mean) because the judge removes false credits that keyword overlap was granting — in particular, a fourth undocumented case in run 2 where the agent's DLL-profile finding was being credited against the stealth-shell finding on shared process vocabulary. The lower number is the more honest one.
 
-See [`RESULTS.md`](RESULTS.md) for the full run-by-run breakdown, scorer evolution (three iterations), manual cross-check of run 3, stable-vs-unstable behavior analysis, and known limitations.
+See [`RESULTS.md`](RESULTS.md) for the full run-by-run breakdown, v0.3 vs v0.4 comparison, confidence-3 verdict investigation, scorer evolution (four iterations), and known limitations.
 
 ---
 
@@ -63,7 +65,16 @@ sift-bench/
 │   └── self-correction/SKILL.md Self-correction protocol
 ├── ground_truth/
 │   └── base-rd01-v1.1.json      Hand-authored ground truth + version history
-├── scorer.py                    Deterministic standalone benchmark scorer (no deps)
+├── scorer.py                    CLI entrypoint (delegates to scorer/ package)
+├── scorer/                      Scorer v0.4 package
+│   ├── scorer.py                Matching logic + score() function
+│   ├── judge.py                 LLM-as-judge call with retry + cache
+│   ├── judge_cache.py           Content-addressed verdict cache
+│   └── prompts/judge_v0.4.txt  Few-shot judge prompt (hash-pinned)
+├── scorer_cache/
+│   └── judge_verdicts.json      Cached verdicts (committed; enables no-API reruns)
+├── tests/
+│   └── validate_judge.py        Regression suite for the judge prompt
 ├── mcp_server/                  YARA + hash enrichment MCP server (week 2)
 ├── yara_rules/                  Detection rules (week 2)
 └── cases/
@@ -113,10 +124,11 @@ Expect ~17 minutes wall time on a 4-vCPU / 16 GB VM.
 **Score against ground truth:**
 
 ```bash
+# Requires ANTHROPIC_API_KEY on first run; subsequent runs use the committed cache
 python scorer.py ground_truth/base-rd01-v1.1.json cases/srl-2018/run3_analysis/findings_post_correction.json
 ```
 
-Scorer is deterministic — repeated invocations on identical input produce identical scores.
+The judge verdict cache (`scorer_cache/judge_verdicts.json`) is committed to the repo. Reviewers without API access get bit-identical output from the cache.
 
 ---
 
@@ -126,7 +138,7 @@ Scorer is deterministic — repeated invocations on identical input produce iden
 
 - **F010 reclassification** was resolved via hexdump evidence review confirming the 0xFFEEFFEE .NET CLR heap signature, not AI inference.
 
-- **The scorer has been iterated three times** during development as failure modes were discovered through use: v0.1 → v0.2 fixed double-matching, v0.2 → v0.3 fixed hash-seed nondeterminism, v0.3 → v0.4 (week 3) will replace keyword overlap with LLM-as-judge for principled semantic matching. See [`RESULTS.md`](RESULTS.md) for the full evolution.
+- **The scorer has been iterated four times** during development: v0.1 → v0.2 fixed double-matching, v0.2 → v0.3 fixed hash-seed nondeterminism, v0.3 → v0.4 replaced keyword overlap with LLM-as-judge for principled semantic matching. See [`RESULTS.md`](RESULTS.md) for the full evolution.
 
 - **Variance across runs is treated as signal, not noise.** Stable behaviors (all 5 critical findings, Outlook/CLR retractions, core attack chain) form the backbone of the demo. Unstable behaviors (which exact FPs get caught run-to-run) are reported with mean ± stdev. See [`RESULTS.md`](RESULTS.md) for the full breakdown.
 
@@ -134,10 +146,9 @@ Scorer is deterministic — repeated invocations on identical input produce iden
 
 ## Known limitations
 
-- Scorer precision is stubbed at 1.0 pending LLM-as-judge implementation (week 3)
-- Keyword-overlap matching can confuse semantically distinct findings that share vocabulary; LLM-as-judge will resolve
-- F011 (spsql NTUSER.DAT) is a stable miss across all three runs — methodology gap, recoverable with an additional step in a future revision
-- N=2 post-tuning runs; larger N would tighten the confidence interval (currently σ = 0.006)
+- Scorer precision is stubbed at 1.0 pending v0.5 implementation
+- F011 (spsql NTUSER.DAT) is a stable miss across all three runs — methodology gap, recoverable with an additional step
+- N=2 post-tuning runs; larger N would tighten the confidence interval (currently σ = 0.030 under v0.4)
 - MCP server (YARA + hash enrichment) currently disabled in baseline runs to keep them comparable to runs without enrichment infrastructure
 
 ---
