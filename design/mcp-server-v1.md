@@ -64,7 +64,7 @@ tests/
 
 **Dependencies:** `mcp` (official Python SDK), `yara-python`. `hashlib` is stdlib. Add to `requirements.txt` alongside `anthropic`.
 
-**Invocation from Claude Code:** registered in the case's `.claude/mcp.json` (or equivalent) with command `python -m mcp_server`, working directory `~/sift-bench/`.
+**Invocation from Claude Code:** registered in `.claude/mcp.json` at the project root (`~/sift-bench/.claude/mcp.json`) with command `python3 -m mcp_server`, working directory `~/sift-bench/`. *(See amendment note at end of document — original design specified the case-scoped path `cases/srl-2018/.claude/mcp.json`.)*
 
 ---
 
@@ -211,7 +211,7 @@ Predictions evaluated using the frozen v0.4 scorer. **No scorer code changes for
   - `test_hash_file`: hashes of a small committed text fixture match expected md5/sha1/sha256
   - `test_yara_scan`: scan of a known-positive fixture with a trivial rule (e.g., `rule TestMarker { strings: $a = "FIND_EVIL_MARKER" condition: $a }`) produces the expected match; scan with a non-matching rule produces empty matches
   - error paths exercised: missing target, missing rules, rules compile error, not-a-regular-file
-- [ ] MCP server registered with Claude Code in the case's `.claude/mcp.json`, verified by invoking each tool manually from a fresh Claude Code session
+- [ ] MCP server registered with Claude Code in `.claude/mcp.json` at the project root (`~/sift-bench/.claude/mcp.json`), verified by invoking each tool manually from a fresh Claude Code session
 - [ ] CLAUDE.md updated (Phase 1 + Phase 2) and committed separately from server code
 - [ ] Run 4 executed end-to-end; findings JSON shows evidence of at least one `hash_file` invocation and one `yara_scan` invocation
 - [ ] Run 4 scored with frozen v0.4 scorer; numbers added to RESULTS.md alongside Runs 1-3
@@ -234,3 +234,15 @@ Predictions evaluated using the frozen v0.4 scorer. **No scorer code changes for
 - Tool calling from non-Claude-Code MCP hosts
 
 The novel SysWOW64 PowerShell YARA rule is **not** part of MCP v1 but is the next baseline item after this. It depends on this server existing, and it ships independently with its own test cases and design considerations.
+
+---
+
+## Amendment: MCP registration path
+
+**Original design:** `cases/srl-2018/.claude/mcp.json`
+
+**Actual implementation:** `~/sift-bench/.claude/mcp.json` (project root)
+
+**Reason:** During implementation it was confirmed that Claude Code's project-root convention (`<repo>/.claude/mcp.json`) is the documented, version-stable pickup location. Case-scoped config pickup (`cases/srl-2018/.claude/`) is version-dependent and unreliable for reviewers on different Claude Code versions. Project-root placement preserves repo portability — reviewers cloning the repo get the registration without any path edits — and is discovered when Claude Code is launched from any subdirectory of `~/sift-bench/`, including the case directory.
+
+No change to tool specs, phase integration, or pre-registered expectations E1–E6.
