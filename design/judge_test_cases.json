@@ -1,0 +1,125 @@
+{
+  "metadata": {
+    "purpose": "Regression test suite for scorer v0.4 LLM-as-judge prompt. These are the three documented failure modes from v0.3 keyword-overlap matching that the new judge must resolve correctly. Expected verdicts are locked here before any judge call is made, per the v0.4 design doc.",
+    "design_doc": "design/scorer-v0.4.md",
+    "expected_verdict_authored": "before_first_judge_call",
+    "scoring_rule": "All three cases must match the expected verdict on match/no-match. Confidence values in expected_verdict are illustrative targets, not hard requirements — confidence >= 4 is acceptable for all test cases regardless of expected match value (the judge should be confident in rejecting weak matches). A confidence-3 verdict on any case is considered a prompt regression and requires iteration.",
+    "shared_agent_finding_note": "TC001 and TC003 deliberately reference the same agent finding (F07, reflective PowerShell in rundll32) compared against two different GT findings (F006 and F011 respectively). This is not duplication — it tests two distinct false-match scenarios with the same agent finding.",
+    "gt_field_provenance": "GT finding fields excerpted from ground_truth/base-rd01-v1.1.json as of design doc commit. If GT is updated (e.g., v1.2), rerun verification against current GT to catch drift."
+  },
+  "test_cases": [
+    {
+      "test_id": "TC001",
+      "failure_mode": "false_match_shared_vocabulary_different_mechanism",
+      "v0_3_behavior": "Credited as a match in some runs due to shared keywords 'rundll32' and 'PowerShell'",
+      "ground_truth_finding": {
+        "id": "F006",
+        "title": "Six short-lived rundll32.exe instances from PowerShell C2 shell",
+        "description": "The attacker's PowerShell C2 shell (PID 5848) spawned six rundll32.exe processes over a 6-hour period, each living only 5-31 seconds. This pattern indicates staged DLL execution or reconnaissance tasks.",
+        "category": "execution",
+        "severity": "high",
+        "evidence": {
+          "parent_pid": 5848,
+          "parent_name": "powershell.exe",
+          "child_count": 6,
+          "child_processes": "rundll32.exe (six instances, PIDs 6768, 5452, 5588, 2216, 4108, 8148)"
+        }
+      },
+      "agent_finding": {
+        "id": "F07",
+        "title": "Reflective PowerShell loaded into rundll32.exe for execution (defense evasion)",
+        "description": "PowerShell transcripts recovered from spsql's Documents directory show that PowerShell was executed inside rundll32.exe (not powershell.exe) as the host application. This confirms reflective loading of the .NET PowerShell runtime into rundll32.",
+        "category": "defense_evasion",
+        "severity": "high",
+        "evidence": {
+          "pid": 1424,
+          "process_name": "rundll32.exe",
+          "command_line": "Host Application: C:\\WINDOWS\\system32\\rundll32.exe",
+          "mechanism": "Reflective PowerShell runtime injection into rundll32 host"
+        }
+      },
+      "expected_verdict": {
+        "match": false,
+        "confidence_min": 4,
+        "reasoning_must_reference": ["different mechanism", "child processes vs injection", "spawning vs reflective loading"]
+      }
+    },
+    {
+      "test_id": "TC002",
+      "failure_mode": "unstable_match_same_observation_different_runs",
+      "v0_3_behavior": "Credited in runs 2-3 but missed in run 1 due to keyword set variation across PYTHONHASHSEED-affected set iteration",
+      "ground_truth_finding": {
+        "id": "F013",
+        "title": "p.exe DLL profile confirms network-capable C2 implant",
+        "description": "DLL analysis of p.exe reveals a full networking and cryptography stack: WININET.dll, WS2_32.dll, DNSAPI.dll, and crypto libraries. mpr.dll was loaded on Sep 5, six days after initial execution, confirming the implant remained active and loaded new capabilities over time.",
+        "category": "malware",
+        "severity": "high",
+        "evidence": {
+          "pid": 8260,
+          "process_name": "p.exe",
+          "key_dlls": ["WININET.dll", "WS2_32.dll", "DNSAPI.dll", "CRYPTSP.dll", "rsaenh.dll", "bcrypt.dll"],
+          "post_launch_dll_load": "mpr.dll loaded 2018-09-05T12:13:26Z (6 days after initial execution)"
+        }
+      },
+      "agent_finding": {
+        "id": "F06",
+        "title": "p.exe DLL inventory confirms active C2 implant with network and crypto capability",
+        "description": "windows.dlllist for p.exe (PID 8260) shows a loaded set of networking and cryptography DLLs: WININET.dll (HTTP/HTTPS), WS2_32.dll (TCP sockets), DNSAPI.dll (DNS), IPHLPAPI.DLL, CRYPTSP.dll, rsaenh.dll, bcrypt.dll. Notably, mpr.dll and USER32.dll were loaded POST-LAUNCH on 2018-09-05.",
+        "category": "malware",
+        "severity": "critical",
+        "evidence": {
+          "pid": 8260,
+          "process_name": "p.exe",
+          "dll_name": "WININET.dll, WS2_32.dll, CRYPTSP.dll, bcrypt.dll",
+          "raw_tool_output": "8260 p.exe 0x7ff831b90000 mpr.dll LoadTime=2018-09-05 12:13:26"
+        }
+      },
+      "expected_verdict": {
+        "match": true,
+        "confidence_min": 4,
+        "reasoning_must_reference": ["same process p.exe", "same DLL inventory", "same post-launch mpr.dll observation"]
+      }
+    },
+    {
+      "test_id": "TC003",
+      "failure_mode": "weak_false_match_marginal_keyword_overlap",
+      "v0_3_behavior": "Credited a weak score-2 match in run 3 due to shared 'PowerShell'/'process' keywords despite describing entirely different subjects",
+      "ground_truth_finding": {
+        "id": "F011",
+        "title": "spsql NTUSER.DAT loaded in memory",
+        "description": "The spsql user's NTUSER.DAT registry hive is loaded in memory, confirming this account had an interactive or network logon session on this host.",
+        "category": "artifact",
+        "severity": "low",
+        "evidence": {
+          "hive_path": "\\?\\C:\\Users\\spsql\\ntuser.dat",
+          "account": "spsql",
+          "subject": "Registry hive artifact for user account"
+        }
+      },
+      "agent_finding": {
+        "id": "F07",
+        "title": "Reflective PowerShell loaded into rundll32.exe for execution (defense evasion)",
+        "description": "PowerShell transcripts recovered from spsql's Documents directory show that PowerShell was executed inside rundll32.exe (not powershell.exe) as the host application.",
+        "category": "defense_evasion",
+        "severity": "high",
+        "evidence": {
+          "pid": 1424,
+          "process_name": "rundll32.exe",
+          "subject": "PowerShell execution mechanism inside rundll32"
+        }
+      },
+      "expected_verdict": {
+        "match": false,
+        "confidence_min": 4,
+        "reasoning_must_reference": ["different subjects", "registry hive vs process execution"]
+      }
+    }
+  ],
+  "validation_protocol": {
+    "step_1": "Run the judge against each test case. Capture match, confidence, reasoning.",
+    "step_2": "For each case, verify: (a) match == expected_verdict.match, (b) confidence >= expected_verdict.confidence_min, (c) reasoning references at least one phrase from reasoning_must_reference (case-insensitive substring match is sufficient — these are semantic anchors, not exact-string requirements).",
+    "step_3": "If any test case fails any check, iterate the prompt. Each iteration is a new commit. The prompt-template hash automatically invalidates affected cache entries; no manual prompt_version bookkeeping required.",
+    "step_4": "Document iterations in the design doc's git history. Do not squash. The iteration history is itself evidence that the prompt was tuned against the test suite, not the other way around.",
+    "step_5": "After all three test cases pass step_2, rerun the judge against the same three cases. Verdicts must be bit-identical to the first run (cache hit, no new API calls). This confirms the cache key construction is working and the test suite is self-contained for rerun-determinism without depending on the design doc's separate validation."
+  }
+}
