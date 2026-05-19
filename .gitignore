@@ -1,0 +1,114 @@
+# =============================================================================
+# SIFT-Bench .gitignore
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Evidence — NEVER commit. SANS FOR508 dataset is not redistributable.
+# -----------------------------------------------------------------------------
+evidence/
+*.img
+*.mem
+*.raw
+*.vmem
+*.dmp
+*.E0[0-9]
+*.aff4
+
+# -----------------------------------------------------------------------------
+# Secrets / credentials
+# -----------------------------------------------------------------------------
+*.pem
+*.key
+*.pfx
+*.p12
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+**/azure-*.json
+**/service-principal*
+
+# -----------------------------------------------------------------------------
+# Working / scratch directories — only run snapshots should be committed
+# -----------------------------------------------------------------------------
+# `analysis/` and `reports/` are the agent's working dirs that get overwritten
+# every run. Commit run snapshots (`run1_analysis/`, `run2_reports/`, etc.)
+# but never the live working dirs.
+/cases/*/analysis/
+/cases/*/reports/
+/cases/*/exports/
+**/scratch/
+**/tmp/
+**/.tmp/
+
+# Backup files from earlier doc iterations
+*.run1
+*.run2
+*.run3
+*.bak
+*.backup
+
+# Large tool output that may include PII or just be too big
+**/*.plaso
+**/*.l2tcsv
+**/bulk_extractor_output/
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.venv/
+venv/
+env/
+ENV/
+
+# -----------------------------------------------------------------------------
+# Node (if MCP server uses Node)
+# -----------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json.bak
+
+# -----------------------------------------------------------------------------
+# Editors / OS cruft
+# -----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.bak
+*.orig
+
+# -----------------------------------------------------------------------------
+# Claude Code session state (keep CLAUDE.md and skills, ignore session caches)
+# -----------------------------------------------------------------------------
+.claude/sessions/
+.claude/cache/
+.claude/logs/
+
+# -----------------------------------------------------------------------------
+# Local notes that shouldn't be public
+# -----------------------------------------------------------------------------
+NOTES.local.md
+TODO.local.md
+*.local.md

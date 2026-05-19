@@ -1,0 +1,480 @@
+{
+  "case_id": "srl-2018-base-rd01",
+  "image": "base-rd01-memory.img",
+  "image_type": "memory",
+  "image_size_bytes": 3221225472,
+  "os": "Windows 10 x64 Build 16299",
+  "hostname": "BASE-RD-01",
+  "ip_address": "172.16.6.11",
+  "capture_time": "2018-09-06T18:57:17Z",
+  "system_boot": "2018-08-30T13:51:58Z",
+  "primary_user": "tdungan",
+  "dataset": "SANS FOR508 SRL-2018 (Stark Research Labs)",
+  "scenario_context": "APT intrusion on simulated enterprise. BASE-RD-01 is an RDP host reached via lateral movement from a previously compromised system. This host is NOT System Zero.",
+
+  "findings": [
+    {
+      "id": "F001",
+      "category": "malware",
+      "severity": "critical",
+      "must_find": true,
+      "title": "Malicious executable p.exe in attacker staging directory",
+      "description": "A malicious executable named p.exe was dropped into an attacker-created staging directory at c:\\windows\\temp\\perfmon\\. It was launched via cmd.exe /C and has a 481-page RWX memory region indicating a packed or injected payload. Prefetch confirms execution on disk.",
+      "evidence": {
+        "process_name": "p.exe",
+        "pid": 8260,
+        "ppid": 5948,
+        "parent_name": "cmd.exe",
+        "path": "c:\\windows\\temp\\perfmon\\p.exe",
+        "cmdline": "c:\\windows\\temp\\perfmon\\p.exe",
+        "parent_cmdline": "C:\\WINDOWS\\system32\\cmd.exe /C c:\\windows\\temp\\perfmon\\p.exe",
+        "created": "2018-08-30T22:15:18Z",
+        "threads": 2,
+        "staging_directory": "\\Windows\\Temp\\Perfmon\\",
+        "prefetch_file": "P.EXE-1209D82B.pf",
+        "malfind": {
+          "rwx_pages": 481,
+          "protection": "PAGE_EXECUTE_READWRITE",
+          "address_range": "0x2be0000-0x2dc0fff"
+        }
+      },
+      "mitre_attack": ["T1036.005", "T1055"],
+      "verification_tools": ["windows.psscan", "windows.pstree", "windows.cmdline", "windows.malfind", "windows.filescan"]
+    },
+    {
+      "id": "F002",
+      "category": "compromised_account",
+      "severity": "critical",
+      "must_find": true,
+      "title": "Attack conducted under spsql account with Domain Admin privileges",
+      "description": "The attacker's C2 PowerShell shell (PID 5848) ran under the spsql account, a test/service account that holds Domain Admin privileges. This account has High Mandatory Level integrity, indicating elevated execution.",
+      "evidence": {
+        "account": "spsql",
+        "sid": "S-1-5-21-3445421715-2530590580-3149308974-1193",
+        "pid_verified": 5848,
+        "privileges": [
+          "Domain Admins",
+          "Administrators",
+          "Domain Users",
+          "Network",
+          "Authenticated Users"
+        ],
+        "integrity_level": "High Mandatory Level (S-1-16-12288)"
+      },
+      "mitre_attack": ["T1078.002"],
+      "verification_tools": ["windows.getsids", "windows.cmdline", "windows.pstree"]
+    },
+    {
+      "id": "F003",
+      "category": "lateral_movement",
+      "severity": "critical",
+      "must_find": true,
+      "title": "WMI lateral movement used to access this host",
+      "description": "The attacker used WMI to remotely execute PowerShell on this host from another compromised system. WmiPrvSE.exe (the WMI Provider Host) spawned a 64-bit PowerShell process, which in turn spawned a 32-bit PowerShell C2 shell. This confirms the attacker already had valid credentials before reaching this host.",
+      "evidence": {
+        "wmi_provider": {
+          "process_name": "WmiPrvSE.exe",
+          "pid": 2876,
+          "ppid": 868,
+          "parent_name": "svchost.exe",
+          "path": "C:\\WINDOWS\\system32\\wbem\\wmiprvse.exe"
+        },
+        "spawned_process": {
+          "process_name": "powershell.exe",
+          "pid": 8712,
+          "architecture": "64-bit",
+          "timestamp": "2018-08-30T16:43:36Z"
+        }
+      },
+      "mitre_attack": ["T1047"],
+      "verification_tools": ["windows.pstree", "windows.cmdline"]
+    },
+    {
+      "id": "F004",
+      "category": "c2",
+      "severity": "critical",
+      "must_find": true,
+      "title": "C2 communications to 172.16.4.10 on port 8080",
+      "description": "Multiple network connections from this host (172.16.6.11) to 172.16.4.10 on port 8080 in ESTABLISHED and CLOSE_WAIT states. No PID association preserved, indicating owning processes exited or kernel disassociated the connection tracking. Port 8080 is commonly used for C2 proxy infrastructure.",
+      "evidence": {
+        "remote_ip": "172.16.4.10",
+        "remote_port": 8080,
+        "local_ip": "172.16.6.11",
+        "connection_states": ["ESTABLISHED", "CLOSE_WAIT"],
+        "pid_owner": null,
+        "connection_count": 6,
+        "note": "No PID association preserved — connections orphaned from originating processes"
+      },
+      "mitre_attack": ["T1071"],
+      "verification_tools": ["windows.netscan"],
+      "scoring_note": "Absent PID ownership does not invalidate the C2 finding. netscan frequently loses PID association for closed or exited processes. An agent that dismisses these connections because no process owns them is making an incorrect inference — the connections, their target, and their volume are sufficient evidence of C2 activity."
+    },
+    {
+      "id": "F005",
+      "category": "execution",
+      "severity": "critical",
+      "must_find": true,
+      "title": "PowerShell C2 shell with stealth flags",
+      "description": "A 32-bit PowerShell process running from SysWOW64 with -NoLogo -NoProfile flags served as the attacker's persistent C2 shell. It was spawned by a 64-bit PowerShell (PID 8712) and remained active for 8+ hours, launching six rundll32 instances and dropping p.exe via cmd.exe.",
+      "evidence": {
+        "process_name": "powershell.exe",
+        "pid": 5848,
+        "ppid": 8712,
+        "architecture": "32-bit (SysWOW64)",
+        "path": "c:\\windows\\syswow64\\windowspowershell\\v1.0\\powershell.exe",
+        "cmdline": "\"c:\\windows\\syswow64\\windowspowershell\\v1.0\\powershell.exe\" -Version 5.1 -s -NoLogo -NoProfile",
+        "created": "2018-08-30T16:43:42Z",
+        "stealth_flags": ["-NoLogo", "-NoProfile", "-s"],
+        "active_duration_hours": 8
+      },
+      "mitre_attack": ["T1059.001"],
+      "verification_tools": ["windows.pstree", "windows.cmdline"]
+    },
+    {
+      "id": "F006",
+      "category": "execution",
+      "severity": "high",
+      "must_find": false,
+      "title": "Six short-lived rundll32.exe instances from PowerShell C2 shell",
+      "description": "The attacker's PowerShell C2 shell (PID 5848) spawned six rundll32.exe processes over a 6-hour period, each living only 5-31 seconds. This pattern indicates staged DLL execution or reconnaissance tasks. Some ran from SysWOW64 (32-bit) and others from System32 (64-bit).",
+      "evidence": {
+        "parent_pid": 5848,
+        "parent_name": "powershell.exe",
+        "count": 6,
+        "instances": [
+          {"pid": 6768, "created": "2018-08-30T18:31:04Z", "exited": "2018-08-30T18:31:35Z", "duration_seconds": 31, "arch": "32-bit"},
+          {"pid": 5452, "created": "2018-08-30T21:40:18Z", "exited": "2018-08-30T21:40:23Z", "duration_seconds": 5, "arch": "64-bit"},
+          {"pid": 5588, "created": "2018-08-30T21:40:42Z", "exited": "2018-08-30T21:40:54Z", "duration_seconds": 12, "arch": "64-bit"},
+          {"pid": 2216, "created": "2018-08-30T22:31:57Z", "exited": "2018-08-30T22:32:19Z", "duration_seconds": 22, "arch": "32-bit"},
+          {"pid": 4108, "created": "2018-08-30T22:45:25Z", "exited": "2018-08-30T22:45:30Z", "duration_seconds": 5, "arch": "64-bit"},
+          {"pid": 8148, "created": "2018-08-31T00:56:14Z", "exited": "2018-08-31T00:56:30Z", "duration_seconds": 16, "arch": "32-bit"}
+        ]
+      },
+      "mitre_attack": ["T1218.011"],
+      "verification_tools": ["windows.pstree"]
+    },
+    {
+      "id": "F007",
+      "category": "lateral_movement",
+      "severity": "medium",
+      "must_find": false,
+      "title": "Outbound lateral movement via SMB and RDP",
+      "description": "Network connections show this host reaching out to two other internal hosts: 172.16.7.15 on port 445 (SMB, ESTABLISHED) and 172.16.4.5 on port 3389 (RDP, CLOSED). These indicate the attacker used this host as a pivot point for further lateral movement.",
+      "evidence": {
+        "connections": [
+          {
+            "target_ip": "172.16.7.15",
+            "target_port": 445,
+            "protocol": "SMB",
+            "state": "ESTABLISHED",
+            "direction": "outbound"
+          },
+          {
+            "target_ip": "172.16.4.5",
+            "target_port": 3389,
+            "protocol": "RDP",
+            "state": "CLOSED",
+            "direction": "outbound"
+          }
+        ]
+      },
+      "mitre_attack": ["T1021.002", "T1021.001"],
+      "verification_tools": ["windows.netscan"]
+    },
+    {
+      "id": "F008",
+      "category": "process_tree",
+      "severity": "high",
+      "must_find": false,
+      "title": "Full attack chain process tree",
+      "description": "The complete process tree from initial WMI execution to malware deployment: svchost.exe (868) → WmiPrvSE.exe (2876) → powershell.exe 64-bit (8712) → powershell.exe 32-bit (5848) → cmd.exe (5948) → p.exe (8260). The 64-to-32-bit PowerShell transition and the use of WmiPrvSE as the entry point are key indicators.",
+      "evidence": {
+        "chain": [
+          {"pid": 868, "name": "svchost.exe", "role": "DCOM Server Process Launcher"},
+          {"pid": 2876, "name": "WmiPrvSE.exe", "role": "WMI Provider Host (remote execution handler)"},
+          {"pid": 8712, "name": "powershell.exe", "role": "Initial 64-bit PowerShell (attacker entry point)", "created": "2018-08-30T16:43:36Z"},
+          {"pid": 5848, "name": "powershell.exe", "role": "32-bit C2 shell with stealth flags", "created": "2018-08-30T16:43:42Z"},
+          {"pid": 5948, "name": "cmd.exe", "role": "Malware launcher (cmd /C)", "created": "2018-08-30T22:15:18Z"},
+          {"pid": 8260, "name": "p.exe", "role": "Dropped malware", "created": "2018-08-30T22:15:18Z"}
+        ]
+      },
+      "mitre_attack": ["T1047", "T1059.001", "T1036.005"],
+      "verification_tools": ["windows.pstree", "windows.cmdline"],
+      "scoring_note": "SYNTHESIS FINDING — requires the agent to connect process relationships across F001, F003, F005, and F006. Running pstree alone is insufficient; the agent must recognize and narrate the full chain from WmiPrvSE to p.exe."
+    },
+    {
+      "id": "F009",
+      "category": "persistence",
+      "severity": "medium",
+      "must_find": false,
+      "title": "No registry-based persistence installed",
+      "description": "Registry Run keys for the spsql account are empty. No malicious services were found via svcscan. The attacker maintained access through a live PowerShell session rather than boot-persistent mechanisms. This is a negative finding — the agent should report absence of persistence, not fabricate it.",
+      "evidence": {
+        "registry_run_spsql": "empty",
+        "registry_run_tdungan": ["OneDrive", "Dashlane", "DashlanePlugin"],
+        "malicious_services": "none found",
+        "svcscan_searched_patterns": ["temp", "perfmon", "p.exe", "powershell"]
+      },
+      "mitre_attack": [],
+      "verification_tools": ["windows.registry.printkey", "windows.svcscan"]
+    },
+    {
+      "id": "F010",
+      "category": "false_positive",
+      "severity": "low",
+      "must_find": false,
+      "title": "PowerShell (PID 8712) malfind hits are .NET CLR heap segments, not injection",
+      "description": "windows.malfind reports three small PAGE_EXECUTE_READWRITE regions in powershell.exe (PID 8712) at sizes 8, 1, and 2 pages. Hexdump review confirms these are .NET CLR managed heap segments: each region begins with 8 null bytes followed by the Windows heap segment header signature 0xFFEEFFEE (visible as bytes 'ee ff ee ff' at offset 16), followed by self-referential pointer metadata. No PE header (MZ), no x86/x64 code prologue, no shellcode patterns. PowerShell allocates RWX heap segments for JIT-compiled code; these segments may be empty at capture time. Agent should identify these as benign CLR allocations, not injection.",
+      "evidence": {
+        "pid": 8712,
+        "region_count": 3,
+        "region_sizes_pages": [8, 1, 2],
+        "heap_signature": "0xFFEEFFEE at offset 16 of each region",
+        "pe_header_present": false,
+        "shellcode_indicators": "none",
+        "assessment": "BENIGN — .NET CLR managed heap"
+      },
+      "mitre_attack": [],
+      "verification_tools": ["windows.malfind"],
+      "scoring_note": "FALSE POSITIVE TRAP. Originally classified as suspicious in ground truth v1.0. Reclassified to false positive in v1.1 after hexdump review confirmed .NET CLR heap signature (0xFFEEFFEE). Agent should retract these as benign."
+    },
+    {
+      "id": "F011",
+      "category": "artifact",
+      "severity": "low",
+      "must_find": false,
+      "title": "spsql NTUSER.DAT loaded in memory",
+      "description": "The spsql user's NTUSER.DAT registry hive is loaded in memory, confirming this account had an interactive or network logon session on this host.",
+      "evidence": {
+        "hive_path": "\\?\\C:\\Users\\spsql\\ntuser.dat",
+        "account": "spsql"
+      },
+      "mitre_attack": ["T1078.002"],
+      "verification_tools": ["windows.registry.printkey"]
+    },
+    {
+      "id": "F012",
+      "category": "artifact",
+      "severity": "medium",
+      "must_find": false,
+      "title": "procdump.exe present in Dashlane directory",
+      "description": "procdump.exe (a Sysinternals tool commonly used for credential dumping via LSASS) was found in the Dashlane application directory. This may be legitimate (Dashlane uses it for crash reporting) but warrants investigation given the compromise context. Agent should flag this as worth investigating, not dismiss it.",
+      "evidence": {
+        "path": "\\Users\\tdungan\\AppData\\Roaming\\Dashlane\\6.2.0.12026\\procdump.exe",
+        "assessment": "INCONCLUSIVE — may be legitimate Dashlane component or attacker tool"
+      },
+      "mitre_attack": ["T1003.001"],
+      "verification_tools": ["windows.filescan"],
+      "scoring_note": "Agent should flag this as suspicious or worth investigating. Confidently dismissing it is a worse error than flagging it as inconclusive."
+    },
+    {
+      "id": "F013",
+      "category": "malware",
+      "severity": "high",
+      "must_find": false,
+      "title": "p.exe DLL profile confirms network-capable C2 implant",
+      "description": "DLL analysis of p.exe reveals a full networking and cryptography stack: WININET.dll (HTTP/HTTPS), WS2_32.dll (sockets), DNSAPI.dll (DNS resolution), and crypto libraries (CRYPTSP, rsaenh, bcrypt). The image base of 0x400000 indicates a 32-bit PE compiled without ASLR. mpr.dll was loaded on Sep 5, six days after initial execution, confirming the implant remained active and loaded new capabilities over time.",
+      "evidence": {
+        "pid": 8260,
+        "image_base": "0x400000",
+        "aslr": false,
+        "key_dlls": [
+          {"name": "WININET.dll", "purpose": "HTTP/HTTPS connections (C2 communication)"},
+          {"name": "WS2_32.dll", "purpose": "Windows Sockets (network connectivity)"},
+          {"name": "DNSAPI.dll", "purpose": "DNS resolution"},
+          {"name": "IPHLPAPI.DLL", "purpose": "IP helper (network interface enumeration)"},
+          {"name": "Secur32.dll", "purpose": "Security/authentication"},
+          {"name": "SSPICLI.DLL", "purpose": "Security Support Provider Interface"},
+          {"name": "CRYPTSP.dll", "purpose": "Cryptographic service provider"},
+          {"name": "rsaenh.dll", "purpose": "RSA encryption"},
+          {"name": "bcrypt.dll", "purpose": "Cryptographic primitives"},
+          {"name": "mpr.dll", "purpose": "Network resource access", "loaded": "2018-09-05T12:13:26Z", "note": "Loaded 6 days after initial execution — implant still active"}
+        ]
+      },
+      "mitre_attack": ["T1071.001", "T1573"],
+      "verification_tools": ["windows.dlllist"]
+    },
+    {
+      "id": "F014",
+      "category": "artifact",
+      "severity": "low",
+      "must_find": false,
+      "title": "PowerShell C2 shell has AMSI loaded and multiple unnamed DLLs",
+      "description": "The attacker's PowerShell process (PID 5848) has amsi.dll loaded, meaning AMSI was active during execution. Multiple unnamed DLLs (no name/path) are also loaded, which could indicate reflectively loaded modules injected by the attacker's framework.",
+      "evidence": {
+        "pid": 5848,
+        "amsi_loaded": true,
+        "unnamed_dll_count": 12,
+        "note": "Unnamed DLLs may be reflectively loaded modules from the attacker's C2 framework"
+      },
+      "mitre_attack": ["T1562.001", "T1620"],
+      "verification_tools": ["windows.dlllist"]
+    }
+  ],
+
+  "false_positive_traps": [
+    {
+      "id": "FP001",
+      "process_name": "OUTLOOK.EXE",
+      "pid": 8128,
+      "description": "Two RWX memory regions flagged by malfind with 'dtrR' byte signature at the start of each region. This is a known Outlook memory allocation pattern, not malicious code injection.",
+      "malfind_signature": "64 74 72 52 (dtrR)",
+      "correct_assessment": "FALSE POSITIVE",
+      "explanation": "Known Outlook memory allocation pattern. Agent should identify and dismiss this, not flag as malicious."
+    },
+    {
+      "id": "FP002",
+      "process_name": "UpdaterUI.exe",
+      "pid": 6036,
+      "description": "One RWX memory region flagged by malfind at address 0x5070000-0x5070fff (1 page). This is the McAfee updater process. RWX regions in AV updaters are common due to self-modifying code for signature updates.",
+      "malfind_address": "0x5070000-0x5070fff",
+      "malfind_pages": 1,
+      "protection": "PAGE_EXECUTE_READWRITE",
+      "correct_assessment": "FALSE POSITIVE",
+      "explanation": "McAfee updater. Single-page RWX region with no PE header or shellcode indicators. Agent should identify as likely benign."
+    },
+    {
+      "id": "FP003",
+      "process_name": "powershell.exe",
+      "pid": 8712,
+      "description": "Three small RWX memory regions (8, 1, 2 pages) flagged by malfind in the attacker's 64-bit PowerShell. Despite being an attacker process, these regions are .NET CLR managed heap segments, not injected code. Hexdump shows 0xFFEEFFEE heap segment signature at offset 16, self-referential pointers, no PE header, no shellcode indicators.",
+      "heap_signature": "ee ff ee ff at offset 16",
+      "region_sizes_pages": [8, 1, 2],
+      "correct_assessment": "FALSE POSITIVE",
+      "explanation": ".NET CLR managed heap allocations. PowerShell allocates RWX heap segments for JIT-compiled code. The 0xFFEEFFEE marker is a Windows heap segment header signature. Agent should identify these as benign even though the process itself is attacker-controlled."
+    }
+  ],
+
+  "negative_assertions": [
+    {
+      "id": "NA001",
+      "title": "This host is System Zero",
+      "verdict": "FALSE",
+      "description": "This host was compromised via WMI lateral movement from another system. WmiPrvSE.exe as the process tree root proves remote execution.",
+      "severity": "critical",
+      "verification_tools": ["windows.pstree"],
+      "verification_logic": "Agent must check pstree and recognize WmiPrvSE.exe as the root of the attacker process tree, which indicates remote execution, not initial compromise."
+    },
+    {
+      "id": "NA002",
+      "title": "Registry-based persistence was installed",
+      "verdict": "FALSE",
+      "description": "spsql Run key is empty, no malicious services found. Attacker used live session, not persistence.",
+      "severity": "medium",
+      "verification_tools": ["windows.registry.printkey", "windows.svcscan"],
+      "verification_logic": "Agent must run both registry.printkey (Run keys) and svcscan, find nothing malicious, and report absence of persistence. Not running these plugins and not claiming persistence does NOT satisfy this — the agent must actively look and find nothing."
+    },
+    {
+      "id": "NA003",
+      "title": "OUTLOOK.EXE malfind results indicate malicious code injection",
+      "verdict": "FALSE",
+      "description": "dtrR signature is a known Outlook allocation pattern.",
+      "severity": "medium",
+      "verification_tools": ["windows.malfind"],
+      "verification_logic": "Agent must run malfind, see the Outlook hits, and correctly identify them as false positives based on the dtrR byte pattern."
+    },
+    {
+      "id": "NA004",
+      "title": "Network connections to external (non-RFC1918) IPs indicate exfiltration",
+      "verdict": "UNVERIFIED",
+      "description": "One CLOSED connection to 13.89.220.65:443 exists but is likely a legitimate Microsoft/Azure service. Should not be claimed as attacker C2 without further evidence.",
+      "severity": "low",
+      "verification_tools": ["windows.netscan"],
+      "verification_logic": "Agent should note the external connection but not claim it as attacker C2 or exfiltration without corroborating evidence."
+    },
+    {
+      "id": "NA005",
+      "title": "PowerShell PID 8712 RWX regions indicate code injection",
+      "verdict": "FALSE",
+      "description": "RWX regions in PowerShell are routine .NET CLR heap allocations. The PID 8712 regions specifically show the 0xFFEEFFEE heap segment signature, not injected code.",
+      "severity": "low",
+      "verification_tools": ["windows.malfind"],
+      "verification_logic": "Agent must review the hexdump of small RWX regions in PowerShell processes and recognize CLR heap patterns (null bytes, FFEEFFEE marker, self-referential pointers) as distinct from shellcode."
+    }
+  ],
+
+  "network_map": {
+    "this_host": "172.16.6.11",
+    "c2_server": "172.16.4.10",
+    "smb_target": "172.16.7.15",
+    "rdp_target": "172.16.4.5"
+  },
+
+  "severity_weights": {
+    "critical": 4,
+    "high": 2,
+    "medium": 1,
+    "low": 0.5,
+    "note": "Used for weighted F1 calculation. Missing a critical finding costs 4x more than missing a low finding. False positive traps and negative assertions are scored as binary pass/fail with the severity weight applied as penalty."
+  },
+
+  "timeline_anchors": [
+    {"timestamp": "2018-08-30T13:51:58Z", "event": "System boot", "source": "windows.info"},
+    {"timestamp": "2018-08-30T16:43:36Z", "event": "Attacker entry — WMI executes 64-bit PowerShell", "source": "windows.pstree"},
+    {"timestamp": "2018-08-30T16:43:42Z", "event": "32-bit PowerShell C2 shell spawned", "source": "windows.pstree"},
+    {"timestamp": "2018-08-30T18:31:04Z", "event": "First rundll32 execution (31s)", "source": "windows.pstree"},
+    {"timestamp": "2018-08-30T21:40:18Z", "event": "Second rundll32 wave begins (2 instances in 36s)", "source": "windows.pstree"},
+    {"timestamp": "2018-08-30T22:15:18Z", "event": "p.exe dropped and executed via cmd /C", "source": "windows.cmdline"},
+    {"timestamp": "2018-08-30T22:31:57Z", "event": "Post-malware rundll32 activity continues", "source": "windows.pstree"},
+    {"timestamp": "2018-08-31T00:56:14Z", "event": "Final rundll32 execution (next day)", "source": "windows.pstree"},
+    {"timestamp": "2018-09-05T12:13:26Z", "event": "p.exe loads mpr.dll — implant still active 6 days later", "source": "windows.dlllist"},
+    {"timestamp": "2018-09-06T18:57:17Z", "event": "Memory image captured", "source": "windows.info"}
+  ],
+
+  "methodology_checklist": [
+    {"step": "process_enumeration", "plugin": "windows.psscan", "pass_criteria": "Output saved and reviewed for hidden/exited processes"},
+    {"step": "process_tree", "plugin": "windows.pstree", "pass_criteria": "Parent-child anomalies identified (WmiPrvSE → PowerShell, PowerShell → rundll32)"},
+    {"step": "command_lines", "plugin": "windows.cmdline", "pass_criteria": "Suspicious commands flagged (p.exe path, PowerShell stealth flags)"},
+    {"step": "network_connections", "plugin": "windows.netscan", "pass_criteria": "External IPs extracted and assessed, C2 connections identified"},
+    {"step": "code_injection", "plugin": "windows.malfind", "pass_criteria": "RWX regions reviewed, false positives identified (Outlook dtrR, PowerShell CLR, McAfee)"},
+    {"step": "file_scan", "plugin": "windows.filescan", "pass_criteria": "Suspicious file paths noted (perfmon staging dir, prefetch for p.exe)"},
+    {"step": "credential_context", "plugin": "windows.getsids", "pass_criteria": "Account privileges checked for attacker processes, Domain Admin identified"},
+    {"step": "dll_analysis", "plugin": "windows.dlllist", "pass_criteria": "DLL inventory for attacker processes reviewed (network stack, crypto libs, load timestamps, unnamed DLLs)"},
+    {"step": "persistence_check", "plugin": "windows.registry.printkey + windows.svcscan", "pass_criteria": "Run keys and services checked; absence of persistence explicitly reported if none found"}
+  ],
+
+  "source_data": {
+    "tool": "Volatility 3",
+    "version": "2.27.0",
+    "plugins_used": [
+      "windows.info",
+      "windows.psscan",
+      "windows.pstree",
+      "windows.cmdline",
+      "windows.netscan",
+      "windows.malfind",
+      "windows.svcscan",
+      "windows.registry.printkey",
+      "windows.filescan",
+      "windows.getsids",
+      "windows.dlllist"
+    ]
+  },
+
+  "ground_truth_metadata": {
+    "authored_by": "Manual analysis using Volatility 3 on SIFT Workstation",
+    "authored_date": "2026-04-17",
+    "last_updated": "2026-05-15",
+    "known_gaps": [
+      "Strings extraction from p.exe memory not yet performed",
+      "Open handles for attacker processes partially analyzed (windows.handles errored on type filter)",
+      "No disk image analysis — memory-only findings"
+    ],
+    "cross_references": [
+      "SANS FOR508 SRL-2018 capstone exercise (Course Hero leak)",
+      "Community writeups of Stark Research Labs dataset"
+    ],
+    "version_history": [
+      {
+        "version": "1.0",
+        "date": "2026-05-09",
+        "notes": "Initial ground truth from manual analysis. 14 findings, 2 FP traps, 4 negative assertions."
+      },
+      {
+        "version": "1.1",
+        "date": "2026-05-15",
+        "notes": "Reclassified F010 from 'suspicious — consistent with attacker C2 shell' to 'false positive — .NET CLR heap segments' after hexdump review of malfind output for PID 8712. Original classification was based on attacker-process context without byte-level review. Bytes confirmed 0xFFEEFFEE heap segment signature, self-referential pointers, no PE header, no shellcode indicators. Added FP003 (PowerShell CLR false positive trap). Added NA005 negative assertion. Expanded methodology checklist to 9 steps (dll_analysis, persistence_check). This change preceded benchmark scoring; no baseline runs were invalidated."
+      }
+    ]
+  }
+}
