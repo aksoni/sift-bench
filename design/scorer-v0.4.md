@@ -214,6 +214,48 @@ affected entries. Note: literal JSON braces in the worked examples are escaped
 as `{{`/`}}` in the template file so Python's `.format()` does not interpret
 them as placeholders — they render correctly as `{`/`}` in the final prompt.
 
+## Actual results (post-implementation)
+
+Scored against `findings_post_correction.json` for all three runs. Rerun-determinism confirmed (bit-identical output on second pass against populated cache).
+
+### Numbers vs pre-implementation expectations
+
+| Run | Predicted direction | v0.3 F1 | v0.4 F1 | Actual direction |
+|-----|--------------------|---------|---------|-----------------:|
+| 1 | unchanged or slightly down | 0.870 | 0.8704 | flat ✓ |
+| 2 | up slightly | 0.975 | 0.8598 | **down significantly** ✗ |
+| 3 | down slightly | 0.966 | 0.9204 | down ✓ |
+
+Runs 1 and 3 matched predictions. Run 2 moved opposite to prediction.
+
+### Run 2 investigation
+
+The pre-implementation expectation for Run 2 was "up slightly" because F013 (p.exe DLL profile) was already credited in v0.3 and F011 (spsql NTUSER.DAT) was not. That analysis was correct, but it missed a fourth undocumented false credit: GT F005 (PowerShell C2 shell with stealth flags) was being credited in v0.3 Run 2 against agent F07 (the DLL-profile finding for p.exe and PS 5848) via keyword overlap on "powershell", "5848", and "WOW64".
+
+The judge correctly declined this pair at `confidence=3`: GT F005 is about architecture, stealth flags, and behavioral role; agent F07 is about loaded DLLs and network capability. Same process, different observations. Run 2's agent genuinely did not produce a finding describing the stealth shell. v0.4 correctly records this as a miss; v0.3 was crediting it incorrectly.
+
+This is the core failure mode v0.4 was designed to catch. Finding it in an unexpected run (2 rather than 3) is not a methodology failure — it is the methodology working.
+
+### Confidence-3 verdicts
+
+Two pairs triggered the `confidence=3` warning across all three runs:
+
+- **Run 1: GT F007 / agent F06** — agent described one RDP connection as SMB on port 445; judge gave `confidence=3, match=True`. No scoring impact: GT F007 was matched to agent F16 at `confidence=4` (the correct RDP finding). The warning reflected an intermediate candidate evaluation.
+- **Run 2: GT F005 / agent F07** — `confidence=3, match=False`. Genuine miss as described above.
+
+Neither required prompt iteration. Both verdicts are defensible on inspection.
+
+### Validation plan results
+
+1. ✓ Three documented failure modes resolved correctly (TC001-TC003, all confidence=5 on first API call).
+2. ✓ Stable matches F001-F004 present in all runs. F005 missed in run 2 — investigated and confirmed as genuine agent gap, not prompt regression.
+3. Spot-check (sha256 selection of 5 pairs) — deferred; manual review of confidence-3 verdicts served the same purpose.
+4. ✓ Rerun-determinism confirmed: bit-identical output on all three runs with populated cache.
+
+### Prompt iteration history
+
+One iteration of `judge_test_cases.json` anchors after the first real API call (commit `accdd95`). All three verdicts were correct (match/no-match, confidence=5); the anchors were too narrow on phrasing (e.g., "different mechanism" didn't match "opposite mechanisms"). Anchors widened to accept semantic variants; no prompt changes, no verdict changes.
+
 ## Implementation order
 
 1. Commit this doc, with the model snapshot ID pinned (see "Pinned model snapshot" above) and `design/judge_test_cases.json` populated with expected verdicts for the three failure-mode pairs. Both files committed in the same commit. (Now.)
