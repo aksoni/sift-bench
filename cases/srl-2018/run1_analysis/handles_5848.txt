@@ -1,0 +1,755 @@
+Volatility 3 Framework 2.27.0
+
+PID	Process	Offset	HandleValue	Type	GrantedAccess	Name
+
+5848	powershell.exe	0x8c88b097c660	0x4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5b1f400	0x8	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b237bec0	0xc	IoCompletion	0x1f0003	-
+5848	powershell.exe	0x8c88b47845b0	0x10	TpWorkerFactory	0xf00ff	-
+5848	powershell.exe	0x8c88b5b66140	0x14	IRTimer	0x100002	-
+5848	powershell.exe	0x8c88b1313b20	0x18	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b460d490	0x1c	IRTimer	0x100002	-
+5848	powershell.exe	0x8c88b04d5a70	0x20	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88af1cb620	0x24	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b567ac40	0x28	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b0d35d10	0x2c	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a4673080	0x30	Directory	0x3	KnownDlls
+5848	powershell.exe	0x8c88b3f3fab0	0x34	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b47ed440	0x38	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3e2c370	0x3c	File	0x100020	\Device\HarddiskVolume2\Windows
+5848	powershell.exe	0x8c88b54b23b0	0x40	Event	0x1f0003	-
+5848	powershell.exe	0xd086a464f650	0x44	Directory	0x3	KnownDlls32
+5848	powershell.exe	0x8c88b32da720	0x48	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b6232d40	0x4c	File	0x12019f	\Device\ConDrv\Input
+5848	powershell.exe	0x8c88b1294570	0x50	File	0x12019f	\Device\ConDrv\Output
+5848	powershell.exe	0x8c88b1294570	0x54	File	0x12019f	\Device\ConDrv\Output
+5848	powershell.exe	0x8c88af63f500	0x58	IoCompletion	0x1f0003	-
+5848	powershell.exe	0x8c88b135d3e0	0x5c	TpWorkerFactory	0xf00ff	-
+5848	powershell.exe	0x8c88b153bd20	0x60	IRTimer	0x100002	-
+5848	powershell.exe	0x8c88b2a66060	0x64	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b113e890	0x68	IRTimer	0x100002	-
+5848	powershell.exe	0x8c88b5b41060	0x6c	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b4a0c070	0x70	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b41c4f90	0x74	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b454d7d0	0x78	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a464f650	0x7c	Directory	0x3	KnownDlls32
+5848	powershell.exe	0x8c88afa23580	0x80	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b44e65b0	0x84	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2a404e0	0x8c	File	0x12019f	\Device\ConDrv\Connect
+5848	powershell.exe	0x8c88b380c2b0	0x90	File	0x12019f	\Device\ConDrv\Reference
+5848	powershell.exe	0x8c88b0503a80	0x94	ALPC Port	0x1f0001	-
+5848	powershell.exe	0x8c88b5a35910	0x98	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b357c6b0	0x9c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b07baac0	0xa0	IoCompletion	0x1f0003	-
+5848	powershell.exe	0x8c88af3f09d0	0xa4	TpWorkerFactory	0xf00ff	-
+5848	powershell.exe	0x8c88b496b060	0xa8	IRTimer	0x100002	-
+5848	powershell.exe	0x8c88afaa3b30	0xac	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b1766360	0xb0	IRTimer	0x100002	-
+5848	powershell.exe	0x8c88afd1c2d0	0xb4	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0xd086a9bfb2c0	0xb8	Key	0x20019	MACHINE\SYSTEM\CONTROLSET001\CONTROL\NLS\SORTING\VERSIONS
+5848	powershell.exe	0x8c88b3635250	0xbc	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a5e46510	0xc0	Key	0x1	MACHINE\SYSTEM\CONTROLSET001\CONTROL\SESSION MANAGER
+5848	powershell.exe	0xd086a878c2c0	0xc4	Key	0x9	MACHINE\SOFTWARE\MICROSOFT\WINDOWS NT\CURRENTVERSION\IMAGE FILE EXECUTION OPTIONS
+5848	powershell.exe	0x8c88b1341d60	0xc8	File	0x120089	\Device\HarddiskVolume2\Windows\SysWOW64\WindowsPowerShell\v1.0\en-US\powershell.exe.mui
+5848	powershell.exe	0x8c88b379d770	0xcc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af679d40	0xd0	IoCompletion	0x1f0003	-
+5848	powershell.exe	0x8c88b5a363b0	0xd4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af122d40	0xd8	WindowStation	0xf016e	Service-0x0-6abe62$
+5848	powershell.exe	0x8c88b1aa0520	0xdc	Desktop	0xf00cf	Default
+5848	powershell.exe	0x8c88af122d40	0xe0	WindowStation	0xf016e	Service-0x0-6abe62$
+5848	powershell.exe	0xd086b1db9910	0xe4	Key	0x1	MACHINE\SYSTEM\CONTROLSET001\CONTROL\NLS\CUSTOMLOCALE
+5848	powershell.exe	0x8c88afe2c4c0	0xe8	Process	0x1f3fff	powershell.exe Pid 5848
+5848	powershell.exe	0x8c88afeddc70	0xec	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3fd2800	0xf0	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88afeb6b30	0xf4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b113d5b0	0xf8	File	0x100001	\Device\CNG
+5848	powershell.exe	0x8c88b3742e50	0xfc	Semaphore	0x100003	-
+5848	powershell.exe	0x8c88b1a744d0	0x100	Semaphore	0x100003	-
+5848	powershell.exe	0xd086aa2d3f70	0x104	Key	0x20019	MACHINE
+5848	powershell.exe	0xd086b205c970	0x108	Key	0x20019	MACHINE\SOFTWARE\MICROSOFT\OLE
+5848	powershell.exe	0x8c88b417ca20	0x10c	Event	0x1f0003	-
+5848	powershell.exe	0xd086a8c81f70	0x110	Key	0x20019	USER\.DEFAULT\SOFTWARE\CLASSES\LOCAL SETTINGS\SOFTWARE\MICROSOFT
+5848	powershell.exe	0xd086a53a45f0	0x114	Key	0x20019	USER\.DEFAULT\SOFTWARE\CLASSES\LOCAL SETTINGS
+5848	powershell.exe	0x8c88af233810	0x118	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af669c00	0x11c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5b4b8a0	0x120	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b42f61f0	0x124	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1a9d510	0x128	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b20f6190	0x12c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5730cc0	0x130	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af63a550	0x134	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1ae6ce0	0x138	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b478ae50	0x13c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4789250	0x140	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086aadc72e0	0x144	Directory	0xf	BaseNamedObjects
+5848	powershell.exe	0x8c88b2943f90	0x148	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88aef14ed0	0x14c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b53b5f90	0x150	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5b7a1f0	0x154	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af457070	0x158	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b6210070	0x15c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b40e4070	0x160	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b432eca0	0x164	Mutant	0x1f0001	-
+5848	powershell.exe	0xd086a4a952e0	0x168	Key	0x20019	MACHINE\SYSTEM\CONTROLSET001\CONTROL\NLS\SORTING\IDS
+5848	powershell.exe	0x8c88b201ae50	0x16c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b381ce30	0x170	Mutant	0x1f0001	-
+5848	powershell.exe	0xd086a8bdb360	0x174	Key	0xf003f	USER\.DEFAULT
+5848	powershell.exe	0x8c88b54ca880	0x178	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af0df6e0	0x17c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5b06560	0x180	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3bdd9d0	0x184	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5396920	0x188	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af59d070	0x18c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b48613d0	0x190	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1ddb590	0x194	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3db4370	0x198	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a91e46f0	0x19c	Key	0x1	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\NET FRAMEWORK SETUP\NDP\V4\FULL
+5848	powershell.exe	0x8c88b43cbf90	0x1a0	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a97ecd50	0x1a4	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\.NETFRAMEWORK
+5848	powershell.exe	0x8c88aeeee960	0x1a8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af12a5e0	0x1ac	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afe22940	0x1b0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af2c7650	0x1b4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af15a770	0x1b8	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b4772c70	0x1bc	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1752860	0x1c0	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086aa307060	0x1c4	Directory	0xf000f	-
+5848	powershell.exe	0xd086a961f490	0x1c8	Section	0xf0007	Cor_Private_IPCBlock_v4_5848
+5848	powershell.exe	0xd086a79c2e20	0x1cc	Section	0xf0007	Cor_SxSPublic_IPCBlock
+5848	powershell.exe	0x8c88af5377a0	0x1d0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b201afe0	0x1d4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1ac2140	0x1d8	Mutant	0x1f0001	-
+5848	powershell.exe	0x8c88b17f0b10	0x1dc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b623ed60	0x1e0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b41a3800	0x1e4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b13eaa20	0x1e8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b53247f0	0x1ec	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afc13410	0x1f0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b22df380	0x1f4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afe96310	0x1f8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af459060	0x1fc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b631fbb0	0x200	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1a71f00	0x204	Mutant	0x1f0001	-
+5848	powershell.exe	0x8c88afa73700	0x208	Thread	0x1fffff	Tid 4952 Pid 5848
+5848	powershell.exe	0x8c88afd06700	0x20c	Thread	0x1fffff	Tid 6048 Pid 5848
+5848	powershell.exe	0x8c88b45fa7c0	0x210	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b42c04f0	0x214	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af3f83d0	0x218	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b494e380	0x21c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b574be50	0x220	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af04c3c0	0x224	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b33d3ce0	0x228	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b43a8e50	0x22c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4206230	0x230	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5a424f0	0x234	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4b71bb0	0x238	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b41924b0	0x23c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4398880	0x240	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afae1200	0x244	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3f9f7b0	0x248	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b12fe4b0	0x24c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b45c1990	0x250	Event	0x1f0003	-
+5848	powershell.exe	0x8c88aeb5fd00	0x254	Event	0x100001	LowMemoryCondition
+5848	powershell.exe	0x8c88af567e50	0x258	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b54bfa60	0x25c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b39f9310	0x260	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b11b37d0	0x264	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af2a9c70	0x268	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b43235f0	0x26c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3d78340	0x270	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1ab7100	0x274	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af0ce700	0x278	Thread	0x1fffff	Tid 8964 Pid 5848
+5848	powershell.exe	0x8c88afa67af0	0x27c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3f2f680	0x280	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af220d60	0x284	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b45d88b0	0x288	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af0ce700	0x28c	Thread	0x1fffff	Tid 8964 Pid 5848
+5848	powershell.exe	0xd086b137a690	0x294	Key	0x20019	USER\.DEFAULT\CONTROL PANEL\INTERNATIONAL
+5848	powershell.exe	0x8c88afd5dec0	0x298	Event	0x1f0003	CPFATE_5848_v4.0.30319
+5848	powershell.exe	0x8c88b6229770	0x29c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3930f00	0x2a0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b19369d0	0x2a4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1353890	0x2a8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b360e060	0x2ac	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2f8e570	0x2b0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88aeeb8b00	0x2b4	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a72dfde0	0x2b8	Key	0x20019	MACHINE\SOFTWARE\MICROSOFT\FUSION\PUBLISHERPOLICY\DEFAULT
+5848	powershell.exe	0x8c88b2fd4620	0x2bc	File	0x120089	\Device\HarddiskVolume2\Windows\assembly\pubpol30.dat
+5848	powershell.exe	0x8c88b135dc40	0x2c0	File	0x120089	\Device\HarddiskVolume2\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.PowerShell.ConsoleHost\v4.0_3.0.0.0__31bf3856ad364e35\Microsoft.PowerShell.ConsoleHost.dll
+5848	powershell.exe	0x8c88b09f6e20	0x2c4	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a6e3b980	0x2c8	Section	0xf0005	-
+5848	powershell.exe	0x8c88b3978ef0	0x2cc	File	0x120089	\Device\HarddiskVolume2\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Management.Automation\v4.0_3.0.0.0__31bf3856ad364e35\System.Management.Automation.dll
+5848	powershell.exe	0x8c88b35b2990	0x2d0	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b058a2c0	0x2d4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3907290	0x2d8	Semaphore	0x100003	-
+5848	powershell.exe	0x8c88b48974a0	0x2dc	Semaphore	0x100003	-
+5848	powershell.exe	0x8c88b48dc250	0x2e0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af4764e0	0x2e4	File	0x100003	\Device\KsecDD
+5848	powershell.exe	0x8c88b46b33a0	0x2e8	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b48d24b0	0x2ec	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a92b1130	0x2f4	Section	0xf0005	-
+5848	powershell.exe	0x8c88b53749c0	0x2f8	Event	0x1f0003	-
+5848	powershell.exe	0xd086a4f3f790	0x2fc	Section	0x4	__ComCatalogCache__
+5848	powershell.exe	0xd086a7cbb6b0	0x300	Key	0xf003f	MACHINE\SOFTWARE\CLASSES
+5848	powershell.exe	0x8c88b36e29a0	0x304	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88aeb5fb00	0x308	Event	0x100001	MaximumCommitCondition
+5848	powershell.exe	0xd086a7c397b0	0x30c	Key	0x20019	MACHINE\SOFTWARE\MICROSOFT\WINDOWSRUNTIME
+5848	powershell.exe	0xd086a715cf70	0x310	Key	0x20019	MACHINE\SOFTWARE\MICROSOFT\WINDOWSRUNTIME\ACTIVATABLECLASSID
+5848	powershell.exe	0x8c88aec2f610	0x314	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b22c8920	0x318	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af6be560	0x31c	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b0631c50	0x320	Mutant	0x1f0001	SM0:5848:168:WilStaging_02
+5848	powershell.exe	0x8c88aeee9080	0x324	Semaphore	0x1f0003	SM0:5848:168:WilStaging_02_p0
+5848	powershell.exe	0xd086b1d94c60	0x328	Key	0x10	USER\.DEFAULT\SOFTWARE\CLASSES
+5848	powershell.exe	0x8c88b170a900	0x32c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afd06700	0x330	Thread	0x1fffff	Tid 6048 Pid 5848
+5848	powershell.exe	0x8c88b496e700	0x334	ALPC Port	0x1f0001	-
+5848	powershell.exe	0xd086a840e360	0x338	Key	0xf003f	MACHINE\SOFTWARE\CLASSES
+5848	powershell.exe	0x8c88b471da00	0x33c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3178090	0x340	ALPC Port	0x1f0001	OLEF0B61BF663A71E81D427E56EE490
+5848	powershell.exe	0x8c88b41c2300	0x344	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afde5070	0x350	ALPC Port	0x1f0001	-
+5848	powershell.exe	0x8c88af5a4080	0x358	Thread	0x1fffff	Tid 2760 Pid 6768
+5848	powershell.exe	0x8c88af2af070	0x35c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b224bce0	0x360	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b0631aa0	0x364	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1718bd0	0x368	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1189920	0x36c	Semaphore	0x1f0003	-
+5848	powershell.exe	0x8c88aee589e0	0x370	Semaphore	0x1f0003	-
+5848	powershell.exe	0x8c88b3b06540	0x374	IoCompletion	0x1f0003	-
+5848	powershell.exe	0x8c88af339390	0x378	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b55cd4e0	0x37c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6239d90	0x380	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b119cab0	0x384	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5798080	0x388	Thread	0x1fffff	Tid 7920 Pid 5848
+5848	powershell.exe	0x8c88b55e4580	0x38c	Thread	0x1fffff	Tid 12144 Pid 5848
+5848	powershell.exe	0x8c88b6b46400	0x394	Thread	0x1fffff	Tid 7828 Pid 5848
+5848	powershell.exe	0x8c88b4b02dd0	0x3a0	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086b1b2bcc0	0x3a4	Key	0x20019	MACHINE\SYSTEM\CONTROLSET001\CONTROL\NLS\LOCALE
+5848	powershell.exe	0xd086a7477b60	0x3a8	Key	0x20019	MACHINE\SYSTEM\CONTROLSET001\CONTROL\NLS\LOCALE\ALTERNATE SORTS
+5848	powershell.exe	0xd086a69ba810	0x3ac	Key	0x20019	MACHINE\SYSTEM\CONTROLSET001\CONTROL\NLS\LANGUAGE GROUPS
+5848	powershell.exe	0x8c88af3d0fe0	0x3b0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4a60860	0x3b4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5798080	0x3b8	Thread	0x1fffff	Tid 7920 Pid 5848
+5848	powershell.exe	0x8c88b1a94d40	0x3bc	File	0x120089	\Device\HarddiskVolume2\Windows\SysWOW64\en-US\winnlsres.dll.mui
+5848	powershell.exe	0x8c88b56f1500	0x3c0	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b28fc4b0	0x3c4	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a8e078b0	0x3c8	Key	0xf003f	MACHINE
+5848	powershell.exe	0x8c88af0bb3c0	0x3cc	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b42f2b40	0x3d0	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b466a770	0x3d4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b33d9410	0x3d8	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5331930	0x3dc	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b362d070	0x3e0	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af3cc240	0x3e4	File	0x120089	\Device\DeviceApi\CMApi
+5848	powershell.exe	0x8c88b17ef0d0	0x3e8	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b622f640	0x3f0	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b17f9d90	0x3f4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b2289230	0x3f8	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af17a420	0x3fc	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b47a6eb0	0x404	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b4a8e3e0	0x408	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b239b570	0x40c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af2158b0	0x410	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88afaa9070	0x414	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1712bf0	0x418	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1774e70	0x41c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b062c7d0	0x420	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1245a40	0x424	Semaphore	0x100003	-
+5848	powershell.exe	0x8c88b2ba4a20	0x428	Semaphore	0x100003	-
+5848	powershell.exe	0x8c88b4377140	0x42c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88aee677a0	0x430	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b4179bb0	0x434	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5343940	0x438	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b576c430	0x43c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af1c9ac0	0x440	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b574fb60	0x444	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b56b1460	0x448	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b366f240	0x44c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1112f90	0x450	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b12e8b20	0x454	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b46fab20	0x458	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a4fb3e90	0x45c	Section	0x6	windows_shell_global_counters
+5848	powershell.exe	0xd086a5dae7e0	0x460	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\WINDOWS\CURRENTVERSION\EXPLORER\FOLDERDESCRIPTIONS\{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\PROPERTYBAG
+5848	powershell.exe	0xd086a698e110	0x464	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\WINDOWS\CURRENTVERSION\EXPLORER\FOLDERDESCRIPTIONS\{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\PROPERTYBAG
+5848	powershell.exe	0xd086a88f0070	0x468	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\WINDOWS\CURRENTVERSION\EXPLORER\FOLDERDESCRIPTIONS\{D65231B0-B2F1-4857-A4CE-A8E7C6EA7D27}\PROPERTYBAG
+5848	powershell.exe	0xd086a9fca290	0x46c	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\WINDOWS\CURRENTVERSION\EXPLORER\FOLDERDESCRIPTIONS\{905E63B6-C1BF-494E-B29C-65B732D3D21A}\PROPERTYBAG
+5848	powershell.exe	0x8c88b395f2c0	0x470	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b4757560	0x474	File	0x120089	\Device\HarddiskVolume2\Windows\Microsoft.NET\assembly\GAC_MSIL\System.DirectoryServices\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.DirectoryServices.dll
+5848	powershell.exe	0x8c88b35bb730	0x478	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1958d50	0x47c	Mutant	0x1f0001	-
+5848	powershell.exe	0x8c88aee84cc0	0x480	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af225c30	0x484	Mutant	0x1f0001	-
+5848	powershell.exe	0x8c88b14b74f0	0x488	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b57c2660	0x48c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6693b30	0x498	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b57a0890	0x49c	Event	0x1f0003	-
+5848	powershell.exe	0xd086aa7fbf70	0x4a0	Key	0x20019	MACHINE\SYSTEM\CONTROLSET001\SERVICES\CRYPT32
+5848	powershell.exe	0x8c88b5743730	0x4a4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b057de10	0x4a8	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b56509c0	0x4ac	IoCompletion	0x1f0003	-
+5848	powershell.exe	0x8c88af3bb870	0x4b0	TpWorkerFactory	0xf00ff	-
+5848	powershell.exe	0x8c88b5330190	0x4b4	IRTimer	0x100002	-
+5848	powershell.exe	0x8c88b16a24e0	0x4b8	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b4755700	0x4bc	IRTimer	0x100002	-
+5848	powershell.exe	0x8c88b28f61d0	0x4c0	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0xd086aaba3890	0x4c4	Key	0xf003f	USER
+5848	powershell.exe	0x8c88b1705450	0x4cc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4b53e70	0x4d0	File	0x100020	\Device\HarddiskVolume2\Windows\Temp\Perfmon
+5848	powershell.exe	0x8c88b5f2e8f0	0x4d4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4885080	0x4e4	File	0x120089	\Device\HarddiskVolume2\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Numerics\v4.0_4.0.0.0__b77a5c561934e089\System.Numerics.dll
+5848	powershell.exe	0x8c88b4660950	0x4fc	File	0x120089	\Device\NamedPipe\
+5848	powershell.exe	0xd086a8e0e780	0x504	Section	0xf0005	-
+5848	powershell.exe	0x8c88b59d4080	0x508	Thread	0x1fffff	Tid 2820 Pid 5848
+5848	powershell.exe	0x8c88b53bb8b0	0x50c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b789fa70	0x510	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b8671700	0x514	Thread	0x1fffff	Tid 9008 Pid 5848
+5848	powershell.exe	0x8c88b3e02ef0	0x518	File	0x120189	\Device\NamedPipe
+5848	powershell.exe	0x8c88b1ac2540	0x51c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5fe32f0	0x520	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af23adb0	0x524	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b04fd960	0x538	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af129920	0x53c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b48ef510	0x540	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b39088a0	0x544	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3fdd7a0	0x548	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b55dcb40	0x54c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b55dcb40	0x550	Event	0x1f0003	-
+5848	powershell.exe	0xd086a849ad90	0x554	Key	0x20019	MACHINE\SOFTWARE\POLICIES\MICROSOFT\SYSTEMCERTIFICATES
+5848	powershell.exe	0x8c88af12abd0	0x558	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b4202f90	0x55c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5838700	0x560	Thread	0x1fffff	Tid 2828 Pid 5848
+5848	powershell.exe	0x8c88b6273e50	0x564	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afe91d70	0x568	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b0cdb3a0	0x56c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6e9f620	0x570	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b665f080	0x574	Thread	0x1fffff	Tid 11060 Pid 5848
+5848	powershell.exe	0x8c88b69c9700	0x578	Thread	0x1fffff	Tid 5144 Pid 5848
+5848	powershell.exe	0x8c88b1a70920	0x580	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b39e2800	0x584	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b0289650	0x588	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b0289650	0x58c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2365cd0	0x590	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0xd086a4603070	0x594	Key	0x20019	USER\.DEFAULT\SOFTWARE\POLICIES\MICROSOFT\SYSTEMCERTIFICATES
+5848	powershell.exe	0x8c88b38a7600	0x598	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b16c49a0	0x59c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b39aa1d0	0x5a0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afe5d210	0x5a4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b0778290	0x5a8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b47f1db0	0x5ac	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b8536410	0x5b0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6f1e080	0x5b4	Thread	0x1fffff	Tid 10888 Pid 5848
+5848	powershell.exe	0x8c88afa79290	0x5b8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af31bd40	0x5c8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88aee89700	0x5e8	Thread	0x1fffff	Tid 8300 Pid 5848
+5848	powershell.exe	0x8c88b8e56a20	0x5f8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b796db00	0x61c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4098410	0x620	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5f6dd20	0x624	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af023080	0x628	Thread	0x1fffff	Tid 5540 Pid 5452
+5848	powershell.exe	0x8c88b5df8e30	0x62c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2def580	0x630	Process	0x1fffff	rundll32.exe Pid 5452
+5848	powershell.exe	0x8c88afe85080	0x634	Thread	0x1fffff	Tid 6028 Pid 5452
+5848	powershell.exe	0x8c88b5d566e0	0x638	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af56d580	0x63c	File	0x120089	\Device\HarddiskVolume2\Windows\SysWOW64\en-US\crypt32.dll.mui
+5848	powershell.exe	0x8c88b3660de0	0x640	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1294570	0x644	File	0x12019f	\Device\ConDrv\Output
+5848	powershell.exe	0x8c88afca6cd0	0x650	File	0x120089	\Device\HarddiskVolume2\Windows\Microsoft.NET\assembly\GAC_32\System.Data\v4.0_4.0.0.0__b77a5c561934e089\System.Data.dll
+5848	powershell.exe	0xd086a89788a0	0x654	Section	0xf0005	-
+5848	powershell.exe	0x8c88b1c43360	0x658	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a9bf85d0	0x65c	Token	0xf01ff	-
+5848	powershell.exe	0x8c88b55e86e0	0x660	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3f507c0	0x664	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b55751e0	0x668	Event	0x1f0003	-
+5848	powershell.exe	0xd086a8487e20	0x66c	Section	0xf0005	-
+5848	powershell.exe	0xd086a70061a0	0x670	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\WINDOWS\CURRENTVERSION\EXPLORER\FOLDERDESCRIPTIONS\{FDD39AD0-238F-46AF-ADB4-6C85480369C7}\PROPERTYBAG
+5848	powershell.exe	0x8c88b0994880	0x674	File	0x12019f	\Device\ConDrv\CurrentOut
+5848	powershell.exe	0x8c88b2fd6580	0x678	Semaphore	0x1f0003	SM0:5848:64:WilError_01_p0
+5848	powershell.exe	0xd086a95f91f0	0x67c	Section	0x4	NLS_CodePage_437_3_2_0_0
+5848	powershell.exe	0x8c88b3fd2730	0x680	Event	0x1f0003	-
+5848	powershell.exe	0xd086a956b4f0	0x684	Section	0xf0005	-
+5848	powershell.exe	0x8c88b17c17f0	0x688	Mutant	0x1f0001	SM0:5848:64:WilError_01
+5848	powershell.exe	0x8c88afb18410	0x68c	Event	0x1f0003	-
+5848	powershell.exe	0xd086a8d91720	0x690	Key	0x1	USER\.DEFAULT\SOFTWARE\MICROSOFT\WINDOWS\CURRENTVERSION\EXPLORER
+5848	powershell.exe	0x8c88af3b0eb0	0x694	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b4a53390	0x698	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a8e25830	0x69c	Section	0xf0007	-
+5848	powershell.exe	0x8c88b0674ae0	0x6a0	File	0x1a019f	\Device\NamedPipe\PSHost.131801210226939398.5848.DefaultAppDomain.powershell
+5848	powershell.exe	0x8c88b5b1cc50	0x6a4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3b715e0	0x6a8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3b67140	0x6ac	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af125080	0x6b0	Thread	0x1fffff	Tid 8664 Pid 5848
+5848	powershell.exe	0x8c88b09d5bd0	0x6b4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af362a40	0x6b8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6229e50	0x6bc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b0640870	0x6c0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5696700	0x6c4	Thread	0x1fffff	Tid 8996 Pid 5848
+5848	powershell.exe	0x8c88b3521cf0	0x6c8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b32c6150	0x6cc	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88aef0ccc0	0x6d0	Semaphore	0x1f0003	-
+5848	powershell.exe	0x8c88b0643760	0x6d4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b48596c0	0x6d8	Semaphore	0x1f0003	-
+5848	powershell.exe	0x8c88b1d7bdd0	0x6dc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af511560	0x6e0	File	0x120089	\Device\HarddiskVolume2\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.PowerShell.Security\v4.0_3.0.0.0__31bf3856ad364e35\Microsoft.PowerShell.Security.dll
+5848	powershell.exe	0x8c88b329dde0	0x6e4	File	0x120089	\Device\HarddiskVolume2\Windows\Microsoft.NET\assembly\GAC_32\System.Transactions\v4.0_4.0.0.0__b77a5c561934e089\System.Transactions.dll
+5848	powershell.exe	0xd086aa1b99a0	0x6e8	Section	0xf0005	-
+5848	powershell.exe	0xd086a8d14710	0x6f0	Section	0xf0005	-
+5848	powershell.exe	0x8c88b36b6e20	0x6f4	ALPC Port	0x1f0001	-
+5848	powershell.exe	0x8c88aec39760	0x6f8	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3176a30	0x6fc	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b40645d0	0x700	ALPC Port	0x1f0001	-
+5848	powershell.exe	0x8c88b4762640	0x704	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af460080	0x708	Thread	0x1fffff	Tid 2020 Pid 5848
+5848	powershell.exe	0x8c88b5b44550	0x70c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b2ac4880	0x710	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1a9d080	0x714	File	0x120196	\Device\NamedPipe
+5848	powershell.exe	0x8c88af6524d0	0x718	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b4a82070	0x71c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b2c4d700	0x720	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1c435d0	0x738	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b49f7590	0x73c	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086aa2b3250	0x740	Section	0xf0007	NLS_CodePage_1252_3_2_0_0
+5848	powershell.exe	0x8c88b4a66070	0x744	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b443d070	0x748	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b2176870	0x754	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b35556b0	0x758	Event	0x1f0003	-
+5848	powershell.exe	0x8c88aef2d490	0x75c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3ddd1d0	0x760	Semaphore	0x1f0003	-
+5848	powershell.exe	0x8c88af460080	0x764	Thread	0x1fffff	Tid 2020 Pid 5848
+5848	powershell.exe	0x8c88b41ce870	0x768	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1af9480	0x76c	Semaphore	0x1f0003	-
+5848	powershell.exe	0x8c88af253ac0	0x770	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4b5f660	0x774	Semaphore	0x1f0003	-
+5848	powershell.exe	0x8c88b3e02d60	0x778	File	0x120189	\Device\NamedPipe
+5848	powershell.exe	0x8c88af6f74e0	0x77c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af405ab0	0x780	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5b08930	0x794	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3fb1410	0x798	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2999150	0x7a0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af2438f0	0x7a4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b56f6890	0x7a8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b28cd300	0x7ac	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3367200	0x7b0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b53fb250	0x7b4	File	0x12019f	\Device\HarddiskVolume2\Users\spsql\Documents\20180830\PowerShell_transcript.BASE-RD-01.5cHlvR59.20180830124344.txt
+5848	powershell.exe	0x8c88b571b5a0	0x7b8	Semaphore	0x1f0003	-
+5848	powershell.exe	0x8c88af166e50	0x7bc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afe999f0	0x7c0	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a9c018d0	0x7c4	Key	0x20019	USER\.DEFAULT\SOFTWARE\MICROSOFT\WINDOWS\CURRENTVERSION\INTERNET SETTINGS
+5848	powershell.exe	0xd086a79a97b0	0x7c8	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\WINDOWS\CURRENTVERSION\INTERNET SETTINGS\5.0\CACHE
+5848	powershell.exe	0x8c88af4256f0	0x7cc	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1de98c0	0x7d0	File	0x120196	\Device\NamedPipe
+5848	powershell.exe	0xd086aa2b3250	0x7d4	Section	0x4	NLS_CodePage_1252_3_2_0_0
+5848	powershell.exe	0x8c88b1d96210	0x7d8	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b6316a60	0x7dc	File	0x120089	\Device\HarddiskVolume2\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.PowerShell.Commands.Utility\v4.0_3.0.0.0__31bf3856ad364e35\Microsoft.PowerShell.Commands.Utility.dll
+5848	powershell.exe	0x8c88b46d2310	0x7e0	File	0x120089	\Device\HarddiskVolume2\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Configuration.Install\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Configuration.Install.dll
+5848	powershell.exe	0xd086aa2ed2e0	0x7e4	Section	0xf0005	-
+5848	powershell.exe	0x8c88b1c32800	0x7e8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3a7dc40	0x7ec	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b28c6e20	0x7f0	ALPC Port	0x1f0001	-
+5848	powershell.exe	0x8c88af04d440	0x7f4	IoCompletion	0x1f0003	-
+5848	powershell.exe	0x8c88afa4d080	0x7f8	IoCompletion	0x1f0003	-
+5848	powershell.exe	0x8c88b45ac4a0	0x804	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a9b7e8d0	0x808	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\WINDOWS\CURRENTVERSION\INTERNET SETTINGS
+5848	powershell.exe	0x8c88afb184c0	0x80c	Process	0x1fffff	rundll32.exe Pid 6768
+5848	powershell.exe	0x8c88b07b29b0	0x810	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b11c6850	0x814	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b47b7080	0x820	Thread	0x1fffff	Tid 1164 Pid 5848
+5848	powershell.exe	0xd086a5a09a20	0x828	Section	0xf0007	UrlZonesSM_spsql
+5848	powershell.exe	0x8c88b33bc590	0x82c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b57681d0	0x830	Semaphore	0x1f0003	-
+5848	powershell.exe	0x8c88b410f970	0x834	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b45a8be0	0x838	File	0x12019f	\Device\NamedPipe\fhsvc-b378
+5848	powershell.exe	0x8c88b3265e60	0x840	Semaphore	0x1f0003	-
+5848	powershell.exe	0x8c88b39e7df0	0x844	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af429540	0x848	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b539ab60	0x84c	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a88122a0	0x850	Key	0x20019	USER\.DEFAULT\SOFTWARE\POLICIES
+5848	powershell.exe	0xd086a89bd070	0x854	Key	0x1	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\INTERNET EXPLORER\MAIN\FEATURECONTROL
+5848	powershell.exe	0x8c88b45410f0	0x858	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1a74d60	0x85c	EtwRegistration	0x804	-
+5848	powershell.exe	0xd086a5d9ece0	0x860	Key	0x20019	MACHINE\SOFTWARE\POLICIES
+5848	powershell.exe	0xd086aa2eb7a0	0x864	Key	0x20019	USER\.DEFAULT\SOFTWARE
+5848	powershell.exe	0xd086a848f460	0x868	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE
+5848	powershell.exe	0xd086a97dcd40	0x86c	Key	0x20019	MACHINE\SOFTWARE\POLICIES\MICROSOFT\WINDOWS\CURRENTVERSION\INTERNET SETTINGS
+5848	powershell.exe	0x8c88b5798080	0x870	Thread	0x1fffff	Tid 7920 Pid 5848
+5848	powershell.exe	0xd086aa0c5170	0x874	Key	0xf003f	MACHINE\SYSTEM\CONTROLSET001\SERVICES\WINSOCK2\PARAMETERS\PROTOCOL_CATALOG9
+5848	powershell.exe	0x8c88b1dfcc40	0x878	Event	0x1f0003	-
+5848	powershell.exe	0xd086a97f1d50	0x87c	Key	0xf003f	MACHINE\SYSTEM\CONTROLSET001\SERVICES\WINSOCK2\PARAMETERS\NAMESPACE_CATALOG5
+5848	powershell.exe	0x8c88aeec5950	0x880	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b45b0300	0x884	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3af7060	0x888	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af24cf90	0x88c	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0xd086a5569a80	0x890	Key	0x20019	USER\.DEFAULT\SOFTWARE\MICROSOFT\INTERNET EXPLORER\MAIN
+5848	powershell.exe	0xd086a7012770	0x894	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\INTERNET EXPLORER\MAIN
+5848	powershell.exe	0xd086aa126990	0x898	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\INTERNET EXPLORER\SECURITY
+5848	powershell.exe	0x8c88af6ff7a0	0x89c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b35f6b60	0x8a0	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3b6d510	0x8a4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b530a1a0	0x8a8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1a8e8e0	0x8ac	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0xd086a61a9a10	0x8b0	Section	0x4	F932B6C7-3A20-46A0-B8A0-8894AA421973
+5848	powershell.exe	0x8c88b430a3a0	0x8b4	Event	0x100002	-
+5848	powershell.exe	0x8c88b56e7730	0x8b8	Event	0x100002	-
+5848	powershell.exe	0x8c88b3b0fd90	0x8bc	File	0x100080	\Device\Nsi
+5848	powershell.exe	0x8c88aec28540	0x8c0	ALPC Port	0x1f0001	-
+5848	powershell.exe	0x8c88b449c6f0	0x8c4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b0a14cc0	0x8cc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5a2b650	0x8d0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1254500	0x8d4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afe5da20	0x8d8	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b5bbd420	0x8dc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5300d00	0x8e0	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b1d81f30	0x8e4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4260a90	0x8e8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b56f5d40	0x8ec	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3733a90	0x8f0	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b1489f10	0x8f4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b078cdb0	0x8f8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b56e22c0	0x8fc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b49330f0	0x900	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88af09f310	0x904	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b159ed10	0x908	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2aa7b30	0x90c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3eac170	0x910	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b4b49880	0x914	TpWorkerFactory	0xf00ff	-
+5848	powershell.exe	0x8c88b22b2060	0x918	IRTimer	0x100002	-
+5848	powershell.exe	0x8c88b126c060	0x91c	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0x8c88b135faa0	0x920	IRTimer	0x100002	-
+5848	powershell.exe	0x8c88b4b1d990	0x924	WaitCompletionPacket	0x1	-
+5848	powershell.exe	0xd086a6c04de0	0x928	Key	0x20019	MACHINE\SOFTWARE\WOW6432NODE\MICROSOFT\WINDOWS\CURRENTVERSION\INTERNET SETTINGS\ZONEMAP
+5848	powershell.exe	0xd086aa04ef70	0x92c	Key	0x2001f	USER\.DEFAULT\SOFTWARE\MICROSOFT\WINDOWS\CURRENTVERSION\INTERNET SETTINGS\ZONEMAP
+5848	powershell.exe	0x8c88b121a3e0	0x934	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1681600	0x93c	File	0x16019f	\Device\Afd\Endpoint
+5848	powershell.exe	0x8c88b45cb2e0	0x940	File	0x120089	\Device\HarddiskVolume2\Windows\SysWOW64\en-US\mswsock.dll.mui
+5848	powershell.exe	0x8c88b4b5e4b0	0x944	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b35c5d00	0x948	IoCompletion	0x1f0003	-
+5848	powershell.exe	0x8c88b45e0fe0	0x94c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b15807f0	0x950	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b46d8a70	0x954	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b39762d0	0x958	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b484f200	0x95c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b49fbd60	0x960	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b3777900	0x964	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b4724490	0x968	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4581b50	0x96c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88aeab5fe0	0x970	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af123710	0x974	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af4c7700	0x978	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b0539070	0x97c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b0abcd00	0x980	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b2338070	0x984	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b4844450	0x988	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b36f8750	0x98c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b05b6730	0x990	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5354ab0	0x994	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af1b8620	0x998	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88afa3b9f0	0x99c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88afd8ad20	0x9a0	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1dc59c0	0x9a4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b486ca50	0x9a8	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b39fe170	0x9ac	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b1dd43a0	0x9b0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b575fb00	0x9b4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b38eb6b0	0x9b8	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b8338490	0x9c4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2c42580	0x9c8	Process	0x1fffff	rundll32.exe Pid 5588
+5848	powershell.exe	0x8c88af430080	0x9cc	Thread	0x1fffff	Tid 7496 Pid 5588
+5848	powershell.exe	0x8c88b624d080	0x9d0	Thread	0x1fffff	Tid 1568 Pid 5588
+5848	powershell.exe	0x8c88b7576390	0x9d4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b696df30	0x9d8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af948920	0x9e4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afdb2440	0x9e8	File	0x120196	\Device\NamedPipe
+5848	powershell.exe	0x8c88afc7c580	0x9ec	Process	0x1fffff	cmd.exe Pid 5948
+5848	powershell.exe	0x8c88b2952080	0x9f0	Thread	0x1fffff	Tid 4616 Pid 5948
+5848	powershell.exe	0x8c88b5e1cce0	0x9f4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af3ddf30	0x9f8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b72ef060	0x9fc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b57e6f00	0xa00	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6c6e060	0xa08	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b67da080	0xa0c	Thread	0x1fffff	Tid 8264 Pid 5848
+5848	powershell.exe	0x8c88b7c6f700	0xa10	Thread	0x1fffff	Tid 10544 Pid 5848
+5848	powershell.exe	0x8c88b16eb4e0	0xa14	Semaphore	0x100003	-
+5848	powershell.exe	0xd086a87959b0	0xa18	Token	0xf01ff	-
+5848	powershell.exe	0x8c88afc77700	0xa1c	Thread	0x1fffff	Tid 6348 Pid 5848
+5848	powershell.exe	0x8c88b62c02c0	0xa20	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b13025c0	0xa24	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2cfe080	0xa28	Thread	0x1fffff	Tid 11176 Pid 5848
+5848	powershell.exe	0x8c88b6ae4700	0xa2c	Thread	0x1fffff	Tid 7708 Pid 5848
+5848	powershell.exe	0x8c88b149f9c0	0xa30	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2e3a580	0xa38	Process	0x1fffff	rundll32.exe Pid 2216
+5848	powershell.exe	0x8c88b3b88700	0xa3c	Thread	0x1fffff	Tid 6040 Pid 2216
+5848	powershell.exe	0x8c88b3580660	0xa40	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2383d20	0xa44	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6c09c40	0xa48	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5a1fef0	0xa4c	File	0x12019f	\Device\Afd\AsyncConnectHlp
+5848	powershell.exe	0x8c88b292b120	0xa50	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3e79350	0xa54	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6206c40	0xa58	Semaphore	0x100003	-
+5848	powershell.exe	0x8c88b58e75c0	0xa60	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afe128d0	0xa64	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3ff19c0	0xa68	IoCompletion	0x1f0003	-
+5848	powershell.exe	0x8c88b06ad060	0xa6c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b666f080	0xa70	Thread	0x1fffff	Tid 10232 Pid 5848
+5848	powershell.exe	0x8c88b2d34700	0xa74	Thread	0x1fffff	Tid 864 Pid 5848
+5848	powershell.exe	0x8c88b11eb080	0xa78	Thread	0x1fffff	Tid 480 Pid 4108
+5848	powershell.exe	0x8c88b2c19080	0xa7c	Process	0x1fffff	rundll32.exe Pid 4108
+5848	powershell.exe	0x8c88b2b83080	0xa80	Thread	0x1fffff	Tid 7860 Pid 4108
+5848	powershell.exe	0x8c88b6b68db0	0xa88	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b687acc0	0xa8c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afb1b080	0xa90	Thread	0x1fffff	Tid 1752 Pid 5848
+5848	powershell.exe	0x8c88b6f9a080	0xa9c	Thread	0x1fffff	Tid 10740 Pid 5848
+5848	powershell.exe	0x8c88b7aa3e20	0xaa0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b70d9080	0xaa4	Thread	0x1fffff	Tid 176 Pid 5848
+5848	powershell.exe	0x8c88b41bf7d0	0xaa8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6cb6cc0	0xaac	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b838a1d0	0xab4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b382f2f0	0xab8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b86369f0	0xabc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b15f82d0	0xac0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b368ddc0	0xac4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5c775e0	0xac8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b0647b00	0xad0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3f49060	0xad4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b758cfe0	0xad8	Event	0x1f0003	-
+5848	powershell.exe	0xd086a7188630	0xae0	Key	0x20019	MACHINE\SYSTEM\CONTROLSET001\CONTROL\NETWORKPROVIDER\HWORDER
+5848	powershell.exe	0xd086a91dd530	0xae4	Key	0x20019	MACHINE\SYSTEM\CONTROLSET001\CONTROL\NETWORKPROVIDER\PROVIDERORDER
+5848	powershell.exe	0x8c88b01a0ef0	0xae8	Semaphore	0x100003	-
+5848	powershell.exe	0x8c88b49f0630	0xaec	Semaphore	0x100003	-
+5848	powershell.exe	0x8c88b809b080	0xaf0	Thread	0x1fffff	Tid 10932 Pid 5848
+5848	powershell.exe	0x8c88b5b85ee0	0xaf4	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b118c700	0xaf8	Thread	0x1fffff	Tid 5520 Pid 5848
+5848	powershell.exe	0x8c88b74db1c0	0xafc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b13758f0	0xb00	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b5bf6070	0xb10	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b2f7c070	0xb14	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b0577550	0xb18	Semaphore	0x100003	-
+5848	powershell.exe	0x8c88b23827f0	0xb1c	Semaphore	0x100003	-
+5848	powershell.exe	0x8c88b2d0bf30	0xb20	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b66c4290	0xb24	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b29c9080	0xb28	Thread	0x1fffff	Tid 6712 Pid 5848
+5848	powershell.exe	0x8c88b17e3070	0xb30	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88af3dadb0	0xb38	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6a5c080	0xb3c	Thread	0x1fffff	Tid 11180 Pid 5848
+5848	powershell.exe	0x8c88b6006440	0xb40	Thread	0x1fffff	Tid 7712 Pid 5848
+5848	powershell.exe	0x8c88b7cfa630	0xb44	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b04e2bb0	0xb48	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2911470	0xb4c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b41d7b60	0xb50	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6eee960	0xb54	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4477290	0xb58	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b765a430	0xb5c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1991580	0xb60	Process	0x1fffff	rundll32.exe Pid 8148
+5848	powershell.exe	0x8c88b2d4d470	0xb68	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b559a070	0xb6c	EtwRegistration	0x804	-
+5848	powershell.exe	0x8c88b4a80700	0xb70	Thread	0x1fffff	Tid 4116 Pid 8148
+5848	powershell.exe	0x8c88b1c14920	0xb78	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1c57ba0	0xb7c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b69b6080	0xb80	Thread	0x1fffff	Tid 5944 Pid 5848
+5848	powershell.exe	0x8c88b1324080	0xb90	Thread	0x1fffff	Tid 5436 Pid 5848
+5848	powershell.exe	0x8c88b392b250	0xb98	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b137ad90	0xb9c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b47efce0	0xba0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2057080	0xbac	Thread	0x1fffff	Tid 1092 Pid 5848
+5848	powershell.exe	0x8c88b83d9d40	0xbb4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b48ab700	0xbbc	Thread	0x1fffff	Tid 8424 Pid 5848
+5848	powershell.exe	0x8c88b6300870	0xbc0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88aecd4e80	0xbd0	File	0x12019f	\Device\Mup\172.16.7.15\pipe\fhsvc-b378
+5848	powershell.exe	0x8c88b5c3e700	0xbd4	Thread	0x1fffff	Tid 1676 Pid 5848
+5848	powershell.exe	0x8c88b5f463a0	0xbd8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afdbb640	0xc40	Thread	0x1fffff	Tid 10896 Pid 5848
+5848	powershell.exe	0x8c88b084c5e0	0xc44	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b81b3640	0xc4c	Thread	0x1fffff	Tid 2288 Pid 5848
+5848	powershell.exe	0x8c88b3ad99d0	0xc50	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b0659770	0xc60	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b195a700	0xc64	Thread	0x1fffff	Tid 8528 Pid 5848
+5848	powershell.exe	0x8c88b4a8f740	0xc68	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4546b90	0xc6c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6836080	0xc70	Thread	0x1fffff	Tid 10172 Pid 5848
+5848	powershell.exe	0x8c88b1ae4380	0xc74	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b195ce50	0xc78	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b7907260	0xc7c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b649c8b0	0xc80	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b89ae3b0	0xc84	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b67921f0	0xc8c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2a4a900	0xc94	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b741ba90	0xc98	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2c6d1f0	0xc9c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b16dfea0	0xca0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3d7b390	0xca4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b80f0910	0xca8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b11a8bb0	0xcac	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5eb7db0	0xcb0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5540810	0xcb4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b4576060	0xcb8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b7ad8700	0xcbc	Thread	0x1fffff	Tid 7700 Pid 5848
+5848	powershell.exe	0x8c88af4e2830	0xcc0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afc56a90	0xcc4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b83da080	0xccc	Thread	0x1fffff	Tid 9324 Pid 5848
+5848	powershell.exe	0x8c88b71ad6a0	0xcd8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af0aa550	0xcdc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5c42700	0xce0	Thread	0x1fffff	Tid 9804 Pid 5848
+5848	powershell.exe	0x8c88b6248340	0xce4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88af3f2cc0	0xce8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2106c20	0xcec	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6a51700	0xcf0	Thread	0x1fffff	Tid 6588 Pid 5848
+5848	powershell.exe	0x8c88b4472a70	0xcf8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b74b7480	0xcfc	Thread	0x1fffff	Tid 8624 Pid 5848
+5848	powershell.exe	0x8c88b6548700	0xd00	Thread	0x1fffff	Tid 10944 Pid 5848
+5848	powershell.exe	0x8c88b1ad41d0	0xd04	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3e59fe0	0xd0c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b78a01c0	0xd10	Thread	0x1fffff	Tid 4212 Pid 5848
+5848	powershell.exe	0x8c88b6bcd840	0xd14	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b16c1300	0xd18	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b209e9a0	0xd1c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b654ae40	0xd24	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b569dcc0	0xd28	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b56b6970	0xd2c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3e3b9a0	0xd30	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3fbe730	0xd34	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1a67140	0xd38	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b41bf850	0xd44	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6a71700	0xd48	Thread	0x1fffff	Tid 4840 Pid 5848
+5848	powershell.exe	0x8c88b1a79360	0xd4c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b8702700	0xd50	Thread	0x1fffff	Tid 4524 Pid 5848
+5848	powershell.exe	0x8c88b7ede140	0xd54	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b1215cc0	0xd5c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b61e73b0	0xda4	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b60b41f0	0xdbc	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b135d8a0	0xde8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b0f11dc0	0xe00	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b05ac500	0xe20	Thread	0x1fffff	Tid 11300 Pid 5848
+5848	powershell.exe	0x8c88b7886d40	0xe24	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b076e610	0xe30	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6639080	0xe38	Thread	0x1fffff	Tid 1824 Pid 5848
+5848	powershell.exe	0x8c88b5f1c310	0xe4c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b67c8080	0xe50	Thread	0x1fffff	Tid 7992 Pid 5848
+5848	powershell.exe	0x8c88b646b340	0xe54	Thread	0x1fffff	Tid 11016 Pid 5848
+5848	powershell.exe	0x8c88afb04490	0xe58	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3ed8dd0	0xe60	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b451d6e0	0xe64	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5c7d310	0xe6c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b3b82140	0xe7c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b62307a0	0xe84	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6a40db0	0xe88	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6afb830	0xe8c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b31c9150	0xe90	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b233d8a0	0xf54	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6129380	0xf5c	Thread	0x1fffff	Tid 9384 Pid 5848
+5848	powershell.exe	0x8c88b29345e0	0xf60	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b19055a0	0xf64	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b2d7f700	0xf6c	Thread	0x1fffff	Tid 7220 Pid 5848
+5848	powershell.exe	0x8c88b448e610	0xf70	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b0bbaca0	0xf74	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b7bcd3e0	0xf78	Event	0x1f0003	-
+5848	powershell.exe	0x8c88afded130	0xf7c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5690950	0xf80	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6eb2480	0xf84	Thread	0x1fffff	Tid 5680 Pid 5848
+5848	powershell.exe	0x8c88b1663540	0xf88	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b7bb1080	0xf8c	Thread	0x1fffff	Tid 6552 Pid 5848
+5848	powershell.exe	0x8c88b5ddd1f0	0xf90	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b5eff580	0xf98	Thread	0x1fffff	Tid 10904 Pid 5848
+5848	powershell.exe	0x8c88af598420	0xf9c	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b29b37c0	0xfa0	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b6a83c50	0xfa8	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b7e97290	0xfac	Event	0x1f0003	-
+5848	powershell.exe	0x8c88b47c6290	0xfb0	Event	0x1f0003	-

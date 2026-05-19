@@ -1,0 +1,27 @@
+Volatility 3 Framework 2.27.0
+
+Last Write Time	Hive Offset	Type	Key	Name	Data	Volatile
+
+-	0xd086a2c24000	Key	[NONAME]\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a2c3d000	Key	\REGISTRY\MACHINE\SYSTEM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a2c56000	Key	\REGISTRY\MACHINE\HARDWARE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a4bb3000	Key	\Device\HarddiskVolume1\Boot\BCD\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a4a02000	Key	\SystemRoot\System32\Config\SOFTWARE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a4aeb000	Key	\SystemRoot\System32\Config\DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a4ea7000	Key	\SystemRoot\System32\Config\SECURITY\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a4ac4000	Key	\SystemRoot\System32\Config\SAM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a500c000	Key	\??\C:\WINDOWS\ServiceProfiles\NetworkService\NTUSER.DAT\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a51ea000	Key	\SystemRoot\System32\Config\BBI\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a5656000	Key	\??\C:\WINDOWS\ServiceProfiles\LocalService\NTUSER.DAT\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a75d0000	Key	\??\C:\WINDOWS\AppCompat\Programs\Amcache.hve\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a803a000	Key	\??\C:\Users\tdungan\AppData\Local\Microsoft\Windows\UsrClass.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a71ed000	Key	\??\C:\ProgramData\Microsoft\Windows\AppRepository\Packages\Microsoft.Windows.ShellExperienceHost_10.0.16299.492_neutral_neutral_cw5n1h2txyewy\ActivationStore.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a8551000	Key	\??\C:\Users\tdungan\AppData\Local\Packages\Microsoft.Windows.ShellExperienceHost_cw5n1h2txyewy\Settings\settings.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a857a000	Key	\??\C:\ProgramData\Microsoft\Windows\AppRepository\Packages\Microsoft.Windows.Cortana_1.9.6.16299_neutral_neutral_cw5n1h2txyewy\ActivationStore.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a85a0000	Key	\??\C:\Users\tdungan\AppData\Local\Packages\Microsoft.Windows.Cortana_cw5n1h2txyewy\Settings\settings.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a92ae000	Key	\??\C:\ProgramData\Microsoft\Windows\AppRepository\Packages\Microsoft.SkypeApp_12.1815.210.0_x64__kzf8qxf38zg5c\ActivationStore.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086aa328000	Key	\??\C:\Users\tdungan\AppData\Local\Packages\Microsoft.SkypeApp_kzf8qxf38zg5c\Settings\settings.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a5a03000	Key	\??\C:\ProgramData\Microsoft\Windows\AppRepository\Packages\Microsoft.WindowsStore_11807.1001.13.0_x64__8wekyb3d8bbwe\ActivationStore.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a5aec000	Key	\??\C:\Users\tdungan\AppData\Local\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\Settings\settings.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086a5f18000	Key	\??\C:\ProgramData\Microsoft\Windows\AppRepository\Packages\windows.immersivecontrolpanel_10.0.1.1000_neutral_neutral_cw5n1h2txyewy\ActivationStore.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-
+-	0xd086b1088000	Key	\??\C:\Users\spsql\ntuser.dat\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce	-	-	-

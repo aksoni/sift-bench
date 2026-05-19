@@ -1,0 +1,219 @@
+4,8c4,9
+<     "title": "WMI-Spawned PowerShell Execution",
+<     "description": "WmiPrvSE.exe (PID 2876) spawned powershell.exe (PID 8712) at 2018-08-30 16:43:36 UTC — WMI used as execution proxy to evade process-parent-based detections.",
+<     "evidence": ["windows.pstree", "windows.cmdline"],
+<     "tool_output": "pstree.txt: PID 8712 parent=2876 (WmiPrvSE.exe); cmdline.txt: PID 8712 args='-'",
+<     "confidence": "CONFIRMED"
+---
+>     "title": "WMI-Spawned PowerShell Execution with Privilege Escalation Context",
+>     "description": "WmiPrvSE.exe (PID 2876) running as NT Authority/Network Service (S-1-5-20) spawned powershell.exe (PID 8712) running as 'spsql' (Domain Admins). WMI was invoked remotely with explicit 'spsql' credentials, consistent with lateral WMI execution (T1047). Child process PS (8712) command line was wiped (args='-') — deliberate anti-forensics to hide the WMI payload.",
+>     "evidence": ["windows.pstree", "windows.cmdline", "windows.getsids"],
+>     "tool_output": "pstree.txt: PID 8712 parent=2876 (WmiPrvSE.exe); cmdline.txt PID 8712 args='-' (wiped); getsids_wmiprvse.txt: WmiPrvSE=NT Authority; getsids_ps8712.txt: powershell.exe=spsql+Domain Admins",
+>     "confidence": "CONFIRMED",
+>     "change_from_pre": "Enhanced with WmiPrvSE SID context and cmdline wipe anti-forensics note"
+12,13c13,14
+<     "title": "Two-Stage PowerShell Chain (SysWOW64 Downgrade)",
+<     "description": "powershell.exe (PID 8712) spawned powershell.exe (PID 5848) from SysWOW64 path with '-Version 5.1 -s -NoLogo -NoProfile' — remoting server mode / 32-bit PS to avoid 64-bit AMSI.",
+---
+>     "title": "Two-Stage PowerShell Chain via SysWOW64",
+>     "description": "powershell.exe (PID 8712, 64-bit) spawned powershell.exe (PID 5848) from c:\\windows\\syswow64\\windowspowershell\\v1.0\\ with '-Version 5.1 -s -NoLogo -NoProfile'. The '-s' flag puts PowerShell into server mode (PowerShell remoting). Using SysWOW64 switches to a 32-bit process, consistent with bypassing 64-bit AMSI or loading 32-bit shellcode.",
+15,16c16,18
+<     "tool_output": "cmdline.txt PID 5848: 'c:\\windows\\syswow64\\windowspowershell\\v1.0\\powershell.exe -Version 5.1 -s -NoLogo -NoProfile'",
+<     "confidence": "CONFIRMED"
+---
+>     "tool_output": "cmdline.txt PID 5848: 'c:\\windows\\syswow64\\windowspowershell\\v1.0\\powershell.exe -Version 5.1 -s -NoLogo -NoProfile'; pstree.txt: PID 5848 Wow64=True",
+>     "confidence": "CONFIRMED",
+>     "change_from_pre": "No change in classification; details confirmed"
+20,21c22,23
+<     "title": "Staged Payload Execution: p.exe in Temp\\Perfmon",
+<     "description": "cmd.exe (PID 5948) executed c:\\windows\\temp\\perfmon\\p.exe — payload staged in a temp subdirectory named 'Perfmon' to masquerade as a performance monitoring utility.",
+---
+>     "title": "Staged Payload Execution: p.exe in \\Windows\\Temp\\Perfmon\\",
+>     "description": "cmd.exe (PID 5948) executed c:\\windows\\temp\\perfmon\\p.exe. Payload staged in a temp subdirectory named 'Perfmon' to blend with legitimate performance monitoring activity. filescan shows the file object \\Windows\\Temp\\Perfmon\\p.exe and four separate directory handles to \\Windows\\Temp\\Perfmon, indicating persistent staging. Prefetch files confirm multiple rundll32.exe executions (four distinct hashes) consistent with shellcode loading.",
+23,24c25,27
+<     "tool_output": "cmdline.txt PID 5948: 'C:\\WINDOWS\\system32\\cmd.exe /C c:\\windows\\temp\\perfmon\\p.exe'; filescan.txt: '\\Windows\\Temp\\Perfmon\\p.exe'; '\\Windows\\Temp\\Perfmon' directory object",
+<     "confidence": "CONFIRMED"
+---
+>     "tool_output": "cmdline.txt PID 5948; filescan.txt: 0x8c88af21def0 \\Windows\\Temp\\Perfmon\\p.exe; 0x8c88af3128b0, 0x8c88b4b53e70, 0x8c88b775bd40 = Perfmon dir; RUNDLL32.EXE prefetch: 4 distinct hashes",
+>     "confidence": "CONFIRMED",
+>     "change_from_pre": "Enhanced with filescan directory handles and rundll32 prefetch corroboration"
+28,32c31,36
+<     "title": "rundll32.exe Abuse for Shellcode Execution",
+<     "description": "Multiple rundll32.exe processes spawned from powershell.exe (PID 5848) and p.exe (PID 8260) with blank command lines — consistent with in-memory shellcode injection via CreateRemoteThread or similar.",
+<     "evidence": ["windows.pstree", "windows.cmdline"],
+<     "tool_output": "pstree.txt: PIDs 2216,5452,4108,6768,5588,8148 parent=5848; PIDs 5768,7552,1424 parent=8260; cmdline.txt: all have args='-'",
+<     "confidence": "CONFIRMED"
+---
+>     "title": "rundll32.exe Abuse for Shellcode Execution (Multiple Instances)",
+>     "description": "Nine rundll32.exe processes spawned across the attack chain — six from powershell.exe (PID 5848) and three from p.exe (PID 8260) — all with blank command lines. Blank cmdlines combined with parent=attacker_process is the hallmark of in-memory shellcode injection via CreateRemoteThread or NtCreateThread. Four distinct rundll32 prefetch hashes in filescan confirm executions from different module paths.",
+>     "evidence": ["windows.pstree", "windows.cmdline", "windows.filescan"],
+>     "tool_output": "pstree.txt: PIDs 2216,5452,4108,6768,5588,8148 parent=5848; PIDs 5768,7552,1424 parent=8260; cmdline.txt: all args='-'; filescan.txt: 4 RUNDLL32.EXE prefetch files with distinct hashes",
+>     "confidence": "CONFIRMED",
+>     "change_from_pre": "Enhanced with prefetch hash count as corroboration"
+36,37c40,41
+<     "title": "C2 Beaconing to 172.16.4.10:8080 via HTTP",
+<     "description": "Multiple TCP connections from 172.16.6.11 to 172.16.4.10 port 8080 found in netscan: 1 ESTABLISHED, 6 CLOSE_WAIT, 2 CLOSED — consistent with recurring C2 beaconing (Cobalt Strike or Metasploit HTTP listener).",
+---
+>     "title": "C2 Beaconing to 172.16.4.10:8080 (Multiple Connections, Recurring Pattern)",
+>     "description": "netscan found 9+ TCP connections from 172.16.6.11 to 172.16.4.10:8080: 1 ESTABLISHED, 6 CLOSE_WAIT, 2 CLOSED. All connections are dissociated from any live PID (PID='-'), consistent with the processes that initiated them having been injected or exited. The recurring pattern to a single non-standard port is consistent with Cobalt Strike, Metasploit, or similar C2 framework HTTP beaconing.",
+39,40c43,45
+<     "tool_output": "netscan.txt: offsets 0x8c88af069cb0 (ESTABLISHED), 0x8c88afa34500, 0x8c88afc2ea80, 0x8c88afc72a60, 0x8c88afe40cb0, 0x8c88b12404c0, 0x8c88b16ba950, 0x8c88b4abe4c0, 0x8c88b434dcb0 (CLOSE_WAIT/CLOSED) all :8080",
+<     "confidence": "CONFIRMED"
+---
+>     "tool_output": "netscan.txt: 9 entries to 172.16.4.10:8080 across offsets 0x8c88af069cb0 through 0x8c88b9076010",
+>     "confidence": "CONFIRMED",
+>     "change_from_pre": "No change in classification; count corrected to 9+"
+45c50
+<     "description": "ESTABLISHED SMB connections from 172.16.6.11 to 172.16.4.5:445 (PID -) and 172.16.7.15:445 indicate lateral movement attempts over SMB.",
+---
+>     "description": "ESTABLISHED SMB connections to two internal hosts: 172.16.4.5:445 and 172.16.7.15:445. Combined with the Domain Admin context of the attack process chain, these represent successful SMB lateral movement attempts. Both connections are PID='-' (processes terminated or injected).",
+48c53,54
+<     "confidence": "CONFIRMED"
+---
+>     "confidence": "CONFIRMED",
+>     "change_from_pre": "No change"
+52,53c58,59
+<     "title": "WinRM Lateral Movement Attempt to 172.16.5.21",
+<     "description": "CLOSED WinRM connection (port 5985) to 172.16.5.21 from the subject machine — WinRM used for remote command execution.",
+---
+>     "title": "WinRM Connection Attempt to 172.16.5.21",
+>     "description": "CLOSED WinRM (port 5985) connection to 172.16.5.21. CLOSED state means the connection was previously established and terminated. With Domain Admin credentials, WinRM allows remote command execution equivalent to interactive shell access.",
+56c62,63
+<     "confidence": "UNCONFIRMED"
+---
+>     "confidence": "UNCONFIRMED",
+>     "change_from_pre": "No change — CLOSED state cannot confirm successful authentication"
+60,61c67,68
+<     "title": "LDAP Enumeration of Active Directory (172.16.4.4:389)",
+<     "description": "CLOSED LDAP connection to 172.16.4.4:389 — likely domain controller queried for AD enumeration (users, groups, computers).",
+---
+>     "title": "LDAP Query to 172.16.4.4 (Likely Domain Controller — AD Enumeration)",
+>     "description": "CLOSED LDAP connection to 172.16.4.4:389. LDAP port 389 on an internal host is consistent with a Domain Controller. Under Domain Admin context this would allow complete AD enumeration (users, computers, groups, GPOs).",
+64c71,72
+<     "confidence": "UNCONFIRMED"
+---
+>     "confidence": "UNCONFIRMED",
+>     "change_from_pre": "No change — single closed connection; host identity not confirmed from memory"
+68,69c76,77
+<     "title": "Domain Admin Account 'spsql' Compromised",
+<     "description": "All attacker processes (powershell.exe PIDs 8712/5848, cmd.exe 5948, p.exe 8260) run as 'spsql' (SID -1193), a member of Domain Admins (SID -512) and local Administrators (SID S-1-5-32-544).",
+---
+>     "title": "Domain Admin Account 'spsql' Fully Compromised",
+>     "description": "The entire attack chain — powershell.exe (PIDs 8712, 5848), cmd.exe (5948), p.exe (8260) — executes as 'spsql' (domain SID-1193), a member of Domain Admins (SID-512) and local Administrators (SID-544), running at High Mandatory Level. This is a privileged service account name ('spsql' suggests SQL Server service account) being abused for lateral movement.",
+71,72c79,81
+<     "tool_output": "getsids_p_exe.txt, getsids_ps8712.txt, getsids_ps5848.txt: all show spsql, Domain Admins, Administrators, High Mandatory Level",
+<     "confidence": "CONFIRMED"
+---
+>     "tool_output": "getsids_p_exe.txt, getsids_ps8712.txt, getsids_ps5848.txt: all show spsql + Domain Admins (S-1-5-21-3445421715-2530590580-3149308974-512) + Administrators (S-1-5-32-544) + High Mandatory Level (S-1-16-12288)",
+>     "confidence": "CONFIRMED",
+>     "change_from_pre": "Enhanced with SQL service account interpretation"
+76,77c85,86
+<     "title": "Code Injection in p.exe (RWX VAD, 481 Pages)",
+<     "description": "windows.malfind found a PAGE_EXECUTE_READWRITE VAD region in p.exe (PID 8260) at 0x2be0000-0x2dc0fff spanning 481 committed pages (approx 1.9MB) with no file backing — consistent with reflective shellcode or injected PE.",
+---
+>     "title": "Code Injection in p.exe: 1.9MB Private RWX VAD (No File Backing)",
+>     "description": "malfind reports a PAGE_EXECUTE_READWRITE VadS region in p.exe (PID 8260) at 0x2be0000-0x2dc0fff spanning 481 committed pages (~1.9MB) with PrivateMemory=1 and no file backing. This is a textbook reflective shellcode or staged payload region. The hexdump is all underscores (paged out of the physical capture) but the region attributes alone are conclusive.",
+79,80c88,90
+<     "tool_output": "malfind.txt: PID 8260 p.exe VadS TAG PAGE_EXECUTE_READWRITE CommitCharge=481 PrivateMemory=1",
+<     "confidence": "CONFIRMED"
+---
+>     "tool_output": "malfind.txt: PID 8260 p.exe VadS TAG PAGE_EXECUTE_READWRITE CommitCharge=481 PrivateMemory=1 at 0x2be0000",
+>     "confidence": "CONFIRMED",
+>     "change_from_pre": "Enhanced with page count interpretation (481 pages = ~1.9MB)"
+85c95
+<     "description": "CLOSED HTTPS connection to external IP 52.16.55.11:443 — possible initial staging server, payload retrieval, or external C2.",
+---
+>     "description": "CLOSED HTTPS connection to external IP 52.16.55.11:443 with no PID attribution. Could represent initial payload staging, C2 over SSL, or cloud service communication. No additional context available from memory alone.",
+87,88c97,99
+<     "tool_output": "netscan.txt: 0x8c88b7f29a40 172.16.6.11:49360->52.16.55.11:443 CLOSED",
+<     "confidence": "UNCONFIRMED"
+---
+>     "tool_output": "netscan.txt: 0x8c88b7f29a40 172.16.6.11:49360->52.16.55.11:443 CLOSED PID='-'",
+>     "confidence": "UNCONFIRMED",
+>     "change_from_pre": "No change"
+93c104
+<     "description": "ESTABLISHED inbound SMB connection from 172.16.6.14:65368 to 172.16.6.11:445 — another host on the same subnet accessed this machine over SMB.",
+---
+>     "description": "ESTABLISHED inbound SMB connection from 172.16.6.14:65368 to 172.16.6.11:445. Could be the attacker pivoting from a previously compromised host on the same subnet, or legitimate administrative access. Cannot distinguish without additional context.",
+96c107,108
+<     "confidence": "UNCONFIRMED"
+---
+>     "confidence": "UNCONFIRMED",
+>     "change_from_pre": "No change"
+100,101c112,113
+<     "title": "OUTLOOK.EXE Malfind Hits (False Positive)",
+<     "description": "Two RWX VAD regions flagged in OUTLOOK.EXE (PID 8128) — initial suspicion of injection.",
+---
+>     "title": "OUTLOOK.EXE Malfind Hits — FALSE POSITIVE (RETRACTED)",
+>     "description": "RETRACTED. Two PAGE_EXECUTE_READWRITE regions in OUTLOOK.EXE (PID 8128) initially appeared suspicious. Both regions begin with byte sequence 64 74 72 52 00 00 00 00 (ASCII: 'dtrR'), which is a known Outlook Distributed Transaction Record memory allocation signature, not injected shellcode. No PE header (no MZ/4D5A). Classification: benign false positive.",
+103,104c115,117
+<     "tool_output": "malfind.txt: PID 8128 OUTLOOK.EXE two regions beginning with 64 74 72 52 (dtrR pattern)",
+<     "confidence": "UNCONFIRMED"
+---
+>     "tool_output": "malfind.txt: PID 8128 both regions hexdump begin 64 74 72 52 (dtrR). Self-correction skill FP table confirms this pattern.",
+>     "confidence": "RETRACTED",
+>     "change_from_pre": "RETRACTED — was UNCONFIRMED; confirmed as known FP pattern"
+108,109c121,122
+<     "title": "Orphan conhost.exe (PID 9936) with Missing Parent PID 11552",
+<     "description": "conhost.exe (PID 9936) shows PPID 11552, which does not appear anywhere in psscan — parent process completely absent from pool scan.",
+---
+>     "title": "Orphan conhost.exe (PID 9936) — Parent PID 11552 Absent from psscan",
+>     "description": "conhost.exe (PID 9936, exited 2018-09-06 18:26:17 UTC) has PPID 11552, which appears nowhere in psscan output. Both processes have exited. Possible explanations: (a) parent exited before pool tag was scanned (normal), (b) parent was deliberately unlinked. Given attacker presence, this warrants notation but cannot be confirmed as malicious from memory alone.",
+111,112c124,126
+<     "tool_output": "psscan.txt: PID 9936 PPID 11552 conhost.exe exited 2018-09-06 18:26:17 UTC; no PID 11552 entry anywhere in psscan",
+<     "confidence": "UNCONFIRMED"
+---
+>     "tool_output": "psscan.txt: PID 9936 PPID 11552 conhost.exe ExitTime 2018-09-06 18:26:17 UTC; grep for 11552 in psscan produces no results",
+>     "confidence": "UNCONFIRMED",
+>     "change_from_pre": "No change in classification"
+117c131
+<     "description": "subject_srv.exe (PID 1096) at C:\\windows\\subject_srv.exe is the F-Response Subject software used to acquire this memory image. Command line: '-s base-hunt.shieldbase.lan:5682 -l 3262 -v F-Response Subject -k 155522845'.",
+---
+>     "description": "subject_srv.exe (PID 1096, created 2018-09-06 18:28:30 UTC) running from C:\\windows\\subject_srv.exe is the F-Response Subject software used to perform the live memory acquisition. Its connection to base-hunt.shieldbase.lan:5682 (port 5682) and listening on port 3262 matches F-Response architecture. This is a legitimate forensic tool, not attacker infrastructure.",
+119,120c133,135
+<     "tool_output": "cmdline.txt PID 1096; netscan.txt: subject_srv.ex listening 3262, ESTABLISHED to 172.16.5.50:39372",
+<     "confidence": "CONFIRMED"
+---
+>     "tool_output": "cmdline.txt PID 1096: 'C:\\windows\\subject_srv.exe -s base-hunt.shieldbase.lan:5682 -l 3262 -v F-Response Subject -k 155522845'; netscan.txt: listening 3262, ESTABLISHED to 172.16.5.50:39372",
+>     "confidence": "CONFIRMED",
+>     "change_from_pre": "No change"
+124,125c139,140
+<     "title": "Multiple RDP Sessions to 172.16.4.5 (Possible DC)",
+<     "description": "Multiple CLOSED RDP connections from 172.16.6.11 to 172.16.4.5:3389 — attacker may have attempted RDP access to another internal host.",
+---
+>     "title": "Multiple RDP Sessions to 172.16.4.5",
+>     "description": "Eight+ CLOSED RDP connections from 172.16.6.11 to 172.16.4.5:3389. The volume suggests persistent or repeated RDP attempts. Combined with Domain Admin credentials, this could indicate interactive RDP lateral movement to that host.",
+127,128c142,171
+<     "tool_output": "netscan.txt: PIDs -, offsets 0x8c88afcea690, 0x8c88b2c039b0, 0x8c88b37e7970, 0x8c88b3943010, 0x8c88b5bfa1a0, 0x8c88b675a9c0, 0x8c88b68f5480, 0x8c88b761a900, 0x8c88b63848 all CLOSED to 172.16.4.5:3389",
+<     "confidence": "UNCONFIRMED"
+---
+>     "tool_output": "netscan.txt: 8 entries CLOSED to 172.16.4.5:3389 at offsets 0x8c88afcea690 through 0x8c88b761a900",
+>     "confidence": "UNCONFIRMED",
+>     "change_from_pre": "No change"
+>   },
+>   {
+>     "id": "F17",
+>     "title": "NEW: Hands-on-Keyboard Activity Confirmed via conhost.exe Attachment",
+>     "description": "conhost.exe (PID 1740) is a direct child of powershell.exe (PID 8712), created at the same second (2018-08-30 16:43:36 UTC). This confirms an interactive console session was attached to the attacker's PowerShell, indicating a human operator — not an automated script — was executing commands.",
+>     "evidence": ["windows.pstree", "windows.psscan"],
+>     "tool_output": "pstree.txt: PID 1740 conhost.exe parent=8712 powershell.exe created 2018-08-30 16:43:36 UTC",
+>     "confidence": "CONFIRMED",
+>     "change_from_pre": "NEW finding added during self-correction"
+>   },
+>   {
+>     "id": "FP01",
+>     "title": "powershell.exe (PID 8712) Malfind Regions — FALSE POSITIVE (not included as finding)",
+>     "description": "Three small PAGE_EXECUTE_READWRITE regions (8, 1, 2 pages) flagged in powershell.exe (PID 8712) by malfind. PowerShell uses .NET CLR which JIT-compiles scripts into executable memory; small RWX regions without PE headers in PowerShell processes are expected. No MZ header observed. Assessed as .NET CLR JIT false positive.",
+>     "evidence": ["windows.malfind"],
+>     "tool_output": "malfind.txt: PID 8712 three VadS regions 8/1/2 CommitCharge pages; no MZ header in hexdump",
+>     "confidence": "RETRACTED",
+>     "change_from_pre": "NEW — identified as FP during self-correction; excluded from main findings"
+>   },
+>   {
+>     "id": "FP02",
+>     "title": "UpdaterUI.exe (PID 6036) Malfind Region — FALSE POSITIVE (not included as finding)",
+>     "description": "One 1-page PAGE_EXECUTE_READWRITE region in McAfee UpdaterUI.exe (PID 6036). McAfee AV components commonly use small self-modifying code regions for signature updates. 1-page RWX region in AV updater is a documented false positive pattern.",
+>     "evidence": ["windows.malfind"],
+>     "tool_output": "malfind.txt: PID 6036 UpdaterUI.exe VadS PAGE_EXECUTE_READWRITE CommitCharge=1",
+>     "confidence": "RETRACTED",
+>     "change_from_pre": "NEW — identified as FP during self-correction; excluded from main findings"

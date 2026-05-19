@@ -1,0 +1,184 @@
+{
+  "case": "SRL-2018",
+  "host": "BASE-RD-01",
+  "analyst": "Claude Code DFIR Orchestrator",
+  "run_start_utc": "2026-05-15T02:44:03Z",
+  "image": "evidence/base-rd01-memory.img",
+  "image_sha256": "83456c716bbbeb116b474b87473445629db5dd018d0c667ec99f088871e1cbca",
+  "commands": [
+    {
+      "step": 1,
+      "phase": "SETUP",
+      "command": "sha256sum ./evidence/base-rd01-memory.img",
+      "output_file": "N/A (stdout)",
+      "stdout_summary": "83456c716bbbeb116b474b87473445629db5dd018d0c667ec99f088871e1cbca",
+      "return_code": 0,
+      "notes": "Image integrity verified"
+    },
+    {
+      "step": 2,
+      "phase": "SETUP",
+      "command": "which vol && vol -V",
+      "output_file": "N/A (stdout)",
+      "stdout_summary": "/home/abhisoni/.local/bin/vol — Volatility 3 Framework 2.27.0",
+      "return_code": 0,
+      "notes": "vol via pipx confirmed as Volatility 3"
+    },
+    {
+      "step": 3,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.info",
+      "output_file": "analysis/memory/windows_info.txt",
+      "stdout_summary": "Win10 x64 Build 16299, SystemTime 2018-09-06 18:57:17 UTC, 2 CPUs",
+      "return_code": 0,
+      "notes": "OS identification and capture timestamp established"
+    },
+    {
+      "step": 4,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.psscan",
+      "output_file": "analysis/memory/psscan.txt",
+      "stdout_summary": "146 lines; 144 processes found including p.exe PID 8260 and two powershell.exe chains",
+      "return_code": 0,
+      "notes": "Pool scan revealed p.exe at \\Windows\\Temp\\Perfmon\\p.exe and attack chain"
+    },
+    {
+      "step": 5,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.pslist",
+      "output_file": "analysis/memory/pslist.txt",
+      "stdout_summary": "133 lines",
+      "return_code": 0,
+      "notes": "Used for psscan vs pslist diff to find hidden processes"
+    },
+    {
+      "step": 6,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img -r pretty windows.pstree",
+      "output_file": "analysis/memory/pstree.txt",
+      "stdout_summary": "131 lines; confirmed WmiPrvSE->PS8712->PS5848->cmd5948->p.exe8260 chain",
+      "return_code": 0,
+      "notes": "Full parent-child attack chain mapped"
+    },
+    {
+      "step": 7,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.cmdline",
+      "output_file": "analysis/memory/cmdline.txt",
+      "stdout_summary": "133 lines; PID 5948 = cmd /C c:\\windows\\temp\\perfmon\\p.exe; PID 8712 cmdline wiped",
+      "return_code": 0,
+      "notes": "Payload path confirmed; anti-forensics cmdline wipe detected on PS8712"
+    },
+    {
+      "step": 8,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.netscan",
+      "output_file": "analysis/memory/netscan.txt",
+      "stdout_summary": "133 lines; 9+ connections to 172.16.4.10:8080; SMB to .4.5 and .7.15; WinRM to .5.21",
+      "return_code": 0,
+      "notes": "C2 and lateral movement network evidence captured"
+    },
+    {
+      "step": 9,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.malfind",
+      "output_file": "analysis/memory/malfind.txt",
+      "stdout_summary": "39 lines; p.exe 481-page RWX region; OUTLOOK.EXE dtrR FP; PS8712 .NET JIT FP; McAfee FP",
+      "return_code": 0,
+      "notes": "p.exe confirmed injected; 3 FPs identified and retracted in self-correction"
+    },
+    {
+      "step": 10,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.filescan",
+      "output_file": "analysis/memory/filescan.txt",
+      "stdout_summary": "25861 lines; \\Windows\\Temp\\Perfmon\\p.exe confirmed; 4 rundll32 prefetch hashes",
+      "return_code": 0,
+      "notes": "Payload staging directory and file confirmed in memory file cache"
+    },
+    {
+      "step": 11,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.getsids --pid 8260",
+      "output_file": "analysis/memory/getsids_p_exe.txt",
+      "stdout_summary": "spsql, Domain Admins, Administrators, High Mandatory Level",
+      "return_code": 0,
+      "notes": "p.exe runs as Domain Admin 'spsql'"
+    },
+    {
+      "step": 12,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.getsids --pid 8712",
+      "output_file": "analysis/memory/getsids_ps8712.txt",
+      "stdout_summary": "spsql, Domain Admins, Administrators, High Mandatory Level",
+      "return_code": 0,
+      "notes": "PS 8712 runs as Domain Admin 'spsql'"
+    },
+    {
+      "step": 13,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.getsids --pid 5848",
+      "output_file": "analysis/memory/getsids_ps5848.txt",
+      "stdout_summary": "spsql, Domain Admins, Administrators, High Mandatory Level",
+      "return_code": 0,
+      "notes": "PS 5848 runs as Domain Admin 'spsql'"
+    },
+    {
+      "step": 14,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.svcscan",
+      "output_file": "analysis/memory/svcscan.txt",
+      "stdout_summary": "No suspicious services; subject_srv.exe not registered as service",
+      "return_code": 0,
+      "notes": "No service-based persistence found"
+    },
+    {
+      "step": 15,
+      "phase": "INVESTIGATE",
+      "command": "vol -f evidence/base-rd01-memory.img windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "output_file": "analysis/memory/reg_run.txt",
+      "stdout_summary": "No malicious Run keys; tdungan user has OneDrive/Dashlane (expected); spsql user Run key is empty",
+      "return_code": 0,
+      "notes": "No registry-based persistence found"
+    },
+    {
+      "step": 16,
+      "phase": "SELF-CORRECT",
+      "command": "Self-correction protocol (SKILL.md Phase 2)",
+      "output_file": "analysis/findings_pre_correction.json, analysis/findings_post_correction.json, analysis/correction_diff.txt",
+      "stdout_summary": "3 FPs retracted; 1 new finding added (F17 hands-on-keyboard); 3 findings enhanced",
+      "return_code": 0,
+      "notes": "219-line diff generated"
+    },
+    {
+      "step": 17,
+      "phase": "SELF-CORRECT",
+      "command": "vol -f evidence/base-rd01-memory.img windows.getsids --pid 2876",
+      "output_file": "analysis/memory/getsids_wmiprvse.txt",
+      "stdout_summary": "NT Authority / Network Service (S-1-5-20) — contrasts with spsql context in child PS",
+      "return_code": 0,
+      "notes": "Additional SID check during self-correction confirmed remote WMI execution with spsql credentials"
+    },
+    {
+      "step": 18,
+      "phase": "REPORT",
+      "command": "Write reports/investigative_narrative.md",
+      "output_file": "reports/investigative_narrative.md",
+      "return_code": 0,
+      "notes": "Phase 3 narrative report generated"
+    },
+    {
+      "step": 19,
+      "phase": "REPORT",
+      "command": "Write reports/findings.json",
+      "output_file": "reports/findings.json",
+      "return_code": 0,
+      "notes": "Machine-readable structured findings generated"
+    }
+  ],
+  "enrichment_skipped": {
+    "tools": ["hash_file", "yara_scan"],
+    "reason": "Not available for this baseline run",
+    "impact": "p.exe and rundll32 loader chain not identified to malware family; external IP 52.16.55.11 not ASN/WHOIS enriched"
+  }
+}

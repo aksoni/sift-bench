@@ -1,0 +1,125 @@
+6c6
+<   "phase": "pre_correction",
+---
+>   "phase": "post_correction",
+11c11
+<       "description": "WmiPrvSE.exe (PID 2876) spawned powershell.exe (PID 8712) in Session 0 starting at 2018-08-30 16:43:36 UTC. WMI should never parent PowerShell in a non-interactive session; this is a classic WMI-based living-off-the-land execution technique. The PowerShell process has no command line in memory (likely cleared by the WMI payload to hinder forensic analysis).",
+---
+>       "description": "WmiPrvSE.exe (PID 2876) spawned powershell.exe (PID 8712) in Session 0 starting at 2018-08-30 16:43:36 UTC. WMI should never parent PowerShell in Session 0 (non-interactive); this is a classic WMI-based living-off-the-land execution technique. The PowerShell process has no command line in memory (likely cleared by the WMI payload). Host machine was in EDT timezone (UTC-4); transcript times are local, Volatility times are UTC.",
+30c30,33
+<       "mitre_attack": ["T1047", "T1059.001"]
+---
+>       "mitre_attack": [
+>         "T1047",
+>         "T1059.001"
+>       ]
+55c58,61
+<       "mitre_attack": ["T1059.001", "T1021.006"]
+---
+>       "mitre_attack": [
+>         "T1059.001",
+>         "T1021.006"
+>       ]
+81c87,90
+<       "mitre_attack": ["T1204.002", "T1036.005"]
+---
+>       "mitre_attack": [
+>         "T1204.002",
+>         "T1036.005"
+>       ]
+95c104
+<         "raw_tool_output": "172.16.6.11:49788->172.16.4.10:8080 ESTABLISHED; 172.16.6.11:49787->172.16.4.10:8080 ESTABLISHED; 172.16.6.11:49786->172.16.4.10:8080 ESTABLISHED"
+---
+>         "raw_tool_output": "172.16.6.11:49788->172.16.4.10:8080 ESTABLISHED PID=-; 172.16.6.11:49787->172.16.4.10:8080 ESTABLISHED PID=-; 172.16.6.11:49786->172.16.4.10:8080 ESTABLISHED PID=- [PID unresolvable in netscan; consistent with p.exe socket after partial teardown]"
+100c109,112
+<       "mitre_attack": ["T1071.001", "T1095"]
+---
+>       "mitre_attack": [
+>         "T1071.001",
+>         "T1095"
+>       ]
+120c132,134
+<       "mitre_attack": ["T1078.002"]
+---
+>       "mitre_attack": [
+>         "T1078.002"
+>       ]
+139c153,156
+<       "mitre_attack": ["T1105", "T1573"]
+---
+>       "mitre_attack": [
+>         "T1105",
+>         "T1573"
+>       ]
+144c161
+<       "description": "PowerShell transcripts recovered from spsql's Documents directory show that PowerShell was executed inside rundll32.exe (not powershell.exe) as the host application. Transcript for PID 1424 (2018-09-06 10:58:42 UTC) and PID 7552 (2018-09-06 13:26:32 UTC) both list 'C:\\WINDOWS\\system32\\rundll32.exe' as the Host Application. This confirms reflective loading of the .NET PowerShell runtime into rundll32 — a well-known defense evasion technique to avoid PowerShell detection.",
+---
+>       "description": "PowerShell transcripts recovered from spsql's Documents directory show that PowerShell was executed inside rundll32.exe (not powershell.exe) as the host application. Transcript for PID 1424 (2018-09-06 10:58:42 UTC) and PID 7552 (2018-09-06 13:26:32 UTC) both list 'C:\\WINDOWS\\system32\\rundll32.exe' as the Host Application. This confirms reflective loading of the .NET PowerShell runtime into rundll32 \u2014 a well-known defense evasion technique to avoid PowerShell detection.",
+160c177,180
+<       "mitre_attack": ["T1218.011", "T1059.001"]
+---
+>       "mitre_attack": [
+>         "T1218.011",
+>         "T1059.001"
+>       ]
+180c200,203
+<       "mitre_attack": ["T1036.003", "T1074.001"]
+---
+>       "mitre_attack": [
+>         "T1036.003",
+>         "T1074.001"
+>       ]
+185c208
+<       "description": "PowerShell transcript from rundll32.exe (PID 1424) at 2018-09-06 10:58:42 UTC records: 'copy c:\\windows\\ImmersiveControlPanel\\SystemSettings.exe C:\\windows\\'. Copying a legitimate Windows binary to the root Windows directory is likely a masquerading or DLL hijacking setup — an attacker may replace or shadow a legitimate binary to establish persistence or bypass defenses.",
+---
+>       "description": "PowerShell transcript from rundll32.exe (PID 1424) at 2018-09-06 10:58:42 UTC records: 'copy c:\\windows\\ImmersiveControlPanel\\SystemSettings.exe C:\\windows\\'. Copying a legitimate Windows binary to the root Windows directory is likely a masquerading or DLL hijacking setup \u2014 an attacker may replace or shadow a legitimate binary to establish persistence or bypass defenses.",
+200c223,225
+<       "mitre_attack": ["T1036.005"]
+---
+>       "mitre_attack": [
+>         "T1036.005"
+>       ]
+219c244,246
+<       "mitre_attack": ["T1021.002"]
+---
+>       "mitre_attack": [
+>         "T1021.002"
+>       ]
+237c264,266
+<       "mitre_attack": ["T1021.001"]
+---
+>       "mitre_attack": [
+>         "T1021.001"
+>       ]
+256c285,287
+<       "mitre_attack": ["T1021.006"]
+---
+>       "mitre_attack": [
+>         "T1021.006"
+>       ]
+275c306,309
+<       "mitre_attack": ["T1018", "T1087.002"]
+---
+>       "mitre_attack": [
+>         "T1018",
+>         "T1087.002"
+>       ]
+324c358,360
+<       "mitre_attack": ["T1003.001"]
+---
+>       "mitre_attack": [
+>         "T1003.001"
+>       ]
+346c382
+<       "title": "powershell.exe (PID 8712) malfind RWX regions — initial injection suspicion",
+---
+>       "title": "powershell.exe (PID 8712) malfind RWX regions \u2014 initial injection suspicion",
+364c400
+<       "title": "UpdaterUI.exe (PID 6036) malfind RWX region — initial suspicion",
+---
+>       "title": "UpdaterUI.exe (PID 6036) malfind RWX region \u2014 initial suspicion",
+387c423
+< }
+---
+> }
+\ No newline at end of file

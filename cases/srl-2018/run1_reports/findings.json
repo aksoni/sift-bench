@@ -1,0 +1,251 @@
+{
+  "case": "SRL-2018",
+  "host": "BASE-RD-01",
+  "image_sha256": "83456c716bbbeb116b474b87473445629db5dd018d0c667ec99f088871e1cbca",
+  "capture_time_utc": "2018-09-06T18:57:17Z",
+  "report_generated_utc": "2026-05-15T02:44:03Z",
+  "os": "Windows 10 x64 Build 16299",
+  "volatility_version": "3 Framework 2.27.0",
+  "enrichment_performed": false,
+  "enrichment_note": "YARA scanning and file hashing skipped — enrichment tools not available for this baseline run",
+  "self_correction_performed": true,
+  "self_correction_changes": [
+    "RETRACTED F13: OUTLOOK.EXE malfind hits confirmed as false positive (dtrR pattern)",
+    "RETRACTED FP01: powershell.exe (PID 8712) malfind regions confirmed as .NET CLR JIT false positive",
+    "RETRACTED FP02: UpdaterUI.exe (PID 6036) malfind region confirmed as McAfee AV false positive",
+    "ENHANCED F01: Added WmiPrvSE SID context (NT Authority vs spsql token) and cmdline wipe anti-forensics",
+    "ENHANCED F03: Added filescan directory handles and rundll32 prefetch corroboration",
+    "ENHANCED F04: Added prefetch hash count as corroboration",
+    "NEW F17: Added hands-on-keyboard confirmation via conhost.exe (PID 1740) attachment to PS 8712"
+  ],
+  "findings": [
+    {
+      "id": "F01",
+      "title": "WMI-Spawned PowerShell Execution with Anti-Forensics",
+      "description": "WmiPrvSE.exe (PID 2876, NT Authority) spawned powershell.exe (PID 8712) executing as 'spsql' (Domain Admins). WMI invoked remotely with explicit spsql credentials. Attacker wiped cmdline of PS 8712 (args='-') to prevent forensic recovery.",
+      "confidence": "CONFIRMED",
+      "tool": "windows.pstree + windows.cmdline + windows.getsids",
+      "evidence_file": "analysis/memory/pstree.txt, analysis/memory/cmdline.txt, analysis/memory/getsids_ps8712.txt, analysis/memory/getsids_wmiprvse.txt",
+      "mitre": ["T1047", "T1070.004"],
+      "key_artifacts": {
+        "parent_pid": 2876,
+        "parent_process": "WmiPrvSE.exe",
+        "parent_context": "NT Authority / Network Service (S-1-5-20)",
+        "child_pid": 8712,
+        "child_process": "powershell.exe",
+        "child_context": "spsql / Domain Admins (S-1-5-21-3445421715-2530590580-3149308974-512)",
+        "child_cmdline": "WIPED (args='-')",
+        "child_create_time_utc": "2018-08-30T16:43:36Z"
+      }
+    },
+    {
+      "id": "F02",
+      "title": "Two-Stage PowerShell Chain via SysWOW64 Remoting Mode",
+      "description": "64-bit PS (PID 8712) spawned 32-bit SysWOW64 PS (PID 5848) with '-Version 5.1 -s -NoLogo -NoProfile' enabling remoting server mode and 32-bit execution context for shellcode loading.",
+      "confidence": "CONFIRMED",
+      "tool": "windows.cmdline + windows.pstree",
+      "evidence_file": "analysis/memory/cmdline.txt, analysis/memory/pstree.txt",
+      "mitre": ["T1059.001", "T1218"],
+      "key_artifacts": {
+        "pid": 5848,
+        "parent_pid": 8712,
+        "cmdline": "c:\\windows\\syswow64\\windowspowershell\\v1.0\\powershell.exe -Version 5.1 -s -NoLogo -NoProfile",
+        "wow64": true,
+        "create_time_utc": "2018-08-30T16:43:42Z"
+      }
+    },
+    {
+      "id": "F03",
+      "title": "Staged Payload: p.exe in \\Windows\\Temp\\Perfmon\\",
+      "description": "Attacker payload staged at c:\\windows\\temp\\perfmon\\p.exe, masquerading as Windows Performance Monitor tooling. File and directory confirmed in filescan. Four distinct rundll32 prefetch hashes corroborate repeated shellcode execution.",
+      "confidence": "CONFIRMED",
+      "tool": "windows.cmdline + windows.psscan + windows.filescan",
+      "evidence_file": "analysis/memory/cmdline.txt, analysis/memory/psscan.txt, analysis/memory/filescan.txt",
+      "mitre": ["T1036.005"],
+      "key_artifacts": {
+        "payload_path": "\\Windows\\Temp\\Perfmon\\p.exe",
+        "filescan_offset": "0x8c88af21def0",
+        "launcher_cmdline": "C:\\WINDOWS\\system32\\cmd.exe /C c:\\windows\\temp\\perfmon\\p.exe",
+        "rundll32_prefetch_hashes": 4,
+        "pid": 8260,
+        "create_time_utc": "2018-08-30T22:15:18Z"
+      }
+    },
+    {
+      "id": "F04",
+      "title": "rundll32.exe Abuse for In-Memory Shellcode Loading",
+      "description": "Nine blank-cmdline rundll32.exe processes spawned from attacker processes (6 from PS 5848, 3 from p.exe 8260). Short lifespans (3-31 seconds) and no command-line arguments indicate shellcode injection use, not legitimate DLL loading.",
+      "confidence": "CONFIRMED",
+      "tool": "windows.pstree + windows.cmdline + windows.filescan",
+      "evidence_file": "analysis/memory/pstree.txt, analysis/memory/cmdline.txt, analysis/memory/filescan.txt",
+      "mitre": ["T1218.011"],
+      "key_artifacts": {
+        "from_ps5848": [6768, 5452, 5588, 2216, 4108, 8148],
+        "from_p_exe_8260": [5768, 1424, 7552],
+        "all_cmdlines": "blank (args='-')",
+        "lifespan_range_seconds": "3-31"
+      }
+    },
+    {
+      "id": "F05",
+      "title": "C2 Beaconing to 172.16.4.10:8080",
+      "description": "Nine+ TCP connections from subject host to 172.16.4.10:8080 (1 ESTABLISHED, 6 CLOSE_WAIT, 2+ CLOSED). Non-standard port, recurring pattern, and dissociation from live PIDs indicate C2 framework beaconing through an internal relay host.",
+      "confidence": "CONFIRMED",
+      "tool": "windows.netscan",
+      "evidence_file": "analysis/memory/netscan.txt",
+      "mitre": ["T1071.001", "T1090"],
+      "key_artifacts": {
+        "c2_host": "172.16.4.10",
+        "c2_port": 8080,
+        "local_host": "172.16.6.11",
+        "connection_states": {"ESTABLISHED": 1, "CLOSE_WAIT": 6, "CLOSED": 2},
+        "pid_attribution": "none (PID='-')"
+      }
+    },
+    {
+      "id": "F06",
+      "title": "SMB Lateral Movement to 172.16.4.5 and 172.16.7.15",
+      "description": "Two ESTABLISHED outbound SMB connections to internal hosts. With Domain Admin context, these enabled full SMB-based lateral movement.",
+      "confidence": "CONFIRMED",
+      "tool": "windows.netscan",
+      "evidence_file": "analysis/memory/netscan.txt",
+      "mitre": ["T1021.002"],
+      "key_artifacts": {
+        "targets": [
+          {"host": "172.16.4.5", "port": 445, "state": "ESTABLISHED", "local_port": 49763},
+          {"host": "172.16.7.15", "port": 445, "state": "ESTABLISHED", "local_port": 59352}
+        ]
+      }
+    },
+    {
+      "id": "F09",
+      "title": "Domain Admin Account 'spsql' Compromised",
+      "description": "Attack chain executes entirely as 'spsql' (SQL service account) which is a member of Domain Admins. Full domain-wide compromise impact.",
+      "confidence": "CONFIRMED",
+      "tool": "windows.getsids",
+      "evidence_file": "analysis/memory/getsids_p_exe.txt, analysis/memory/getsids_ps8712.txt, analysis/memory/getsids_ps5848.txt",
+      "mitre": ["T1078.002"],
+      "key_artifacts": {
+        "username": "spsql",
+        "domain_sid_prefix": "S-1-5-21-3445421715-2530590580-3149308974",
+        "user_rid": 1193,
+        "groups": ["Domain Admins (RID 512)", "Administrators (S-1-5-32-544)"],
+        "integrity": "High Mandatory Level (S-1-16-12288)",
+        "affected_pids": [8712, 5848, 5948, 8260]
+      }
+    },
+    {
+      "id": "F10",
+      "title": "Code Injection in p.exe: 1.9MB Private RWX VAD",
+      "description": "1.9MB PAGE_EXECUTE_READWRITE private memory region (no file backing) in p.exe. Consistent with reflective shellcode or staged C2 implant allocation.",
+      "confidence": "CONFIRMED",
+      "tool": "windows.malfind",
+      "evidence_file": "analysis/memory/malfind.txt",
+      "mitre": ["T1055", "T1620"],
+      "key_artifacts": {
+        "pid": 8260,
+        "process": "p.exe",
+        "region_start": "0x2be0000",
+        "region_end": "0x2dc0fff",
+        "protection": "PAGE_EXECUTE_READWRITE",
+        "commit_pages": 481,
+        "size_mb_approx": 1.88,
+        "private_memory": true,
+        "file_backed": false,
+        "content": "paged out (not captured in image)"
+      }
+    },
+    {
+      "id": "F15",
+      "title": "subject_srv.exe = F-Response Collection Agent (NOT Malicious)",
+      "description": "subject_srv.exe (PID 1096) is the F-Response Subject software used to acquire this memory image. Confirmed by command-line flags and port 3262 connection to forensic collection host.",
+      "confidence": "CONFIRMED",
+      "tool": "windows.cmdline + windows.netscan",
+      "evidence_file": "analysis/memory/cmdline.txt, analysis/memory/netscan.txt",
+      "mitre": [],
+      "key_artifacts": {
+        "pid": 1096,
+        "path": "C:\\windows\\subject_srv.exe",
+        "cmdline": "C:\\windows\\subject_srv.exe -s base-hunt.shieldbase.lan:5682 -l 3262 -v F-Response Subject -k 155522845",
+        "collection_host": "base-hunt.shieldbase.lan (172.16.5.50)",
+        "create_time_utc": "2018-09-06T18:28:30Z"
+      }
+    },
+    {
+      "id": "F17",
+      "title": "Hands-on-Keyboard Attacker Session Confirmed",
+      "description": "conhost.exe (PID 1740) spawned as direct child of attacker's powershell.exe (PID 8712) at the same timestamp, confirming an interactive console session — a human operator, not an automated script.",
+      "confidence": "CONFIRMED",
+      "tool": "windows.pstree + windows.psscan",
+      "evidence_file": "analysis/memory/pstree.txt, analysis/memory/psscan.txt",
+      "mitre": ["T1059.001"],
+      "key_artifacts": {
+        "pid": 1740,
+        "process": "conhost.exe",
+        "parent_pid": 8712,
+        "parent_process": "powershell.exe",
+        "create_time_utc": "2018-08-30T16:43:36Z"
+      }
+    },
+    {
+      "id": "F07",
+      "title": "WinRM Connection to 172.16.5.21",
+      "description": "CLOSED WinRM (5985) connection to 172.16.5.21. Insufficient to confirm successful authentication from memory alone.",
+      "confidence": "UNCONFIRMED",
+      "tool": "windows.netscan",
+      "evidence_file": "analysis/memory/netscan.txt",
+      "mitre": ["T1021.006"],
+      "key_artifacts": {"target": "172.16.5.21:5985", "state": "CLOSED"}
+    },
+    {
+      "id": "F08",
+      "title": "LDAP Enumeration of 172.16.4.4",
+      "description": "CLOSED LDAP connection to 172.16.4.4:389. Consistent with AD enumeration but unconfirmed from memory alone.",
+      "confidence": "UNCONFIRMED",
+      "tool": "windows.netscan",
+      "evidence_file": "analysis/memory/netscan.txt",
+      "mitre": ["T1087.002"],
+      "key_artifacts": {"target": "172.16.4.4:389", "state": "CLOSED"}
+    },
+    {
+      "id": "F11",
+      "title": "External HTTPS to 52.16.55.11:443",
+      "description": "CLOSED external HTTPS connection. Could be C2 staging or routine traffic. Requires enrichment.",
+      "confidence": "UNCONFIRMED",
+      "tool": "windows.netscan",
+      "evidence_file": "analysis/memory/netscan.txt",
+      "mitre": ["T1071.001"],
+      "key_artifacts": {"target": "52.16.55.11:443", "state": "CLOSED"}
+    },
+    {
+      "id": "F12",
+      "title": "Inbound SMB from 172.16.6.14",
+      "description": "ESTABLISHED inbound SMB from same subnet. Cannot confirm attacker pivot vs. legitimate admin.",
+      "confidence": "UNCONFIRMED",
+      "tool": "windows.netscan",
+      "evidence_file": "analysis/memory/netscan.txt",
+      "mitre": ["T1021.002"],
+      "key_artifacts": {"source": "172.16.6.14:65368", "dest": "172.16.6.11:445", "state": "ESTABLISHED"}
+    },
+    {
+      "id": "F13",
+      "title": "OUTLOOK.EXE Malfind Hits — RETRACTED (False Positive)",
+      "description": "Both RWX regions in OUTLOOK.EXE (PID 8128) begin with bytes 64 74 72 52 (dtrR), a known Outlook memory allocation signature. Not malicious. Retracted during self-correction.",
+      "confidence": "RETRACTED",
+      "tool": "windows.malfind",
+      "evidence_file": "analysis/memory/malfind.txt",
+      "mitre": [],
+      "key_artifacts": {"pid": 8128, "fp_pattern": "dtrR (64 74 72 52)", "retraction_reason": "Known Outlook memory allocation signature per self-correction FP table"}
+    },
+    {
+      "id": "F16",
+      "title": "Multiple RDP Sessions to 172.16.4.5",
+      "description": "Eight+ CLOSED RDP connections to 172.16.4.5:3389. Volume suggests repeated attempts; cannot confirm successful authentication.",
+      "confidence": "UNCONFIRMED",
+      "tool": "windows.netscan",
+      "evidence_file": "analysis/memory/netscan.txt",
+      "mitre": ["T1021.001"],
+      "key_artifacts": {"target": "172.16.4.5:3389", "connection_count": "8+", "state": "CLOSED"}
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+Progress:    0.00		Scanning FileLayer using PageMapScannerProgress:   23.33		Scanning FileLayer using PageMapScannerProgress:  100.00		Stacking attempts finished             Progress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:   37.50		Scanning layer_name using PdbSignatureScannerProgress:   37.60		Scanning layer_name using PdbSignatureScannerProgress:   37.70		Scanning layer_name using PdbSignatureScannerProgress:   37.79		Scanning layer_name using PdbSignatureScannerProgress:   37.89		Scanning layer_name using PdbSignatureScannerProgress:   37.99		Scanning layer_name using PdbSignatureScannerProgress:   38.09		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:   26.07		Scanning layer_name using PdbSignatureScannerProgress:   26.17		Scanning layer_name using PdbSignatureScannerProgress:   26.27		Scanning layer_name using PdbSignatureScannerProgress:   26.37		Scanning layer_name using PdbSignatureScannerProgress:   26.46		Scanning layer_name using PdbSignatureScannerProgress:   26.56		Scanning layer_name using PdbSignatureScannerProgress:   26.66		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:  100.00		PDB scanning finished                        Volatility 3 Framework 2.27.0
+
+PID	Process	Start VPN	End VPN	Tag	Protection	CommitCharge	PrivateMemory	File output	Notes	Hexdump	Disasm
+
+8128	OUTLOOK.EXE	0x363a0000	0x363affff	VadS	PAGE_EXECUTE_READWRITE	16	1	Disabled	N/A	
+64 74 72 52 00 00 00 00 18 03 3a 36 00 00 00 00 dtrR......:6....
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................	64 74 72 52 00 00 00 00 18 03 3a 36 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+8128	OUTLOOK.EXE	0x6f2f0000	0x6f2fffff	VadS	PAGE_EXECUTE_READWRITE	16	1	Disabled	N/A	
+64 74 72 52 00 00 00 00 60 18 2f 6f 00 00 00 00 dtrR....`./o....
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................	64 74 72 52 00 00 00 00 60 18 2f 6f 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+6036	UpdaterUI.exe	0x5070000	0x5070fff	VadS	PAGE_EXECUTE_READWRITE	1	1	Disabled	N/A	
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+00 00 07 05 00 00 00 00 00 00 00 00 00 00 00 00 ................
+10 00 07 05 00 00 00 00 00 00 00 00 00 00 00 00 ................
+20 00 07 05 00 00 00 00 00 00 00 00 00 00 00 00  ...............	00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 05 00 00 00 00 00 00 00 00 00 00 00 00 10 00 07 05 00 00 00 00 00 00 00 00 00 00 00 00 20 00 07 05 00 00 00 00 00 00 00 00 00 00 00 00
+8712	powershell.exe	0x1b4ce1a0000	0x1b4ce1affff	VadS	PAGE_EXECUTE_READWRITE	8	1	Disabled	N/A	
+00 00 00 00 00 00 00 00 de 86 57 19 7a ea 00 01 ..........W.z...
+ee ff ee ff 02 00 00 00 20 01 1a ce b4 01 00 00 ........ .......
+20 01 1a ce b4 01 00 00 00 00 1a ce b4 01 00 00  ...............
+00 00 1a ce b4 01 00 00 0f 00 00 00 00 00 00 00 ................	00 00 00 00 00 00 00 00 de 86 57 19 7a ea 00 01 ee ff ee ff 02 00 00 00 20 01 1a ce b4 01 00 00 20 01 1a ce b4 01 00 00 00 00 1a ce b4 01 00 00 00 00 1a ce b4 01 00 00 0f 00 00 00 00 00 00 00
+8712	powershell.exe	0x1b4ce300000	0x1b4ce30cfff	VadS	PAGE_EXECUTE_READWRITE	1	1	Disabled	N/A	
+00 00 00 00 00 00 00 00 30 77 1a ce b4 01 00 00 ........0w......
+30 77 1a ce b4 01 00 00 00 00 1a ce b4 01 00 00 0w..............
+e0 0d 30 ce b4 01 00 00 00 10 30 ce b4 01 00 00 ..0.......0.....
+00 d0 30 ce b4 01 00 00 01 00 00 00 00 00 00 00 ..0.............	00 00 00 00 00 00 00 00 30 77 1a ce b4 01 00 00 30 77 1a ce b4 01 00 00 00 00 1a ce b4 01 00 00 e0 0d 30 ce b4 01 00 00 00 10 30 ce b4 01 00 00 00 d0 30 ce b4 01 00 00 01 00 00 00 00 00 00 00
+8712	powershell.exe	0x1b4ce530000	0x1b4ce53ffff	VadS	PAGE_EXECUTE_READWRITE	2	1	Disabled	N/A	
+00 00 00 00 00 00 00 00 d9 d8 19 31 c9 8b 00 01 ...........1....
+ee ff ee ff 02 00 00 00 20 01 53 ce b4 01 00 00 ........ .S.....
+20 01 53 ce b4 01 00 00 00 00 53 ce b4 01 00 00  .S.......S.....
+00 00 53 ce b4 01 00 00 0f 00 00 00 00 00 00 00 ..S.............	00 00 00 00 00 00 00 00 d9 d8 19 31 c9 8b 00 01 ee ff ee ff 02 00 00 00 20 01 53 ce b4 01 00 00 20 01 53 ce b4 01 00 00 00 00 53 ce b4 01 00 00 00 00 53 ce b4 01 00 00 0f 00 00 00 00 00 00 00
+8260	p.exe	0x2be0000	0x2dc0fff	VadS	PAGE_EXECUTE_READWRITE	481	1	Disabled	N/A	
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ ................
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ ................
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ ................
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ ................	00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ 01 00 00 00 00 53 ce b4 01 00 00  .S.......S.....
+00 00 53 ce b4 01 00 00 0f 00 00 00 00 00 00 00 ..S.............	00 00 00 00 00 00 00 00 d9 d8 19 31 c9 8b 00 01 ee ff ee ff 02 00 00 00 20 01 53 ce b4 01 00 00 20 01 53 ce b4 01 00 00 00 00 53 ce b4 01 00 00 00 00 53 ce b4 01 00 00 0f 00 00 00 00 00 00 00
+8260	p.exe	0x2be0000	0x2dc0fff	VadS	PAGE_EXECUTE_READWRITE	481	1	Disabled	N/A	
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ ................
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ ................
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ ................
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ ................	00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00

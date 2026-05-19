@@ -1,0 +1,191 @@
+3,10c3,9
+<   "image_metadata": {
+<     "os": "Windows 10 x64 build 15.16299 (1709)",
+<     "capture_time_utc": "2018-09-06T18:57:17Z",
+<     "hostname": "BASE-RD-01",
+<     "domain": "shieldbase.lan",
+<     "image_path": "./evidence/base-rd01-memory.img"
+<   },
+<   "enrichment_note": "YARA and hash_file enrichment skipped — tools not available for this baseline run.",
+---
+>   "self_correction_changes": [
+>     "Added F11: Unnamed DLLs in PS 5848 indicating reflective loading",
+>     "Added F12: Active Directory enumeration via System.DirectoryServices in PS 8712",
+>     "Added F13: Explicit false positive classification for OUTLOOK.EXE and PS 8712 malfind hits",
+>     "Clarified F04: PID attribution gap for C2 connections explained",
+>     "Clarified F07: Added that PS 5848 also loaded HTTP stack (wininet/winhttp) and NTLM credential DLL (msv1_0)"
+>   ],
+14c13
+<       "title": "Malicious process p.exe executing from C:\\Windows\\Temp\\Perfmon\\",
+---
+>       "title": "Malicious implant p.exe executing from C:\\Windows\\Temp\\Perfmon\\",
+17,19c16,18
+<       "description": "p.exe (PID 8260) is running from C:\\Windows\\Temp\\Perfmon\\p.exe. The use of a temp directory disguised as a performance monitoring path is a classic masquerading technique (T1036.005). The process was launched at 2018-08-30 22:15:18 UTC and remains active at image capture time.",
+<       "evidence": "windows.pstree shows p.exe (PID 8260) at path c:\\windows\\temp\\perfmon\\p.exe, created 2018-08-30 22:15:18 UTC, still running. windows.filescan confirms file object at \\Windows\\Temp\\Perfmon\\p.exe and directory \\Windows\\Temp\\Perfmon.",
+<       "tool": "windows.pstree, windows.filescan",
+---
+>       "description": "p.exe (PID 8260) is running from C:\\Windows\\Temp\\Perfmon\\p.exe, launched at 2018-08-30 22:15:18 UTC and still active at image capture time (2018-09-06 18:57:17 UTC — 7-day dwell time). The Perfmon subdirectory name masquerades as a Windows Performance Monitor component.",
+>       "evidence": "windows.pstree: PID 8260 path c:\\windows\\temp\\perfmon\\p.exe, CreateTime 2018-08-30 22:15:18 UTC, ExitTime N/A. windows.filescan: \\Windows\\Temp\\Perfmon\\p.exe and \\Windows\\Temp\\Perfmon directory objects in memory. windows.cmdline: arg 'c:\\windows\\temp\\perfmon\\p.exe'.",
+>       "tool": "windows.pstree, windows.filescan, windows.cmdline",
+27,28c26,27
+<       "description": "WmiPrvSE.exe (PID 2876) spawned powershell.exe (PID 8712) at 2018-08-30 16:43:36 UTC. Powershell (8712) then spawned a second PowerShell (PID 5848) with arguments '-Version 5.1 -s -NoLogo -NoProfile' (server-mode remoting session). This PS session ultimately launched cmd.exe (PID 5948) with the command 'C:\\WINDOWS\\system32\\cmd.exe /C c:\\windows\\temp\\perfmon\\p.exe' at 2018-08-30 22:15:18 UTC.",
+<       "evidence": "windows.pstree and windows.cmdline output: WmiPrvSE (2876) -> powershell (8712) -> powershell (5848, args: -Version 5.1 -s -NoLogo -NoProfile) -> cmd (5948, args: /C c:\\windows\\temp\\perfmon\\p.exe) -> p.exe (8260)",
+---
+>       "description": "WmiPrvSE.exe (PID 2876, started 2018-08-30 13:52:26 UTC) spawned powershell.exe (PID 8712) at 2018-08-30 16:43:36 UTC — approximately 3 hours after system start. Powershell 8712 spawned a WOW64 PowerShell (PID 5848) in server/remoting mode ('-Version 5.1 -s -NoLogo -NoProfile'). This remoting session ran for 5.5 hours before launching cmd.exe (PID 5948) at 2018-08-30 22:15:18 UTC with command '/C c:\\windows\\temp\\perfmon\\p.exe', deploying the implant.",
+>       "evidence": "windows.pstree: WmiPrvSE (2876) -> powershell (8712, 16:43:36) -> powershell (5848, 16:43:42, Wow64=True) -> cmd (5948, 22:15:18) -> p.exe (8260, 22:15:18). windows.cmdline confirms all argument fields.",
+30c29
+<       "mitre": "T1047 - WMI; T1059.001 - PowerShell; T1569.002 - System Services"
+---
+>       "mitre": "T1047 - WMI; T1059.001 - PowerShell; T1105 - Ingress Tool Transfer"
+34c33
+<       "title": "Domain Admin credentials used by attacker-controlled processes",
+---
+>       "title": "Compromised Domain Admin account 'spsql' used throughout attack",
+37,38c36,37
+<       "description": "p.exe (PID 8260), powershell (PID 8712), and powershell (PID 5848) all run under account 'spsql' (SID S-1-5-21-3445421715-2530590580-3149308974-1193), which is a member of Domain Admins (S-1-5-21-3445421715-2530590580-3149308974-512) and Administrators (S-1-5-32-544) at High Mandatory Level. The name 'spsql' suggests a SQL Server service account was compromised for this attack.",
+<       "evidence": "windows.getsids output for PIDs 8260, 8712, 5848 all show spsql with Domain Admins membership.",
+---
+>       "description": "All three attacker-controlled processes (p.exe PID 8260, powershell PID 8712, powershell PID 5848) run under account 'spsql' (SID S-1-5-21-3445421715-2530590580-3149308974-1193), a member of Domain Admins (S-1-5-21-...-512) and local Administrators (S-1-5-32-544) at High Mandatory Level. Network logon SID (S-1-5-2) indicates the credentials arrived over the network. The account name suggests a SQL Server service account, a common high-privilege target for credential theft.",
+>       "evidence": "windows.getsids --pid 8260, --pid 8712, --pid 5848: all three return spsql with S-1-5-32-544 (Administrators), S-1-5-21-...-512 (Domain Admins), S-1-5-2 (Network), S-1-16-12288 (High Mandatory Level).",
+47,48c46,47
+<       "description": "Multiple TCP connections (ESTABLISHED and CLOSE_WAIT) observed between the victim (172.16.6.11) and 172.16.4.10 on port 8080. Three connections remain ESTABLISHED at capture time; seven additional CLOSE_WAIT connections indicate sustained beaconing activity over an extended period. No owning PID is attributed by netscan, consistent with connections made by a process that has since cycled its connection handles or with network stack state retention after process activity.",
+<       "evidence": "windows.netscan: offsets 0x8c88af069cb0, 0x8c88b7f274c0, 0x8c88b9076010 show ESTABLISHED TCPv4 to 172.16.4.10:8080; seven additional CLOSE_WAIT entries to same endpoint.",
+---
+>       "description": "At image capture time, three TCP connections remain ESTABLISHED from victim (172.16.6.11) to 172.16.4.10:8080. Seven additional CLOSE_WAIT connections to the same endpoint indicate prior beaconing sessions. All connections show PID '-' in netscan: this is consistent with connections owned by p.exe whose TCP handle state is not reflected in the pool-scanned owner-module structures — a pattern seen in some implants that use asynchronous I/O. Attribution to the attack chain is supported by the full process context (p.exe loaded WININET.dll + WS2_32.dll; PS 5848 loaded wininet.DLL + winhttp.dll).",
+>       "evidence": "windows.netscan: ESTABLISHED to 172.16.4.10:8080 at offsets 0x8c88af069cb0, 0x8c88b7f274c0, 0x8c88b9076010. Seven CLOSE_WAIT at 0x8c88afa34500, 0x8c88afc2ea80, 0x8c88afc72a60, 0x8c88afe40cb0, 0x8c88b12404c0, 0x8c88b16ba950, 0x8c88b434dcb0, 0x8c88b4abe4c0.",
+50c49
+<       "mitre": "T1071.001 - Application Layer Protocol: Web Protocols; T1571 - Non-Standard Port"
+---
+>       "mitre": "T1071.001 - Web Protocols; T1571 - Non-Standard Port"
+54c53
+<       "title": "Multiple rundll32 executions with no arguments from attacker-controlled PowerShell",
+---
+>       "title": "Multiple rundll32 executions with no arguments (process injection carrier)",
+57,58c56,57
+<       "description": "PowerShell (PID 5848) spawned at least 6 rundll32.exe instances (PIDs 6768, 5452, 5588, 2216, 4108, 8148) with no command-line arguments visible. All exited within seconds to minutes. Rundll32 without arguments is a classic hollow-process or code-injection carrier. p.exe (PID 8260) additionally spawned 3 rundll32.exe instances (PIDs 5768, 7552, 1424) across multiple days.",
+<       "evidence": "windows.pstree shows rundll32 children of PID 5848 and PID 8260; windows.cmdline shows all with empty argument fields.",
+---
+>       "description": "PowerShell 5848 spawned 6 rundll32.exe instances (PIDs 6768, 5452, 5588, 2216, 4108, 8148) with no visible command-line arguments. All exited within 5-30 seconds. p.exe (8260) separately spawned 3 rundll32.exe instances (PIDs 5768, 7552, 1424) on different dates (2018-09-05 and 2018-09-06). Rundll32 with no arguments is a well-known pattern for process hollowing or shellcode injection. Confidence MEDIUM because no memory dumps could be obtained of running instances.",
+>       "evidence": "windows.pstree: PIDs 6768, 5452, 5588, 2216, 4108, 8148 as children of PID 5848; PIDs 5768, 7552, 1424 as children of PID 8260. windows.cmdline: all show empty argument fields.",
+64c63
+<       "title": "Large RWX memory region in p.exe indicative of in-memory payload",
+---
+>       "title": "Large private RWX memory region in p.exe (in-memory payload)",
+67,68c66,67
+<       "description": "windows.malfind identified a 481-page (approximately 1.88 MB) PAGE_EXECUTE_READWRITE private VAD region in p.exe (PID 8260) at virtual address range 0x2be0000-0x2dc0fff with no file backing. This is a primary indicator of an in-memory shellcode or reflectively-loaded payload.",
+<       "evidence": "windows.malfind: PID 8260 p.exe, VPN 0x2be0000-0x2dc0fff, VadS, PAGE_EXECUTE_READWRITE, CommitCharge=481, PrivateMemory=1.",
+---
+>       "description": "windows.malfind identified a 481-page (~1.88 MB) PAGE_EXECUTE_READWRITE private VAD region in p.exe (PID 8260) at virtual addresses 0x2be0000-0x2dc0fff with no file backing. This large committed private executable region is a primary indicator of an in-memory shellcode stage or reflectively-loaded DLL. Pages were paged out at capture time, preventing direct hex examination.",
+>       "evidence": "windows.malfind: PID 8260, VPN 0x2be0000-0x2dc0fff, Tag VadS, Protection PAGE_EXECUTE_READWRITE, CommitCharge=481, PrivateMemory=1.",
+74c73
+<       "title": "p.exe DLL load profile matches C2 implant with post-load capability expansion",
+---
+>       "title": "p.exe and PS 5848 carry full C2 network and crypto stack; p.exe gained new capabilities post-launch",
+77,78c76,77
+<       "description": "p.exe loaded WININET.dll (HTTP/S), WS2_32.dll, DNSAPI.dll (network stack), CRYPTSP.dll, rsaenh.dll, bcrypt.dll (crypto stack), Secur32.dll, SSPICLI.DLL (credential APIs) at startup. Critically, mpr.dll (network drive/redirector API), USER32.dll, GDI32.dll loaded approximately 6 days after initial execution (2018-09-05 12:13-12:14 UTC), indicating the implant downloaded and activated additional modules during its 7-day dwell time.",
+<       "evidence": "windows.dlllist --pid 8260: initial DLLs loaded at 2018-08-30 22:15:18-19 UTC; mpr.dll LoadTime=2018-09-05 12:13:26 UTC; USER32/GDI32/etc LoadTime=2018-09-05 12:14:36 UTC.",
+---
+>       "description": "p.exe (8260) loaded at startup: WININET.dll (HTTP), WS2_32.dll, DNSAPI.dll, IPHLPAPI.DLL (network stack), CRYPTSP.dll, rsaenh.dll, bcrypt.dll (encryption), Secur32.dll, SSPICLI.DLL (credential APIs). Critically, mpr.dll (network redirector/drive API) loaded 2018-09-05 12:13:26 UTC and USER32.dll, GDI32.dll, gdi32full.dll loaded at 2018-09-05 12:14:36 UTC — 6 days after p.exe started, indicating the implant activated a new screen/UI interaction module mid-operation. PS 5848 (WOW64) additionally loaded wininet.DLL, winhttp.dll, urlmon.dll (HTTP download capability) and msv1_0.DLL (NTLM authentication/credential access).",
+>       "evidence": "windows.dlllist --pid 8260: mpr.dll LoadTime=2018-09-05 12:13:26 UTC; USER32/GDI32/etc LoadTime=2018-09-05 12:14:36 UTC. windows.dlllist --pid 5848: wininet.DLL, winhttp.dll, msv1_0.DLL present.",
+80c79
+<       "mitre": "T1071.001 - C2 over HTTP; T1573 - Encrypted Channel"
+---
+>       "mitre": "T1071.001 - C2 over HTTP; T1573 - Encrypted Channel; T1056 - Input Capture (mpr/GDI capability)"
+84c83
+<       "title": "Lateral movement to 172.16.4.5 via RDP and SMB",
+---
+>       "title": "Lateral movement to 172.16.4.5 (RDP+SMB) and 172.16.7.15 (SMB)",
+87,88c86,87
+<       "description": "Multiple closed RDP connections observed from the victim (172.16.6.11) to 172.16.4.5:3389, plus one ESTABLISHED SMB connection to 172.16.4.5:445. A second SMB connection to 172.16.7.15:445 was also established. An LDAP query to 172.16.4.4:389 (likely a domain controller) indicates Active Directory reconnaissance. Incoming SMB connection from 172.16.6.14:65368 suggests the compromised host was also accessed by another attacker-controlled host.",
+<       "evidence": "windows.netscan: CLOSED RDP to 172.16.4.5:3389 (multiple), ESTABLISHED SMB to 172.16.4.5:445 and 172.16.7.15:445, CLOSED LDAP to 172.16.4.4:389, ESTABLISHED incoming SMB from 172.16.6.14:65368.",
+---
+>       "description": "Multiple RDP connections (CLOSED) were attempted from 172.16.6.11 to 172.16.4.5:3389. One ESTABLISHED SMB connection to 172.16.4.5:445 and one ESTABLISHED SMB to 172.16.7.15:445 are present at capture time. An LDAP query to 172.16.4.4:389 (likely domain controller) indicates prior Active Directory reconnaissance. An incoming ESTABLISHED SMB connection from 172.16.6.14:65368 indicates the compromised host was also accessed inbound by another host. A WinRM attempt (CLOSED) to 172.16.5.21:5985 indicates additional lateral movement attempts.",
+>       "evidence": "windows.netscan: CLOSED RDP connections to 172.16.4.5:3389 (6 entries); ESTABLISHED SMB 172.16.6.11->172.16.4.5:445 (0x8c88b292b450); ESTABLISHED SMB 172.16.6.11->172.16.7.15:445 (0x8c88afe80450); CLOSED LDAP to 172.16.4.4:389 (0x8c88b5b1a010); ESTABLISHED inbound SMB from 172.16.6.14 (0x8c88b7647470); CLOSED WinRM to 172.16.5.21:5985 (0x8c88b8479cb0).",
+90c89
+<       "mitre": "T1021.001 - RDP; T1021.002 - SMB/Windows Admin Shares"
+---
+>       "mitre": "T1021.001 - RDP; T1021.002 - SMB/Windows Admin Shares; T1021.006 - WinRM"
+94c93
+<       "title": "No registry-based persistence detected",
+---
+>       "title": "No registry-based or service-based persistence detected — negative finding",
+97,98c96,97
+<       "description": "windows.registry.printkey on SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run and RunOnce revealed no malicious entries. Only legitimate Run entries for OneDrive, Dashlane, and DashlanePlugin under the tdungan user profile. No malware-associated services found in windows.svcscan in user-writable paths.",
+<       "evidence": "windows.registry.printkey on Run and RunOnce keys; windows.svcscan output grep for temp/appdata/users returned no suspicious entries.",
+---
+>       "description": "Checked HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run (empty), HKCU (only legitimate: OneDrive, Dashlane, DashlanePlugin for user tdungan), and RunOnce keys (all empty). windows.svcscan grep for user-writable paths (temp, appdata, users) returned no suspicious entries. The implant may rely on the attacker re-establishing access via the compromised spsql credentials rather than file-based persistence, or persistence may exist in disk artifacts not captured in memory.",
+>       "evidence": "windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run: only legitimate entries for tdungan. windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce: all empty. windows.svcscan filtered grep: no suspicious paths.",
+103a103,122
+>       "title": "Active Directory enumeration from PowerShell 8712",
+>       "status": "CONFIRMED",
+>       "confidence": "MEDIUM",
+>       "description": "windows.dlllist on PS 8712 shows System.DirectoryServices.ni.dll was loaded at 2018-08-30 16:43:37 UTC. This .NET assembly provides programmatic LDAP/Active Directory access from PowerShell. Combined with the observed LDAP connection to 172.16.4.4:389 (domain controller), this confirms AD enumeration was performed — likely to identify targets for lateral movement or privilege escalation.",
+>       "evidence": "windows.dlllist --pid 8712: System.DirectoryServices.ni.dll path C:\\WINDOWS\\assembly\\NativeImages_v4.0.30319_64\\System.Dired13b18a9#\\...\\System.DirectoryServices.ni.dll, LoadTime=2018-08-30 16:43:37 UTC. windows.netscan: CLOSED LDAP connection to 172.16.4.4:389.",
+>       "tool": "windows.dlllist, windows.netscan",
+>       "mitre": "T1018 - Remote System Discovery; T1069 - Permission Groups Discovery; T1087 - Account Discovery"
+>     },
+>     {
+>       "id": "F11",
+>       "title": "Multiple unnamed DLLs in PowerShell 5848 suggesting reflective loading",
+>       "status": "UNCONFIRMED",
+>       "confidence": "MEDIUM",
+>       "description": "windows.dlllist on PS 5848 (WOW64) shows approximately 15 DLL entries with no name or path (listed as '-'). Some entries also show timestamps far in the future (year 3400-3900 range) which is a known artifact of in-memory reflectively-loaded modules that do not initialize the LDR timestamp field. This pattern is consistent with shellcode or reflectively-loaded payloads injected into the PowerShell process. Confidence MEDIUM as corrupt LDR entries can also occur naturally in WOW64 processes. Cannot confirm without memory dump analysis.",
+>       "evidence": "windows.dlllist --pid 5848: multiple entries with Name='-', Path='-', and LoadCount='-'. Example entries at bases 0x545b0000, 0x76510000, 0x59640000, 0x53b20000 with no path and anomalous timestamps.",
+>       "tool": "windows.dlllist",
+>       "mitre": "T1620 - Reflective Code Loading; T1055 - Process Injection"
+>     },
+>     {
+>       "id": "F12",
+107,108c126,127
+<       "description": "subject_srv.exe (PID 1096) running as C:\\windows\\subject_srv.exe with arguments connecting to base-hunt.shieldbase.lan:5682. This is the F-Response Subject utility used by the investigator for remote memory acquisition. Started 2018-09-06 18:28:30 UTC, approximately 29 minutes before image capture. Connection 172.16.6.11:3262 -> 172.16.5.50:39372 ESTABLISHED corresponds to this service.",
+<       "evidence": "windows.pstree and windows.cmdline: subject_srv.exe with -s base-hunt.shieldbase.lan:5682 -v 'F-Response Subject'; windows.svcscan confirms F-Response Subject service. netscan shows ESTABLISHED connection to 172.16.5.50:39372.",
+---
+>       "description": "subject_srv.exe (PID 1096) running as the F-Response Subject service, started 2018-09-06 18:28:30 UTC, approximately 29 minutes before image capture. This is the legitimate forensic remote memory acquisition tool used by the investigator. The ESTABLISHED connection 172.16.6.11:3262 -> 172.16.5.50:39372 corresponds to this service. This process and its connections should be excluded from threat analysis.",
+>       "evidence": "windows.pstree and windows.cmdline: PID 1096 subject_srv.exe with args -s base-hunt.shieldbase.lan:5682 -l 3262. windows.svcscan: 'F-Response Subject' service confirmed. windows.netscan: 0x8c88b54bd6d0 ESTABLISHED 172.16.6.11:3262->172.16.5.50:39372.",
+110a130,149
+>     },
+>     {
+>       "id": "FP01",
+>       "title": "FALSE POSITIVE: OUTLOOK.EXE (PID 8128) malfind RWX regions",
+>       "status": "RETRACTED",
+>       "confidence": "HIGH",
+>       "description": "windows.malfind flagged two RWX regions in OUTLOOK.EXE (PID 8128) beginning with the byte pattern '64 74 72 52' (dtrR). This is a documented Outlook/32-bit COM memory allocation pattern, not injected code. RETRACTED — reclassified as false positive.",
+>       "evidence": "windows.malfind: PID 8128, VPN 0x363a0000 and 0x6f2f0000, hexdump starts with '64 74 72 52 00 00 00 00'. Known Outlook allocation signature.",
+>       "tool": "windows.malfind",
+>       "mitre": "N/A - False positive"
+>     },
+>     {
+>       "id": "FP02",
+>       "title": "FALSE POSITIVE: powershell.exe (PID 8712) malfind RWX regions",
+>       "status": "RETRACTED",
+>       "confidence": "HIGH",
+>       "description": "windows.malfind flagged three RWX regions in powershell.exe (PID 8712). Examination of hexdumps shows data patterns consistent with .NET CLR thread synchronization structures (LockRecord, sync objects), not shellcode or PE headers. windows.dlllist confirms clrjit.dll is loaded, accounting for JIT-compiled code in RWX regions. RETRACTED — reclassified as .NET CLR/JIT false positive.",
+>       "evidence": "windows.malfind: PID 8712, VPN 0x1b4ce1a0000, 0x1b4ce300000, 0x1b4ce530000 — data starts with null padding and CLR-style sync object patterns (0xeeff). windows.dlllist --pid 8712: clrjit.dll present.",
+>       "tool": "windows.malfind, windows.dlllist",
+>       "mitre": "N/A - False positive"
+114,117c153,172
+<     "ip_addresses": ["172.16.4.10 (C2, port 8080)", "172.16.4.5 (lateral movement target, RDP+SMB)", "172.16.7.15 (lateral movement target, SMB)", "172.16.4.4 (domain controller, LDAP query)", "172.16.6.14 (accessed victim via SMB)", "52.16.55.11 (external, port 443 - closed)"],
+<     "file_paths": ["C:\\Windows\\Temp\\Perfmon\\p.exe"],
+<     "accounts": ["spsql (Domain Admin - compromised)"],
+<     "processes": ["p.exe (PID 8260)", "powershell.exe (PID 8712)", "powershell.exe (PID 5848)"]
+---
+>     "ip_addresses": [
+>       "172.16.4.10 (C2 server, port 8080)",
+>       "172.16.4.5 (lateral movement target, RDP+SMB)",
+>       "172.16.7.15 (lateral movement target, SMB)",
+>       "172.16.4.4 (domain controller, LDAP query)",
+>       "172.16.6.14 (inbound SMB to victim — attacker-controlled host)",
+>       "172.16.5.21 (WinRM lateral movement target, closed)",
+>       "52.16.55.11 (external, port 443, closed — unknown)"
+>     ],
+>     "file_paths": [
+>       "C:\\Windows\\Temp\\Perfmon\\p.exe"
+>     ],
+>     "accounts": [
+>       "spsql (Domain Admin — compromised)"
+>     ],
+>     "processes": [
+>       "p.exe (PID 8260) — implant",
+>       "powershell.exe (PID 8712) — attacker C2 shell",
+>       "powershell.exe (PID 5848) — attacker WOW64 C2 shell"
+>     ]

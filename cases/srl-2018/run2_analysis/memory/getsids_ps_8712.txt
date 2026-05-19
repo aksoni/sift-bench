@@ -1,0 +1,16 @@
+Volatility 3 Framework 2.27.0
+
+PID	Process	SID	Name
+
+8712	powershell.exe	S-1-5-21-3445421715-2530590580-3149308974-1193	spsql
+8712	powershell.exe	S-1-5-21-3445421715-2530590580-3149308974-513	Domain Users
+8712	powershell.exe	S-1-1-0	Everyone
+8712	powershell.exe	S-1-5-32-545	Users
+8712	powershell.exe	S-1-5-32-544	Administrators
+8712	powershell.exe	S-1-5-2	Network
+8712	powershell.exe	S-1-5-11	Authenticated Users
+8712	powershell.exe	S-1-5-15	This Organization
+8712	powershell.exe	S-1-5-21-3445421715-2530590580-3149308974-512	Domain Admins
+8712	powershell.exe	S-1-18-1	Authentication Authority Asserted Identity
+8712	powershell.exe	S-1-5-21-3445421715-2530590580-3149308974-572	-
+8712	powershell.exe	S-1-16-12288	High Mandatory Level

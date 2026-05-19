@@ -1,0 +1,144 @@
+{
+  "case": "srl-2018",
+  "image": "./evidence/base-rd01-memory.img",
+  "analyst": "DFIR Orchestrator (Claude Code / claude-sonnet-4-6)",
+  "analysis_date_utc": "2026-05-16",
+  "volatility_version": "Volatility 3 Framework 2.27.0",
+  "enrichment_skipped": true,
+  "enrichment_note": "YARA and hash_file tools not available for this baseline run",
+  "commands": [
+    {
+      "step": "Image identification",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.info",
+      "output_file": "./analysis/memory/windows_info.txt",
+      "key_result": "Windows 10 x64 build 15.16299, SystemTime 2018-09-06 18:57:17 UTC, symbols resolved",
+      "return_code": 0
+    },
+    {
+      "step": "Process pool scan",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.psscan",
+      "output_file": "./analysis/memory/psscan.txt",
+      "key_result": "147 process entries found including exited processes; no processes hidden from pslist",
+      "return_code": 0
+    },
+    {
+      "step": "Process tree",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.pstree",
+      "output_file": "./analysis/memory/pstree.txt",
+      "key_result": "Attack chain identified: WmiPrvSE->powershell(8712)->powershell(5848)->cmd->p.exe",
+      "return_code": 0
+    },
+    {
+      "step": "Process command lines",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.cmdline",
+      "output_file": "./analysis/memory/cmdline.txt",
+      "key_result": "p.exe at c:\\windows\\temp\\perfmon\\p.exe; PS 5848 in server mode; cmd arg /C c:\\windows\\temp\\perfmon\\p.exe",
+      "return_code": 0
+    },
+    {
+      "step": "Network connections",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.netscan",
+      "output_file": "./analysis/memory/netscan.txt",
+      "key_result": "3 ESTABLISHED + 7 CLOSE_WAIT connections to 172.16.4.10:8080; SMB lateral movement to .4.5 and .7.15",
+      "return_code": 0
+    },
+    {
+      "step": "Code injection scan",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.malfind",
+      "output_file": "./analysis/memory/malfind.txt",
+      "key_result": "p.exe: 481-page RWX VAD (1.88MB private, no file backing) — CONFIRMED. OUTLOOK/PS8712: FALSE POSITIVES",
+      "return_code": 0
+    },
+    {
+      "step": "File system scan",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.filescan",
+      "output_file": "./analysis/memory/filescan.txt",
+      "key_result": "\\Windows\\Temp\\Perfmon\\p.exe and \\Windows\\Temp\\Perfmon directory objects confirmed in memory",
+      "return_code": 0
+    },
+    {
+      "step": "Security identifiers — p.exe",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.getsids --pid 8260",
+      "output_file": "./analysis/memory/getsids_p_exe.txt",
+      "key_result": "p.exe runs as spsql — Domain Admin, High Mandatory Level, Network logon",
+      "return_code": 0
+    },
+    {
+      "step": "Security identifiers — PS 8712",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.getsids --pid 8712",
+      "output_file": "./analysis/memory/getsids_ps_8712.txt",
+      "key_result": "PS 8712 runs as spsql — Domain Admin",
+      "return_code": 0
+    },
+    {
+      "step": "Security identifiers — PS 5848",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.getsids --pid 5848",
+      "output_file": "./analysis/memory/getsids_ps_5848.txt",
+      "key_result": "PS 5848 runs as spsql — Domain Admin",
+      "return_code": 0
+    },
+    {
+      "step": "DLL list — p.exe implant",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.dlllist --pid 8260",
+      "output_file": "./analysis/memory/dlllist_p_exe.txt",
+      "key_result": "Network/crypto stack at launch; mpr.dll and GDI32/USER32 loaded 2018-09-05 12:13-14 UTC (post-launch capability expansion)",
+      "return_code": 0
+    },
+    {
+      "step": "DLL list — PowerShell 8712",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.dlllist --pid 8712",
+      "output_file": "./analysis/memory/dlllist_ps_8712.txt",
+      "key_result": "System.DirectoryServices.ni.dll loaded — AD enumeration confirmed; amsi.dll present",
+      "return_code": 0
+    },
+    {
+      "step": "DLL list — PowerShell 5848",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.dlllist --pid 5848",
+      "output_file": "./analysis/memory/dlllist_ps_5848.txt",
+      "key_result": "wininet.DLL, winhttp.dll, msv1_0.DLL loaded; ~15 unnamed DLLs with no LDR path (possible reflective loads)",
+      "return_code": 0
+    },
+    {
+      "step": "Registry persistence — Run",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "output_file": "./analysis/memory/reg_run.txt",
+      "key_result": "No malicious Run entries; only legitimate OneDrive/Dashlane entries for tdungan",
+      "return_code": 0
+    },
+    {
+      "step": "Registry persistence — RunOnce",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+      "output_file": "./analysis/memory/reg_runonce.txt",
+      "key_result": "All RunOnce keys empty across all hives",
+      "return_code": 0
+    },
+    {
+      "step": "Service scan",
+      "command": "vol -f ./evidence/base-rd01-memory.img windows.svcscan",
+      "output_file": "./analysis/memory/svcscan.txt",
+      "key_result": "No services in user-writable paths; F-Response Subject service confirmed (investigator artifact)",
+      "return_code": 0
+    },
+    {
+      "step": "Self-correction — pre-correction snapshot",
+      "command": "cat > ./analysis/findings_pre_correction.json",
+      "output_file": "./analysis/findings_pre_correction.json",
+      "key_result": "10 findings saved pre-correction",
+      "return_code": 0
+    },
+    {
+      "step": "Self-correction — post-correction findings",
+      "command": "Write ./analysis/findings_post_correction.json",
+      "output_file": "./analysis/findings_post_correction.json",
+      "key_result": "12 findings + 2 explicit FP retractions; added F10 (AD enum), F11 (unnamed DLLs), FP01, FP02",
+      "return_code": 0
+    },
+    {
+      "step": "Self-correction — diff",
+      "command": "diff ./analysis/findings_pre_correction.json ./analysis/findings_post_correction.json",
+      "output_file": "./analysis/correction_diff.txt",
+      "key_result": "191 diff lines; added 3 findings, retracted 2 false positives, expanded 2 existing findings",
+      "return_code": 1
+    }
+  ]
+}

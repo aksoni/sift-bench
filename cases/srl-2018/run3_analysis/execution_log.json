@@ -1,0 +1,155 @@
+{
+  "case_id": "srl-2018",
+  "analyst": "claude-code-sift-bench",
+  "evidence_image": "base-rd01-memory.img",
+  "log_timestamp_utc": "2026-05-17T23:55:00Z",
+  "tool_invocations": [
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.psscan",
+      "timestamp_utc": "2026-05-17T23:37:00Z",
+      "output_file": "analysis/memory/psscan.txt",
+      "return_code": 0,
+      "notes": "Pool tag scan for all processes including hidden/exited. 95+ processes enumerated. No hidden processes detected (psscan and pslist counts matched)."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.pstree",
+      "timestamp_utc": "2026-05-17T23:37:00Z",
+      "output_file": "analysis/memory/pstree.txt",
+      "return_code": 0,
+      "notes": "Full attack chain visible: WmiPrvSE(2876)->PS(8712)->PS(5848)->cmd(5948)->p.exe(8260). Multiple rundll32 children of PS5848 and p.exe confirmed."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.cmdline",
+      "timestamp_utc": "2026-05-17T23:40:00Z",
+      "output_file": "analysis/memory/cmdline.txt",
+      "return_code": 0,
+      "notes": "Key findings: PS8712 has blank args (WMI cleared PEB); PS5848 has '-Version 5.1 -s -NoLogo -NoProfile' (pipeline C2 shell); cmd5948 has '/C c:\\windows\\temp\\perfmon\\p.exe'."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.netscan",
+      "timestamp_utc": "2026-05-17T23:40:00Z",
+      "output_file": "analysis/memory/netscan.txt",
+      "return_code": 0,
+      "notes": "14 connections to 172.16.4.10:8080 (C2), 7 closed RDP to 172.16.4.5, ESTABLISHED SMB to 172.16.7.15:445, CLOSED WinRM to 172.16.5.21:5985, CLOSED LDAP to 172.16.4.4:389."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.malfind",
+      "timestamp_utc": "2026-05-17T23:40:00Z",
+      "output_file": "analysis/memory/malfind.txt",
+      "return_code": 0,
+      "notes": "Plugin deprecated - produced no output. Replaced by windows.malware.malfind."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.malware.malfind",
+      "timestamp_utc": "2026-05-17T23:48:00Z",
+      "output_file": "analysis/memory/malfind.txt",
+      "return_code": 0,
+      "notes": "Hits: OUTLOOK.EXE (2x dtrR ATL thunk FP), powershell.exe PID8712 (3x .NET CLR heap FP), UpdaterUI.exe (1x COM dispatch FP), p.exe (481-page private RWX expected for malware heap). No code injection into third-party processes confirmed."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.filescan",
+      "timestamp_utc": "2026-05-17T23:40:00Z",
+      "output_file": "analysis/memory/filescan.txt",
+      "return_code": 0,
+      "notes": "Key finds: \\Windows\\Temp\\Perfmon\\p.exe; \\Users\\spsql\\Documents\\20180830\\PowerShell_transcript.*.txt (x2); \\Users\\spsql\\Documents\\20180906\\PowerShell_transcript.*.txt (x2); \\Users\\tdungan\\AppData\\Roaming\\Dashlane\\6.2.0.12026\\procdump.exe."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.getsids --pid 8712",
+      "timestamp_utc": "2026-05-17T23:43:00Z",
+      "output_file": "analysis/memory/getsids_8712.txt",
+      "return_code": 0,
+      "notes": "spsql, Domain Admins (S-1-5-21-...-512), High Mandatory Level confirmed."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.getsids --pid 5848",
+      "timestamp_utc": "2026-05-17T23:43:00Z",
+      "output_file": "analysis/memory/getsids_5848.txt",
+      "return_code": 0,
+      "notes": "spsql, Domain Admins confirmed."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.getsids --pid 8260",
+      "timestamp_utc": "2026-05-17T23:43:00Z",
+      "output_file": "analysis/memory/getsids_8260.txt",
+      "return_code": 0,
+      "notes": "spsql, Domain Admins confirmed for p.exe."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.dlllist --pid 8260",
+      "timestamp_utc": "2026-05-17T23:44:00Z",
+      "output_file": "analysis/memory/dlllist_8260_pexe.txt",
+      "return_code": 0,
+      "notes": "WININET.dll, WS2_32.dll, CRYPTSP.dll, bcrypt.dll, Secur32.dll/SSPICLI loaded at launch. mpr.dll and USER32 stack loaded post-launch 2018-09-05 (implant gaining capabilities over time)."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.dlllist --pid 8712",
+      "timestamp_utc": "2026-05-17T23:44:00Z",
+      "output_file": "analysis/memory/dlllist_8712_ps1.txt",
+      "return_code": 0,
+      "notes": "Standard 64-bit PowerShell .NET stack. amsi.dll present. No anomalous DLLs."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.dlllist --pid 5848",
+      "timestamp_utc": "2026-05-17T23:44:00Z",
+      "output_file": "analysis/memory/dlllist_5848_ps2.txt",
+      "return_code": 0,
+      "notes": "32-bit WOW64 PowerShell. wininet.DLL, winhttp.dll, urlmon.dll, iertutil.dll loaded (not standard for PS). Multiple unnamed DLLs (blank name/path) indicating reflectively loaded modules without on-disk backing."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.registry.printkey --key \"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\"",
+      "timestamp_utc": "2026-05-17T23:44:00Z",
+      "output_file": "analysis/memory/registry_run.txt",
+      "return_code": 0,
+      "notes": "No malicious entries. spsql NTUSER.DAT Run key empty. tdungan has OneDrive, Dashlane, DashlanePlugin (all legitimate)."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.registry.printkey --key \"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce\"",
+      "timestamp_utc": "2026-05-17T23:44:00Z",
+      "output_file": "analysis/memory/registry_runonce.txt",
+      "return_code": 0,
+      "notes": "All RunOnce keys empty across all hives. No attacker persistence."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img windows.svcscan",
+      "timestamp_utc": "2026-05-17T23:48:00Z",
+      "output_file": "analysis/memory/svcscan_summary.txt",
+      "return_code": 0,
+      "notes": "No services with binary paths in user-writable directories. subject_srv.exe confirmed as F-Response forensic tool (not malware). No attacker service persistence."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img -o exports/dumpfiles/ windows.dumpfiles --virtaddr 0x8c88aef197c0",
+      "timestamp_utc": "2026-05-17T23:46:00Z",
+      "output_file": "exports/dumpfiles/file.0x8c88aef197c0.*",
+      "return_code": 0,
+      "notes": "PowerShell transcript 20180830124337 — SharedCacheMap vacb file (262144 bytes) all zeros (paged out). DataSectionObject 0 bytes. Content not recoverable."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img -o exports/dumpfiles/ windows.dumpfiles --virtaddr 0x8c88b53fb250",
+      "timestamp_utc": "2026-05-17T23:46:00Z",
+      "output_file": "exports/dumpfiles/file.0x8c88b53fb250.*",
+      "return_code": 0,
+      "notes": "PowerShell transcript 20180830124344 — vacb all zeros. Content not recoverable."
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img -o exports/dumpfiles/ windows.dumpfiles --virtaddr 0x8c88b5498ef0",
+      "timestamp_utc": "2026-05-17T23:46:00Z",
+      "output_file": "exports/dumpfiles/file.0x8c88b5498ef0.*.dat",
+      "return_code": 0,
+      "notes": "PowerShell transcript 20180906132632 — 4096 bytes, RECOVERED. Host: rundll32.exe PID 7552. Command: mv c:\\windows\\temp\\perfmon\\pa.exe c:\\windows\\system32\\"
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img -o exports/dumpfiles/ windows.dumpfiles --virtaddr 0x8c88b963b5e0",
+      "timestamp_utc": "2026-05-17T23:46:00Z",
+      "output_file": "exports/dumpfiles/file.0x8c88b963b5e0.*.dat",
+      "return_code": 0,
+      "notes": "PowerShell transcript 20180906105842 — 4096 bytes, RECOVERED. Host: rundll32.exe PID 1424. Command: copy c:\\windows\\ImmersiveControlPanel\\SystemSettings.exe C:\\windows\\"
+    },
+    {
+      "command": "vol -f evidence/base-rd01-memory.img -o exports/dumpfiles/ windows.dumpfiles --virtaddr 0x8c88af21def0",
+      "timestamp_utc": "2026-05-17T23:46:00Z",
+      "output_file": "exports/dumpfiles/file.0x8c88af21def0.*.img",
+      "return_code": 0,
+      "notes": "p.exe ImageSectionObject — Error dumping file (image section paged out). 0-byte output. Binary not recoverable from memory."
+    }
+  ]
+}

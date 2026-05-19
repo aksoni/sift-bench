@@ -1,0 +1,24 @@
+Progress:    0.00		Scanning FileLayer using PageMapScannerProgress:   23.33		Scanning FileLayer using PageMapScannerProgress:  100.00		Stacking attempts finished             Progress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:   37.50		Scanning layer_name using PdbSignatureScannerProgress:   37.60		Scanning layer_name using PdbSignatureScannerProgress:   37.70		Scanning layer_name using PdbSignatureScannerProgress:   37.79		Scanning layer_name using PdbSignatureScannerProgress:   37.89		Scanning layer_name using PdbSignatureScannerProgress:   37.99		Scanning layer_name using PdbSignatureScannerProgress:   38.09		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:   26.07		Scanning layer_name using PdbSignatureScannerProgress:   26.17		Scanning layer_name using PdbSignatureScannerProgress:   26.27		Scanning layer_name using PdbSignatureScannerProgress:   26.37		Scanning layer_name using PdbSignatureScannerProgress:   26.46		Scanning layer_name using PdbSignatureScannerProgress:   26.56		Scanning layer_name using PdbSignatureScannerProgress:   26.66		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:  100.00		PDB scanning finished                        Volatility 3 Framework 2.27.0
+
+Variable	Value
+
+Kernel Base	0xf80125017000
+DTB	0x1aa000
+Symbols	file:///home/abhisoni/.local/share/pipx/venvs/volatility3/lib/python3.12/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/72037CCACC96492D8CB366CAC90CE2BE-1.json.xz
+Is64Bit	True
+IsPAE	False
+layer_name	0 WindowsIntel32e
+memory_layer	1 FileLayer
+KdVersionBlock	0xf8012536f710
+Major/Minor	15.16299
+MachineType	34404
+KeNumberProcessors	2
+SystemTime	2018-09-06 18:57:17+00:00
+NtSystemRoot	C:\WINDOWS
+NtProductType	NtProductWinNt
+NtMajorVersion	10
+NtMinorVersion	0
+PE MajorOperatingSystemVersion	10
+PE MinorOperatingSystemVersion	0
+PE Machine	34404
+PE TimeDateStamp	Fri Jun 29 07:55:16 2018

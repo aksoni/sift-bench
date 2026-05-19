@@ -1,0 +1,67 @@
+Volatility 3 Framework 2.27.0
+
+Offset	Order	PID	Start	State	Type	Name	Display	Binary	Binary (Registry)	Dll
+
+0x23b9911c710	36	1592	SERVICE_AUTO_START	SERVICE_RUNNING	SERVICE_WIN32_OWN_PROCESS	Audiosrv	Windows Audio	C:\WINDOWS\System32\svchost.exe -k LocalServiceNetworkRestricted -p	%SystemRoot%\System32\svchost.exe -k LocalServiceNetworkRestricted -p	%SystemRoot%\System32\Audiosrv.dll
+0x23b9911c720	35	1064	SERVICE_AUTO_START	SERVICE_RUNNING	SERVICE_WIN32_SHARE_PROCESS	AudioEndpointBuilder	Windows Audio Endpoint Builder	C:\WINDOWS\System32\svchost.exe -k LocalSystemNetworkRestricted -p	%SystemRoot%\System32\svchost.exe -k LocalSystemNetworkRestricted -p	%SystemRoot%\System32\AudioEndpointBuilder.dll
+0x23b9911c400	34	N/A	SERVICE_BOOT_START	SERVICE_RUNNING	SERVICE_KERNEL_DRIVER	atapi	IDE Channel	\Driver\atapi	System32\drivers\atapi.sys	-
+0x23b9911b5f0	33	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	AsyncMac	RAS Asynchronous Media Driver	N/A	\SystemRoot\System32\drivers\asyncmac.sys	-
+0x23b9911be60	32	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	AssignedAccessManagerSvc	AssignedAccessManager Service	N/A	%SystemRoot%\system32\svchost.exe -k AssignedAccessManagerSvc	%SystemRoot%\System32\assignedaccessmanagersvc.dll
+0x23b9911c1e0	31	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	arcsas	Adaptec SAS/SATA-II RAID Storport's Miniport Driver	N/A	System32\drivers\arcsas.sys	-
+0x23b9911b140	30	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	AppXSvc	AppX Deployment Service (AppXSVC)	N/A	%systemroot%\system32\svchost.exe -k wsappx -p	-
+0x23b9911c050	29	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_FILE_SYSTEM_DRIVER	AppvVfs	AppvVfs	N/A	\SystemRoot\system32\drivers\AppvVfs.sys	-
+0x23b9911b7d0	28	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_FILE_SYSTEM_DRIVER	AppvVemgr	AppvVemgr	N/A	\SystemRoot\system32\drivers\AppvVemgr.sys	-
+0x23b9911bb90	27	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_FILE_SYSTEM_DRIVER	AppvStrm	AppvStrm	N/A	\SystemRoot\system32\drivers\AppvStrm.sys	-
+0x23b9911b050	26	N/A	SERVICE_DISABLED	SERVICE_STOPPED	SERVICE_WIN32_OWN_PROCESS	AppVClient	Microsoft App-V Client	N/A	%systemroot%\system32\AppVClient.exe	-
+0x23b99111cc0	25	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	AppReadiness	App Readiness	N/A	%SystemRoot%\System32\svchost.exe -k AppReadiness -p	-
+0x23b99111a80	24	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	AppMgmt	Application Management	N/A	%SystemRoot%\system32\svchost.exe -k netsvcs -p	%SystemRoot%\System32\appmgmts.dll
+0x23b991118f0	23	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	applockerfltr	Smartlocker Filter Driver	N/A	system32\drivers\applockerfltr.sys	-
+0x23b9911b230	22	556	SERVICE_DEMAND_START	SERVICE_RUNNING	SERVICE_WIN32_SHARE_PROCESS	Appinfo	Application Information	C:\WINDOWS\system32\svchost.exe -k netsvcs -p	%SystemRoot%\system32\svchost.exe -k netsvcs -p	%SystemRoot%\System32\appinfo.dll
+0x23b99111670	21	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	AppIDSvc	Application Identity	N/A	%SystemRoot%\system32\svchost.exe -k LocalServiceNetworkRestricted -p	%SystemRoot%\System32\appidsvc.dll
+0x23b99111410	20	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	AppID	AppID Driver	N/A	system32\drivers\appid.sys	-
+0x23b9911b6e0	19	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	amdxata	amdxata	N/A	System32\drivers\amdxata.sys	-
+0x23b9911bd70	18	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	amdsbs	amdsbs	N/A	System32\drivers\amdsbs.sys	-
+0x23b9911bc80	17	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	amdsata	amdsata	N/A	System32\drivers\amdsata.sys	-
+0x23b99111310	16	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	AmdPPM	AMD Processor Driver	N/A	\SystemRoot\System32\drivers\amdppm.sys	-
+0x23b99111210	15	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	AmdK8	AMD K8 Processor Driver	N/A	\SystemRoot\System32\drivers\amdk8.sys	-
+0x23b99110d80	14	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_OWN_PROCESS	ALG	Application Layer Gateway Service	N/A	%SystemRoot%\System32\alg.exe	-
+0x23b99110fc0	13	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	AJRouter	AllJoyn Router Service	N/A	%SystemRoot%\system32\svchost.exe -k LocalServiceNetworkRestricted -p	%SystemRoot%\System32\AJRouter.dll
+0x23b99110bf0	12	N/A	SERVICE_SYSTEM_START	SERVICE_RUNNING	SERVICE_KERNEL_DRIVER	ahcache	Application Compatibility Cache	\Driver\ahcache	system32\DRIVERS\ahcache.sys	-
+0x23b99110af0	11	N/A	SERVICE_SYSTEM_START	SERVICE_RUNNING	SERVICE_KERNEL_DRIVER	AFD	Ancillary Function Driver for Winsock	\Driver\AFD	\SystemRoot\system32\drivers\afd.sys	-
+0x23b99110930	10	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	ADP80XX	ADP80XX	N/A	System32\drivers\ADP80XX.SYS	-
+0x23b99110770	9	2152	SERVICE_AUTO_START	SERVICE_RUNNING	SERVICE_WIN32_OWN_PROCESS	AdobeARMservice	Adobe Acrobat Update Service	"C:\Program Files (x86)\Common Files\Adobe\ARM\1.0\armsvc.exe"	"C:\Program Files (x86)\Common Files\Adobe\ARM\1.0\armsvc.exe"	-
+0x23b99110520	8	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	acpitime	ACPI Wake Alarm Driver	N/A	\SystemRoot\System32\drivers\acpitime.sys	-
+0x23b99110360	7	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	AcpiPmi	ACPI Power Meter Driver	N/A	\SystemRoot\System32\drivers\acpipmi.sys	-
+0x23b991101a0	6	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	acpipagr	ACPI Processor Aggregator Driver	N/A	\SystemRoot\System32\drivers\acpipagr.sys	-
+0x23b9910ffe0	5	N/A	SERVICE_BOOT_START	SERVICE_RUNNING	SERVICE_KERNEL_DRIVER	acpiex	Microsoft ACPIEx Driver	\Driver\acpiex	System32\Drivers\acpiex.sys	-
+0x23b9910fe20	4	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	AcpiDev	ACPI Devices driver	N/A	\SystemRoot\System32\drivers\AcpiDev.sys	-
+0x23b9910fc60	3	N/A	SERVICE_BOOT_START	SERVICE_RUNNING	SERVICE_KERNEL_DRIVER	ACPI	Microsoft ACPI Driver	\Driver\ACPI	System32\drivers\ACPI.sys	-
+0x23b9910e310	2	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	3ware	3ware	N/A	System32\drivers\3ware.sys	-
+0x23b9910e210	1	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	1394ohci	1394 OHCI Compliant Host Controller	N/A	\SystemRoot\System32\drivers\1394ohci.sys	-
+0x23b9917d0d0	588	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_OWN_PROCESS	WlanSvc	WLAN AutoConfig	N/A	%SystemRoot%\system32\svchost.exe -k LocalSystemNetworkRestricted -p	%SystemRoot%\System32\wlansvc.dll
+0x23b9917d0e0	587	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	wisvc	Windows Insider Service	N/A	%systemroot%\system32\svchost.exe -k netsvcs -p	%systemroot%\system32\flightsettings.dll
+0x23b9917c360	586	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	WinVerbs	WinVerbs Service	N/A	\SystemRoot\System32\drivers\winverbs.sys	-
+0x23b99173220	585	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	WINUSB	WinUsb Driver	N/A	\SystemRoot\System32\drivers\WinUSB.SYS	-
+0x23b99173400	584	1100	SERVICE_AUTO_START	SERVICE_RUNNING	SERVICE_WIN32_SHARE_PROCESS	WinRM	Windows Remote Management (WS-Management)	C:\WINDOWS\system32\svchost.exe -k NetworkService -p	%SystemRoot%\System32\svchost.exe -k NetworkService -p	%SystemRoot%\system32\WsmSvc.dll
+0x23b9917dce0	583	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	WinNat	Windows NAT Driver	N/A	system32\drivers\winnat.sys	-
+0x23b991748a0	582	556	SERVICE_AUTO_START	SERVICE_RUNNING	SERVICE_WIN32_SHARE_PROCESS	Winmgmt	Windows Management Instrumentation	C:\WINDOWS\system32\svchost.exe -k netsvcs -p	%systemroot%\system32\svchost.exe -k netsvcs -p	%SystemRoot%\system32\wbem\WMIsvc.dll
+0x23b991707e0	581	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	WinMad	WinMad Service	N/A	\SystemRoot\System32\drivers\winmad.sys	-
+0x23b991743f0	580	848	SERVICE_DEMAND_START	SERVICE_RUNNING	SERVICE_WIN32_SHARE_PROCESS	WinHttpAutoProxySvc	WinHTTP Web Proxy Auto-Discovery Service	C:\WINDOWS\System32\svchost.exe -k LocalServiceNetworkRestricted -p	%SystemRoot%\system32\svchost.exe -k LocalServiceNetworkRestricted -p	%SystemRoot%\system32\winhttp.dll
+0x23b99170360	579	N/A	SERVICE_BOOT_START	SERVICE_RUNNING	SERVICE_KERNEL_DRIVER	WindowsTrustedRTProxy	Microsoft Windows Trusted Runtime Secure Service	\Driver\WindowsTrustedRTProxy	System32\drivers\WindowsTrustedRTProxy.sys	-
+0x23b99174210	578	N/A	SERVICE_BOOT_START	SERVICE_RUNNING	SERVICE_KERNEL_DRIVER	WindowsTrustedRT	Windows Trusted Execution Environment Class Extension	\Driver\WindowsTrustedRT	system32\drivers\WindowsTrustedRT.sys	-
+0x23b99174120	577	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_OWN_PROCESS	WinDefend	Windows Defender Antivirus Service	N/A	"%ProgramFiles%\Windows Defender\MsMpEng.exe"	-
+0x23b99170de0	576	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_FILE_SYSTEM_DRIVER	WIMMount	WIMMount	N/A	system32\drivers\wimmount.sys	-
+0x23b99174030	575	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	WiaRpc	Still Image Acquisition Events	N/A	%SystemRoot%\system32\svchost.exe -k LocalSystemNetworkRestricted -p	%SystemRoot%\System32\wiarpc.dll
+0x23b99170660	574	N/A	SERVICE_BOOT_START	SERVICE_RUNNING	SERVICE_KERNEL_DRIVER	WFPLWFS	Microsoft Windows Filtering Platform	\Driver\WFPLWFS	System32\drivers\wfplwfs.sys	-
+0x23b99173310	573	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	WFDSConMgrSvc	Wi-Fi Direct Services Connection Manager Service	N/A	%SystemRoot%\system32\svchost.exe -k LocalServiceNetworkRestricted -p	%SystemRoot%\System32\wfdsconmgrsvc.dll
+0x23b99170c60	572	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_OWN_PROCESS	WerSvc	Windows Error Reporting Service	N/A	%SystemRoot%\System32\svchost.exe -k WerSvcGroup	%SystemRoot%\System32\WerSvc.dll
+0x23b99170ae0	571	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	wercplsupport	Problem Reports and Solutions Control Panel Support	N/A	%SystemRoot%\System32\svchost.exe -k netsvcs -p	%SystemRoot%\System32\wercplsupport.dll
+0x23b991704e0	570	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	WEPHOSTSVC	Windows Encryption Provider Host Service	N/A	%systemroot%\system32\svchost.exe -k WepHostSvcGroup	%systemroot%\system32\wephostsvc.dll
+0x23b991701e0	569	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	Wecsvc	Windows Event Collector	N/A	%SystemRoot%\system32\svchost.exe -k NetworkService -p	%SystemRoot%\system32\wecsvc.dll
+0x23b99170960	568	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	WebClient	WebClient	N/A	%SystemRoot%\system32\svchost.exe -k LocalService -p	%SystemRoot%\System32\webclnt.dll
+0x23b99170060	567	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	wdnsfltr	Windows Defender Network Stream Filter Driver	N/A	system32\drivers\wdnsfltr.sys	-
+0x23b99173130	566	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_OWN_PROCESS	WdNisSvc	Windows Defender Antivirus Network Inspection Service	N/A	"%ProgramFiles%\Windows Defender\NisSrv.exe"	-
+0x23b9916d060	565	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	WdNisDrv	Windows Defender Antivirus Network Inspection System Driver	N/A	system32\Drivers\WdNisDrv.sys	-
+0x23b99172f50	564	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_KERNEL_DRIVER	wdiwifi	WDI Driver Framework	N/A	system32\DRIVERS\wdiwifi.sys	-
+0x23b99173040	563	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	WdiSystemHost	Diagnostic System Host	N/A	%SystemRoot%\System32\svchost.exe -k LocalSystemNetworkRestricted -p	%SystemRoot%\system32\wdi.dll
+0x23b9916f760	562	692	SERVICE_DEMAND_START	SERVICE_RUNNING	SERVICE_WIN32_SHARE_PROCESS	WdiServiceHost	Diagnostic Service Host	C:\WINDOWS\system32\svchost.exe -k LocalService -p	%SystemRoot%\System32\svchost.exe -k LocalService -p	%SystemRoot%\system32\wdi.dll

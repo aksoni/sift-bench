@@ -1,0 +1,130 @@
+[
+  {
+    "id": "F01",
+    "title": "WMI-Spawned PowerShell Execution",
+    "description": "WmiPrvSE.exe (PID 2876) spawned powershell.exe (PID 8712) at 2018-08-30 16:43:36 UTC — WMI used as execution proxy to evade process-parent-based detections.",
+    "evidence": ["windows.pstree", "windows.cmdline"],
+    "tool_output": "pstree.txt: PID 8712 parent=2876 (WmiPrvSE.exe); cmdline.txt: PID 8712 args='-'",
+    "confidence": "CONFIRMED"
+  },
+  {
+    "id": "F02",
+    "title": "Two-Stage PowerShell Chain (SysWOW64 Downgrade)",
+    "description": "powershell.exe (PID 8712) spawned powershell.exe (PID 5848) from SysWOW64 path with '-Version 5.1 -s -NoLogo -NoProfile' — remoting server mode / 32-bit PS to avoid 64-bit AMSI.",
+    "evidence": ["windows.pstree", "windows.cmdline"],
+    "tool_output": "cmdline.txt PID 5848: 'c:\\windows\\syswow64\\windowspowershell\\v1.0\\powershell.exe -Version 5.1 -s -NoLogo -NoProfile'",
+    "confidence": "CONFIRMED"
+  },
+  {
+    "id": "F03",
+    "title": "Staged Payload Execution: p.exe in Temp\\Perfmon",
+    "description": "cmd.exe (PID 5948) executed c:\\windows\\temp\\perfmon\\p.exe — payload staged in a temp subdirectory named 'Perfmon' to masquerade as a performance monitoring utility.",
+    "evidence": ["windows.cmdline", "windows.psscan", "windows.filescan"],
+    "tool_output": "cmdline.txt PID 5948: 'C:\\WINDOWS\\system32\\cmd.exe /C c:\\windows\\temp\\perfmon\\p.exe'; filescan.txt: '\\Windows\\Temp\\Perfmon\\p.exe'; '\\Windows\\Temp\\Perfmon' directory object",
+    "confidence": "CONFIRMED"
+  },
+  {
+    "id": "F04",
+    "title": "rundll32.exe Abuse for Shellcode Execution",
+    "description": "Multiple rundll32.exe processes spawned from powershell.exe (PID 5848) and p.exe (PID 8260) with blank command lines — consistent with in-memory shellcode injection via CreateRemoteThread or similar.",
+    "evidence": ["windows.pstree", "windows.cmdline"],
+    "tool_output": "pstree.txt: PIDs 2216,5452,4108,6768,5588,8148 parent=5848; PIDs 5768,7552,1424 parent=8260; cmdline.txt: all have args='-'",
+    "confidence": "CONFIRMED"
+  },
+  {
+    "id": "F05",
+    "title": "C2 Beaconing to 172.16.4.10:8080 via HTTP",
+    "description": "Multiple TCP connections from 172.16.6.11 to 172.16.4.10 port 8080 found in netscan: 1 ESTABLISHED, 6 CLOSE_WAIT, 2 CLOSED — consistent with recurring C2 beaconing (Cobalt Strike or Metasploit HTTP listener).",
+    "evidence": ["windows.netscan"],
+    "tool_output": "netscan.txt: offsets 0x8c88af069cb0 (ESTABLISHED), 0x8c88afa34500, 0x8c88afc2ea80, 0x8c88afc72a60, 0x8c88afe40cb0, 0x8c88b12404c0, 0x8c88b16ba950, 0x8c88b4abe4c0, 0x8c88b434dcb0 (CLOSE_WAIT/CLOSED) all :8080",
+    "confidence": "CONFIRMED"
+  },
+  {
+    "id": "F06",
+    "title": "SMB Lateral Movement to 172.16.4.5 and 172.16.7.15",
+    "description": "ESTABLISHED SMB connections from 172.16.6.11 to 172.16.4.5:445 (PID -) and 172.16.7.15:445 indicate lateral movement attempts over SMB.",
+    "evidence": ["windows.netscan"],
+    "tool_output": "netscan.txt: 0x8c88b292b450 172.16.6.11:49763->172.16.4.5:445 ESTABLISHED; 0x8c88afe80450 172.16.6.11:59352->172.16.7.15:445 ESTABLISHED",
+    "confidence": "CONFIRMED"
+  },
+  {
+    "id": "F07",
+    "title": "WinRM Lateral Movement Attempt to 172.16.5.21",
+    "description": "CLOSED WinRM connection (port 5985) to 172.16.5.21 from the subject machine — WinRM used for remote command execution.",
+    "evidence": ["windows.netscan"],
+    "tool_output": "netscan.txt: 0x8c88b8479cb0 172.16.6.11:49791->172.16.5.21:5985 CLOSED",
+    "confidence": "UNCONFIRMED"
+  },
+  {
+    "id": "F08",
+    "title": "LDAP Enumeration of Active Directory (172.16.4.4:389)",
+    "description": "CLOSED LDAP connection to 172.16.4.4:389 — likely domain controller queried for AD enumeration (users, groups, computers).",
+    "evidence": ["windows.netscan"],
+    "tool_output": "netscan.txt: 0x8c88b5b1a010 172.16.6.11:56345->172.16.4.4:389 CLOSED",
+    "confidence": "UNCONFIRMED"
+  },
+  {
+    "id": "F09",
+    "title": "Domain Admin Account 'spsql' Compromised",
+    "description": "All attacker processes (powershell.exe PIDs 8712/5848, cmd.exe 5948, p.exe 8260) run as 'spsql' (SID -1193), a member of Domain Admins (SID -512) and local Administrators (SID S-1-5-32-544).",
+    "evidence": ["windows.getsids"],
+    "tool_output": "getsids_p_exe.txt, getsids_ps8712.txt, getsids_ps5848.txt: all show spsql, Domain Admins, Administrators, High Mandatory Level",
+    "confidence": "CONFIRMED"
+  },
+  {
+    "id": "F10",
+    "title": "Code Injection in p.exe (RWX VAD, 481 Pages)",
+    "description": "windows.malfind found a PAGE_EXECUTE_READWRITE VAD region in p.exe (PID 8260) at 0x2be0000-0x2dc0fff spanning 481 committed pages (approx 1.9MB) with no file backing — consistent with reflective shellcode or injected PE.",
+    "evidence": ["windows.malfind"],
+    "tool_output": "malfind.txt: PID 8260 p.exe VadS TAG PAGE_EXECUTE_READWRITE CommitCharge=481 PrivateMemory=1",
+    "confidence": "CONFIRMED"
+  },
+  {
+    "id": "F11",
+    "title": "External HTTPS Connection to 52.16.55.11:443",
+    "description": "CLOSED HTTPS connection to external IP 52.16.55.11:443 — possible initial staging server, payload retrieval, or external C2.",
+    "evidence": ["windows.netscan"],
+    "tool_output": "netscan.txt: 0x8c88b7f29a40 172.16.6.11:49360->52.16.55.11:443 CLOSED",
+    "confidence": "UNCONFIRMED"
+  },
+  {
+    "id": "F12",
+    "title": "Inbound SMB Connection from 172.16.6.14",
+    "description": "ESTABLISHED inbound SMB connection from 172.16.6.14:65368 to 172.16.6.11:445 — another host on the same subnet accessed this machine over SMB.",
+    "evidence": ["windows.netscan"],
+    "tool_output": "netscan.txt: 0x8c88b7647470 172.16.6.11:445<-172.16.6.14:65368 ESTABLISHED",
+    "confidence": "UNCONFIRMED"
+  },
+  {
+    "id": "F13",
+    "title": "OUTLOOK.EXE Malfind Hits (False Positive)",
+    "description": "Two RWX VAD regions flagged in OUTLOOK.EXE (PID 8128) — initial suspicion of injection.",
+    "evidence": ["windows.malfind"],
+    "tool_output": "malfind.txt: PID 8128 OUTLOOK.EXE two regions beginning with 64 74 72 52 (dtrR pattern)",
+    "confidence": "UNCONFIRMED"
+  },
+  {
+    "id": "F14",
+    "title": "Orphan conhost.exe (PID 9936) with Missing Parent PID 11552",
+    "description": "conhost.exe (PID 9936) shows PPID 11552, which does not appear anywhere in psscan — parent process completely absent from pool scan.",
+    "evidence": ["windows.psscan"],
+    "tool_output": "psscan.txt: PID 9936 PPID 11552 conhost.exe exited 2018-09-06 18:26:17 UTC; no PID 11552 entry anywhere in psscan",
+    "confidence": "UNCONFIRMED"
+  },
+  {
+    "id": "F15",
+    "title": "subject_srv.exe = F-Response Forensic Collection Agent (NOT Malicious)",
+    "description": "subject_srv.exe (PID 1096) at C:\\windows\\subject_srv.exe is the F-Response Subject software used to acquire this memory image. Command line: '-s base-hunt.shieldbase.lan:5682 -l 3262 -v F-Response Subject -k 155522845'.",
+    "evidence": ["windows.cmdline", "windows.netscan"],
+    "tool_output": "cmdline.txt PID 1096; netscan.txt: subject_srv.ex listening 3262, ESTABLISHED to 172.16.5.50:39372",
+    "confidence": "CONFIRMED"
+  },
+  {
+    "id": "F16",
+    "title": "Multiple RDP Sessions to 172.16.4.5 (Possible DC)",
+    "description": "Multiple CLOSED RDP connections from 172.16.6.11 to 172.16.4.5:3389 — attacker may have attempted RDP access to another internal host.",
+    "evidence": ["windows.netscan"],
+    "tool_output": "netscan.txt: PIDs -, offsets 0x8c88afcea690, 0x8c88b2c039b0, 0x8c88b37e7970, 0x8c88b3943010, 0x8c88b5bfa1a0, 0x8c88b675a9c0, 0x8c88b68f5480, 0x8c88b761a900, 0x8c88b63848 all CLOSED to 172.16.4.5:3389",
+    "confidence": "UNCONFIRMED"
+  }
+]

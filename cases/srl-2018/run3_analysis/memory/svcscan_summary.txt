@@ -1,0 +1,14 @@
+Offset	Order	PID	Start	State	Type	Name	Display	Binary	Binary (Registry)	Dll
+0x23b99172e60	558	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_FILE_SYSTEM_DRIVER	wcnfs	Windows Container Name Virtualization	N/A	\SystemRoot\system32\drivers\wcnfs.sys	-
+0x23b9915d600	429	3552	SERVICE_DEMAND_START	SERVICE_RUNNING	SERVICE_WIN32_SHARE_PROCESS	StateRepository	State Repository Service	C:\WINDOWS\system32\svchost.exe -k appmodel -p	%SystemRoot%\system32\svchost.exe -k appmodel -p	-
+0x23b99153650	344	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	PNRPsvc	Peer Name Resolution Protocol	N/A	%SystemRoot%\System32\svchost.exe -k LocalServicePeerNet	-
+0x23b991534d0	343	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	PNRPAutoReg	PNRP Machine Name Publication Service	N/A	%SystemRoot%\System32\svchost.exe -k LocalServicePeerNet	-
+0x23b99154cd0	311	N/A	SERVICE_SYSTEM_START	SERVICE_RUNNING	SERVICE_KERNEL_DRIVER	npsvctrig	Named pipe service trigger provider	\Driver\npsvctrig	\SystemRoot\System32\drivers\npsvctrig.sys	-
+0x23b99134dd0	90	N/A	SERVICE_SYSTEM_START	SERVICE_RUNNING	SERVICE_FILE_SYSTEM_DRIVER	Dfsc	DFS Namespace Client Driver	\FileSystem\Dfsc	System32\Drivers\dfsc.sys	-
+0x23b99154cd0	311	N/A	SERVICE_SYSTEM_START	SERVICE_RUNNING	SERVICE_KERNEL_DRIVER	npsvctrig	Named pipe service trigger provider	\Driver\npsvctrig	\SystemRoot\System32\drivers\npsvctrig.sys	-
+0x23b99134dd0	90	N/A	SERVICE_SYSTEM_START	SERVICE_RUNNING	SERVICE_FILE_SYSTEM_DRIVER	Dfsc	DFS Namespace Client Driver	\FileSystem\Dfsc	System32\Drivers\dfsc.sys	-
+0x23b99167c40	429	3552	SERVICE_DEMAND_START	SERVICE_RUNNING	SERVICE_WIN32_SHARE_PROCESS	StateRepository	State Repository Service	C:\WINDOWS\system32\svchost.exe -k appmodel -p	%SystemRoot%\system32\svchost.exe -k appmodel -p	-
+0x23b99172e60	558	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_FILE_SYSTEM_DRIVER	wcnfs	Windows Container Name Virtualization	N/A	\SystemRoot\system32\drivers\wcnfs.sys	-
+0x23b99153650	344	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	PNRPsvc	Peer Name Resolution Protocol	N/A	%SystemRoot%\System32\svchost.exe -k LocalServicePeerNet	-
+0x23b991534d0	343	N/A	SERVICE_DEMAND_START	SERVICE_STOPPED	SERVICE_WIN32_SHARE_PROCESS	PNRPAutoReg	PNRP Machine Name Publication Service	N/A	%SystemRoot%\System32\svchost.exe -k LocalServicePeerNet	-
+0x23b9917e2d0	696	1096	SERVICE_AUTO_START	SERVICE_RUNNING	SERVICE_WIN32_OWN_PROCESS	F-Response Subject	F-Response Subject	C:\windows\subject_srv.exe -s "base-hunt.shieldbase.lan:5682" -l 3262 -v "F-Response Subject" -k "155522845"	C:\windows\subject_srv.exe -s "base-hunt.shieldbase.lan:5682" -l 3262 -v "F-Response Subject" -k "155522845"	-
