@@ -14,6 +14,8 @@ Post-tuning runs (N=2, runs 2+3): **mean weighted F1 = 0.890 ± 0.030, recall = 
 
 **Run 4 (MCP-enabled):** F1 = 0.8909, recall = 0.8033. All 5 critical findings identified, all 3 FP traps caught. E5 deviated (−0.03 from Run 3); E1–E3 all deviated — both MCP tools bypassed by the agent in favor of direct Python invocation. See "Run 4" section below for full E1–E6 disclosure.
 
+**Run 5 (strengthened prohibitions):** Score pending (scorer requires API key; Run 5 judge verdicts not yet cached). Pre-scoring observables: F01 (p.exe malware) reclassified UNCONFIRMED — Phase 2 audit fired correctly when MCP evidence was absent. All 3 FP traps retracted. Zero MCP invocations in any `tool_attribution`. Root cause determined post-run: `.mcp.json` was at the wrong path (`.claude/mcp.json`), so the server was not loaded — E1/E2/E3 were not testable in Run 5. See "Run 5" section below and "Reframing note" for full disclosure.
+
 ---
 
 ## Run table (v0.4)
@@ -24,6 +26,7 @@ Post-tuning runs (N=2, runs 2+3): **mean weighted F1 = 0.890 ± 0.030, recall = 
 | 2   | + `dlllist` + persistence check | 0.8598 | 0.7541 | 4/5 ✗F005 | 2/3 | 3/5 | 10/14 |
 | 3   | + output schema pin | 0.9204 | 0.8525 | **5/5** | 3/3 | 3/5 | 11/14 |
 | 4   | + MCP server (hash_file + yara_scan) | 0.8909 | 0.8033 | **5/5** | 3/3 | 3/5 | 9/14 |
+| 5   | + strengthened prohibitions (gate failed) | pending | pending | pending | 3/3 ✓ | pending | pending |
 
 **Post-tuning mean (runs 2 + 3):** F1 = 0.890, σ = 0.030 · Recall = 0.803, σ = 0.049
 
@@ -101,19 +104,82 @@ Pre-registered in `design/mcp-server-v1.md` before Run 4 was executed. Results e
 
 ---
 
+## Reframing note: Run 5 gate failure and what each run actually tested
+
+The predictions in `design/mcp-tool-routing-v1.1.md` (R5-E1/E2/E3) were written with the assumption that the MCP server would be visible to the agent. They were not testable in Run 5 because `.mcp.json` was at the wrong path (`.claude/mcp.json` instead of repo-root `.mcp.json`), so the server was never loaded. Run 5's zero MCP invocations reflect a missing server, not an agent routing failure — a fundamentally different failure mode than Run 4's bypass of an available server.
+
+This retroactively shifts what each run demonstrates:
+
+| Run | What it actually tested |
+|-----|------------------------|
+| 4 | Agent routing when MCP server is registered and available: both tools bypassed in favor of inline CLI equivalents |
+| 5 | Phase 2 audit clause behavior when MCP server is absent: correctly reclassified F01 (p.exe) as UNCONFIRMED rather than accepting unattributed hash/YARA evidence. R5-E1/E2/E3 not testable — gate not met |
+| 6 | First fair test of R5-E1/E2/E3: strengthened CLAUDE.md prohibitions + server actually available (gate verified, `mcp_verification.txt` committed at `41d7c71`) |
+
+Run 5 is not a failed Run 5. It is valid evidence about one failure mode (audit clause under tool absence) that was never the target of the pre-registration. The pre-registered predictions (MCP routing under strengthened prohibitions) get their first fair test in Run 6.
+
+---
+
+## Run 5 — Strengthened prohibitions; gate not met (pre-registered expectations R5-E1–E6)
+
+Pre-registered in `design/mcp-tool-routing-v1.1.md` before Run 5 was executed.
+
+**Gate status at time of Run 5:** FAIL. `.mcp.json` at wrong path; server not loaded. R5-E1, R5-E2, R5-E3 were untestable. This was not known until post-run diagnosis; the run was executed and counts per the methodology's pre-flight gating rule ("score and disclose regardless").
+
+**R5-E1 — Agent calls `mcp__hash_file` at least once:** NOT TESTABLE. Server absent; tool not in agent's tool list. Zero MCP invocations in any `tool_attribution` across all 15 findings.
+
+**R5-E2 — Agent calls `mcp__yara_scan` at least once:** NOT TESTABLE. Same as E1.
+
+**R5-E3 — At least one finding has `file_hash_sha256` from `mcp__hash_file`:** NOT TESTABLE. Same as E1. No hash fields populated in Run 5 findings.
+
+**R5-E4 — Phase 2 does not retract a malware finding solely for lack of hash/YARA evidence:** MET — with a meaningful qualification. F01 (p.exe malware) was not retracted; it was reclassified UNCONFIRMED. This is the correct behavior under the strengthened Phase 2 clause: without MCP-attributed hash or YARA evidence, the clause requires the finding to be UNCONFIRMED rather than silently accepting unattributed output. The agent did not fall back to inline computation; it correctly acknowledged the evidence gap. This is the audit clause working as designed, demonstrated under tool-absence rather than tool-bypass.
+
+**R5-E5 — Run 5 weighted F1 within ±0.02 of Run 4 (0.871–0.911):** PENDING SCORING. Pre-scoring observable: F01 UNCONFIRMED status may affect the critical-finding match for GT F001 (p.exe), depending on judge evaluation of the finding's content vs. its classification status. If F01's description is rich enough to match GT F001 on content, the match may still be credited; if the UNCONFIRMED classification causes the judge to decline, the critical miss would drop F1 below the band. This is the primary scoring uncertainty.
+
+**R5-E6 — No FP regression:** MET. All 3 FP traps retracted (F11, F12, F13 all status=RETRACTED). Phase 1 prohibitions did not affect FP detection.
+
+**Run 5 findings summary:** 15 total — 8 CONFIRMED, 4 UNCONFIRMED (F01 malware, F07 lateral movement, F14 lateral movement, F15 credential access), 3 RETRACTED (FP traps). The 4 UNCONFIRMED findings all lack MCP-attributed evidence, consistent with Phase 2 audit clause behavior under server absence.
+
+**Overall:** E4, E6 met. E1, E2, E3 not testable (gate failed). E5 pending. Run 5's primary contribution is a clean demonstration of the Phase 2 audit clause: when MCP evidence is unavailable, the agent declines to classify binaries as confirmed malware rather than fabricating attribution or falling back to inline tools. That is a distinct and useful result — it just answers a different question than the one pre-registered.
+
+---
+
+## Run 6 — Pre-registered interpretation matrix (gate met)
+
+Gate verified and committed at `41d7c71` (`cases/srl-2018/run6_analysis/mcp_verification.txt`). Both `mcp__hash_file` and `mcp__yara_scan` confirmed live. Run 6 is the first fair test of R5-E1/E2/E3.
+
+The CLAUDE.md prohibitions being tested are unchanged from Run 5 (the strengthened language was committed before Run 5). The only change between Run 5 and Run 6 is the server being actually available.
+
+**Interpretation matrix (pre-registered before Run 6 is executed):**
+
+| Outcome | Interpretation |
+|---------|---------------|
+| `tool_attribution` shows `mcp__hash_file`/`mcp__yara_scan`; F1 in 0.871–0.911 | Cleanest result. R5-E1/E2/E3 confirmed. MCP integration pattern demonstrated end-to-end. v1 acceptance criteria met. |
+| MCP invocations present; F1 below 0.871 due to Phase 2 UNCONFIRMED reclassification | Pre-committed interpretation from v1.1 design applies: audit working correctly under a different failure mode (tool invoked but match fails or evidence gap remains). Not a methodology regression. |
+| MCP invocations present; F1 below 0.871 for some other reason | Real finding. Investigate per v0.4 discipline — identify which GT findings dropped and why. |
+| MCP invocations absent despite server demonstrably available | Most significant result. Would mean strengthened CLAUDE.md prohibitions are insufficient to override the agent's default-to-inline routing even when the MCP tools are in the tool list. Threat-collections-relevant finding about agent tool routing under stated constraints. Requires investigation into why the routing failed despite explicit prohibitions. |
+
+**What "gate met" means for scoring:** Run 6 counts and is scored regardless of which outcome obtains. The gate determines testability of the pre-registered predictions, not whether the run counts. A run that produces outcome 4 above is more informative than a run that produces outcome 1.
+
+**Run 6 baseline:** Run 4 (0.8909 F1, 0.8033 recall) remains the comparison baseline — same CLAUDE.md prohibitions as Run 5, same frozen v0.4 scorer, same ground truth. Run 3 (0.9204) is not the baseline.
+
+---
+
 ## Unstable behaviors (noise) — v0.4
 
-| Behavior | Run 1 | Run 2 | Run 3 | Run 4 |
-|----------|:-----:|:-----:|:-----:|:-----:|
-| F005 (PowerShell stealth shell) | ✓ | ✗ | ✓ | ✓ |
-| F006 (six rundll32 from PS 5848) | ✓ | ✓ | ✗ | ✓ |
-| F013 (p.exe DLL profile) | ✗ | ✓ | ✓ | ✗ |
-| McAfee UpdaterUI FP retraction (FP002) | ✓ | ✗ | ✓ | ✓ |
-| Total findings produced | 19 | 14 | 19 | 15 |
+| Behavior | Run 1 | Run 2 | Run 3 | Run 4 | Run 5 |
+|----------|:-----:|:-----:|:-----:|:-----:|:-----:|
+| F005 (PowerShell stealth shell) | ✓ | ✗ | ✓ | ✓ | pending |
+| F006 (six rundll32 from PS 5848) | ✓ | ✓ | ✗ | ✓ | pending |
+| F013 (p.exe DLL profile) | ✗ | ✓ | ✓ | ✗ | pending |
+| McAfee UpdaterUI FP retraction (FP002) | ✓ | ✗ | ✓ | ✓ | ✓ |
+| Total findings produced | 19 | 14 | 19 | 15 | 15 |
 
 F013 missed in Run 4: DLL evidence was present and collected but merged into F01 (implant finding) rather than surfaced as a standalone structured finding. This is a recurrence of the Run 1 miss and confirms F013 as an unstable behavior tied to how the agent chooses to consolidate DLL evidence.
 
 F006 recovered in Run 4 after missing in Run 3: the six rundll32 instances from PS 5848 were correctly identified and attributed.
+
+Run 5 behaviors pending scorer output. FP002 (McAfee UpdaterUI) marked ✓ from direct inspection of retracted findings.
 
 ---
 
