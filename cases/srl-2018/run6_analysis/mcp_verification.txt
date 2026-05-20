@@ -1,0 +1,71 @@
+MCP Tool Verification — sift-bench-enrichment server
+Generated: 2026-05-20T00:00:00Z
+Purpose: Pre-Run-6 gate — both MCP tools must respond before Run 6 scoring is enabled.
+
+================================================================================
+TOOL 1: mcp__sift-bench-enrichment__hash_file
+================================================================================
+Invocation: mcp__hash_file(path="/etc/hostname")
+
+Response:
+{
+  "path": "/etc/hostname",
+  "size_bytes": 14,
+  "md5": "125f01fb6e6e1d39897f83c0395472ec",
+  "sha1": "20d7a7580b54661c71267ef5703287acd154627e",
+  "sha256": "94eee2c3cbb3a4a62ede5e1158d09d7e57b29853f8eeba7690f5c34ab4cfbd07"
+}
+
+Result: PASS — tool returned structured hashes and size. sha256 field present and non-empty.
+
+================================================================================
+TOOL 2: mcp__sift-bench-enrichment__yara_scan
+================================================================================
+Test rule (/tmp/test.yar):
+  rule TestMarker { strings: $a = "FIND_EVIL_MARKER" condition: $a }
+
+Test target (/tmp/test_target.txt):
+  "FIND_EVIL_MARKER inside"
+
+Invocation: mcp__yara_scan(target_path="/tmp/test_target.txt", rules_path="/tmp/test.yar")
+
+Response:
+{
+  "target_path": "/tmp/test_target.txt",
+  "target_sha256": "ef827e282f8e13c402925f500f72373b373dae088e2b809cea63f24836d19bcd",
+  "rules_path": "/tmp/test.yar",
+  "rules_sha256": "c5b284bfeb4f8a3bc769dc43d9060ec5db1d2989939b2a84b02e2bc250d65728",
+  "matches": [
+    {
+      "rule": "TestMarker",
+      "namespace": "default",
+      "tags": [],
+      "meta": {},
+      "strings": [
+        {
+          "identifier": "$a",
+          "offset": 0,
+          "data": "46494e445f4556494c5f4d41524b4552"
+        }
+      ]
+    }
+  ],
+  "scan_duration_ms": 0
+}
+
+Hex decode check: 46494e445f4556494c5f4d41524b4552 → "FIND_EVIL_MARKER" ✓
+Match offset: 0 (start of file, as expected)
+
+Result: PASS — rule compiled, scan ran, match returned with correct string data and offset.
+
+================================================================================
+GATE STATUS: PASS — both tools responding. Run 6 scoring is enabled.
+================================================================================
+
+Methodology note (for writeup):
+  Run 4/5 "not available this session" errors were caused by .mcp.json being at
+  the wrong path (.claude/mcp.json instead of .mcp.json at repo root). Both
+  interactive and headless modes were equally affected — the headless-mode
+  hypothesis was a red herring. The path fix is what restored MCP availability,
+  not any invocation-mode change. This verification file is the committed artifact
+  that closes that ambiguity for the scoring record.
