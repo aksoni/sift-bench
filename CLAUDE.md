@@ -91,9 +91,9 @@ Run the full memory analysis methodology (see memory-analysis skill file):
 
 **Enrichment (inline):** Whenever you encounter a suspicious file during investigation:
 - Extract the binary first using `vol ... windows.dumpfiles` (or `windows.dumpfiles --physoffset` for pool-scan hits)
-- Hash the extracted file using the `hash_file` MCP tool (`mcp__hash_file`); record the `sha256` in the finding's `evidence.file_hash_sha256` field
-- Scan the extracted file using the `yara_scan` MCP tool (`mcp__yara_scan`) against `yara_rules/` rule sets; include any rule matches as supporting evidence
-- Record all enrichment results alongside the finding
+- **Hash using `mcp__hash_file` only.** Do not use `sha256sum`, `certutil`, `Get-FileHash`, `hashlib`, or any other inline hash method — they produce unattributed output that cannot be verified. Record the `sha256` field from the `mcp__hash_file` response in `evidence.file_hash_sha256`.
+- **Scan using `mcp__yara_scan` only**, with `rules_path` pointing to `yara_rules/srl-2018-operative.yar`. Do not use `/usr/local/bin/yara`, `yara.compile()`, or any other direct YARA invocation — they bypass the registered tool and produce unattributed output. Include any rule matches as supporting evidence.
+- Record all enrichment results alongside the finding.
 
 Save all tool output to `./analysis/` with descriptive filenames.
 
@@ -103,7 +103,7 @@ Save all tool output to `./analysis/` with descriptive filenames.
 
 After completing investigation, consult `@~/.claude/skills/self-correction/SKILL.md` and perform the full self-correction protocol. Log your pre-correction findings to `./analysis/findings_pre_correction.json` before making any changes. Both pre- and post-correction files MUST conform to the schema defined in "Output Schema Requirements" below.
 
-**Hash/YARA evidence for malware-class claims.** For any finding classifying a binary as malware, shellcode loader, C2 binary, or implant, the evidence section must include at least one of: (a) a `sha256` from `mcp__hash_file`, (b) a YARA rule match from `mcp__yara_scan`, or (c) explicit acknowledgment that the artifact was not extractable (e.g., process exited, memory paged out, no on-disk copy available). Findings making such claims without one of these three must be re-classified as `UNCONFIRMED` or `RETRACTED`.
+**Hash/YARA evidence for malware-class claims.** For any finding classifying a binary as malware, shellcode loader, C2 binary, or implant, the evidence section must include at least one of: (a) a `sha256` from an `mcp__hash_file` invocation — inline computation via `sha256sum`, `hashlib`, `certutil`, or `Get-FileHash` does not satisfy this requirement, (b) a YARA rule match from an `mcp__yara_scan` invocation — matches produced by `/usr/local/bin/yara` or `yara.compile()` do not satisfy this requirement, or (c) explicit acknowledgment that the artifact was not extractable (e.g., process exited, memory paged out, no on-disk copy available). Findings making such claims without one of these three must be re-classified as `UNCONFIRMED` or `RETRACTED`.
 
 ### Phase 3: REPORT
 
