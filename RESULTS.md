@@ -37,6 +37,23 @@ Run 4 is the MCP-enabled run scored against the same frozen v0.4 scorer. Run 3 i
 
 Scored against `findings_post_correction.json` for all runs. Precision stubbed at 1.0 (v0.5 scope). All scores produced by `scorer/scorer.py` v0.4 with `claude-sonnet-4-6` as judge, prompt hash `d6cfae8c...`, verdicts cached in `scorer_cache/judge_verdicts.json`.
 
+## Methodology checklist + self-correction table (v0.4)
+
+Produced by `scorer/checklist.py` and `scorer/self_correction.py`. `n/a` = source file absent for that run.
+
+| Run | Checklist | Missing step | FP traps caught | Retractions | Additions |
+|-----|----------:|--------------|----------------:|------------:|----------:|
+| 1   | 8/9       | dlllist      | **3/3**         | 2           | 3         |
+| 2   | 9/9       | —            | 2/3             | 2           | 4         |
+| 3   | 9/9       | —            | **3/3**         | 0           | 0         |
+| 4   | n/a       | —            | **3/3**         | 3           | 0         |
+| 5   | 9/9       | —            | **3/3**         | 3           | 0         |
+| 6   | 9/9       | —            | **3/3**         | 0           | 0         |
+
+**Checklist:** run 1 missed `dlllist` (step added in run 2 CLAUDE.md); all subsequent runs achieve 9/9.
+**FP traps:** run 2 missed FP002 (McAfee UpdaterUI) — the agent did not retract it during self-correction. All other runs caught all 3. Run 1's 3/3 reflects pre-correction retractions already in place before Phase 2 (the self-correction phase was not formally structured in run 1).
+**Retractions/additions:** run 3 and run 6 show 0 retractions and 0 additions — the agent's pre-correction findings were already clean, requiring no Phase 2 changes. Runs 4 and 5 show 3 retractions each: the tightened evidence-attribution rules in the CLAUDE.md output schema drove the agent to downgrade findings that lacked direct tool attribution.
+
 ---
 
 ## v0.4 vs v0.3 comparison

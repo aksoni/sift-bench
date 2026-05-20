@@ -11,8 +11,10 @@ from pathlib import Path
 
 import anthropic
 
+from .checklist import score_checklist
 from .judge import JudgeApiError, judge_pair
 from .judge_cache import JudgeCache, JudgeVerdict
+from .self_correction import score_self_correction
 
 MODEL_SNAPSHOT = "claude-sonnet-4-6"
 
@@ -190,7 +192,7 @@ def check_na_addressed(na, agent_findings):
     return False
 
 
-def score(gt_path, findings_path):
+def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
     """Score agent findings against ground truth. Returns results dict."""
     gt = load_json(gt_path)
     agent_findings = normalize_findings(load_json(findings_path))
@@ -291,6 +293,12 @@ def score(gt_path, findings_path):
     results["must_find_total"] = sum(1 for f in gt["findings"] if f.get("must_find", False))
     results["must_find_missed"] = [m["gt_id"] for m in results["findings_missed"] if m["must_find"]]
 
+    # Optional sub-scorers
+    if log_path is not None:
+        results["checklist"] = score_checklist(log_path)
+    if pre_correction_path is not None:
+        results["self_correction"] = score_self_correction(pre_correction_path, findings_path, gt_path)
+
     return results
 
 
@@ -334,4 +342,26 @@ def print_report(results):
 
     print(f"\nAgent produced {results['agent_finding_count']} total findings")
     print(f"Weighted TP: {results['weighted_tp']}, Weighted FN: {results['weighted_fn']}")
+
+    if "checklist" in results:
+        cl = results["checklist"]
+        print(f"\n--- Methodology checklist: {cl['passed']}/{cl['total']} ({cl['coverage']:.0%}) ---")
+        for s in cl["steps"]:
+            mark = "✓" if s["status"] == "pass" else ("✗" if s["status"] == "fail" else "·")
+            print(f"  {mark} {s['name']}")
+
+    if "self_correction" in results:
+        sc = results["self_correction"]
+        if "error" in sc:
+            print(f"\n--- Self-correction: ERROR — {sc['error']} ---")
+        else:
+            print(f"\n--- Self-correction: retracted={sc['retracted_count']}  added={sc['added_count']}  "
+                  f"FP traps caught={sc['fp_traps_retracted_count']}/3 ---")
+            if sc["fp_traps_retracted"]:
+                for t in sc["fp_traps_retracted"]:
+                    print(f"  ✓ {t['trap_id']} ({t['trap_name']}) ← finding {t['finding_id']}")
+            fp_missed = 3 - sc["fp_traps_retracted_count"]
+            if fp_missed:
+                print(f"  (missed {fp_missed} trap{'s' if fp_missed > 1 else ''})")
+
     print("=" * 60)
