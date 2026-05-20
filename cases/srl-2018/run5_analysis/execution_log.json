@@ -1,0 +1,196 @@
+{
+  "case_id": "srl-2018",
+  "analyst": "claude-code-sift-bench",
+  "analysis_date_utc": "2026-05-20",
+  "tool_invocations": [
+    {
+      "step": 1,
+      "command": "vol -f evidence/base-rd01-memory.img windows.psscan",
+      "output_file": "run5_analysis/memory/psscan.txt",
+      "purpose": "Pool-scan all processes including hidden and exited",
+      "key_findings": [
+        "p.exe (PID 8260, PPID 5948) at C:\\Windows\\Temp\\Perfmon\\p.exe, started 2018-08-30 22:15:18 UTC",
+        "WmiPrvSE.exe (PID 2876, PPID 868) spawned powershell.exe (PID 8712) at 2018-08-30 16:43:36 UTC",
+        "powershell.exe (PID 5848, PPID 8712) with SysWOW64 path",
+        "Multiple rundll32.exe (PIDs 6768,5452,5588,4108,2216,8148) spawned by PS 5848",
+        "Multiple rundll32.exe (PIDs 5768,7552,1424) spawned by p.exe 8260 on 2018-09-05 to 2018-09-06"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 2,
+      "command": "vol -f evidence/base-rd01-memory.img windows.pstree",
+      "output_file": "run5_analysis/memory/pstree.txt",
+      "purpose": "Parent-child process relationships",
+      "key_findings": [
+        "Full attack chain confirmed: WmiPrvSE(2876) → powershell(8712) → powershell(5848) → cmd(5948) → p.exe(8260)",
+        "p.exe binary path: \\Device\\HarddiskVolume2\\Windows\\Temp\\Perfmon\\p.exe",
+        "cmd.exe cmdline: C:\\WINDOWS\\system32\\cmd.exe /C c:\\windows\\temp\\perfmon\\p.exe",
+        "powershell 5848 cmdline: syswow64\\...\\powershell.exe -Version 5.1 -s -NoLogo -NoProfile"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 3,
+      "command": "vol -f evidence/base-rd01-memory.img windows.cmdline",
+      "output_file": "run5_analysis/memory/cmdline.txt",
+      "purpose": "Command line arguments for all processes",
+      "key_findings": [
+        "powershell.exe PID 5848: -Version 5.1 -s -NoLogo -NoProfile (PS Remoting engine mode)",
+        "p.exe PID 8260: c:\\windows\\temp\\perfmon\\p.exe",
+        "cmd.exe PID 5948: /C c:\\windows\\temp\\perfmon\\p.exe",
+        "subject_srv.exe PID 1096: F-Response forensic agent (legitimate)",
+        "All rundll32 instances: blank command lines"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 4,
+      "command": "vol -f evidence/base-rd01-memory.img windows.netscan",
+      "output_file": "run5_analysis/memory/netscan.txt",
+      "purpose": "Network connections including historical",
+      "key_findings": [
+        "3x ESTABLISHED + 8x CLOSE_WAIT to 172.16.4.10:8080 (C2 beaconing)",
+        "ESTABLISHED SMB to 172.16.7.15:445 (lateral movement)",
+        "ESTABLISHED SMB to 172.16.4.5:445 (lateral movement)",
+        "7x CLOSED RDP to 172.16.4.5:3389 (RDP attempts)",
+        "CLOSED LDAP to 172.16.4.4:389 (AD recon)",
+        "CLOSED WinRM to 172.16.5.21:5985 (PS Remoting lateral move)",
+        "ESTABLISHED inbound SMB from 172.16.6.14:65368 (unknown source)",
+        "ESTABLISHED F-Response to 172.16.5.50:39372 (forensic investigator)"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 5,
+      "command": "vol -f evidence/base-rd01-memory.img windows.malfind",
+      "output_file": "run5_analysis/memory/malfind.txt",
+      "purpose": "Code injection detection via RWX VAD regions",
+      "key_findings": [
+        "OUTLOOK.EXE PID 8128: 2x RWX hits with dtrR signature — RETRACTED as known FP",
+        "UpdaterUI.exe PID 6036: 1x single-page null RWX — RETRACTED as AV updater FP",
+        "powershell.exe PID 8712: 3x RWX with 0xEEFFEEFF — RETRACTED as .NET CLR heap FP",
+        "p.exe PID 8260: 1x large RWX (481 pages, 0x2BE0000-0x2DC0FFF) with unreadable content — suspicious anonymous region"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 6,
+      "command": "vol -f evidence/base-rd01-memory.img windows.filescan",
+      "output_file": "run5_analysis/memory/filescan.txt",
+      "purpose": "File objects in memory",
+      "key_findings": [
+        "0x8c88af21def0 \\Windows\\Temp\\Perfmon\\p.exe — staging file",
+        "0x8c88b5a2b960 \\Windows\\Prefetch\\P.EXE-1209D82B.pf — confirms prior execution",
+        "0x8c88b3fd7770 \\Users\\tdungan\\AppData\\Roaming\\Dashlane\\6.2.0.12026\\procdump.exe — suspicious"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 7,
+      "command": "vol -f evidence/base-rd01-memory.img windows.getsids --pid 8260",
+      "output_file": "run5_analysis/memory/getsids_p_exe.txt",
+      "purpose": "Account context for p.exe",
+      "key_findings": [
+        "spsql (RID-1193), Domain Admins (S-1-5-21-...-512), Administrators (S-1-5-32-544)",
+        "High Mandatory Level (S-1-16-12288)"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 8,
+      "command": "vol -f evidence/base-rd01-memory.img windows.getsids --pid 8712",
+      "output_file": "run5_analysis/memory/getsids_ps8712.txt",
+      "purpose": "Account context for powershell.exe PID 8712",
+      "key_findings": [
+        "spsql (RID-1193), Domain Admins (S-1-5-21-...-512) — confirms DA privilege via WMI"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 9,
+      "command": "vol -f evidence/base-rd01-memory.img windows.getsids --pid 2876",
+      "output_file": "run5_analysis/memory/getsids_wmi.txt",
+      "purpose": "Account context for WmiPrvSE.exe",
+      "key_findings": [
+        "S-1-5-20 NT Authority/NetworkService — standard WMI Provider Host context",
+        "Spawned child powershell runs as spsql DA: confirms attacker used spsql credentials for WMI auth"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 10,
+      "command": "vol -f evidence/base-rd01-memory.img windows.dlllist --pid 8260",
+      "output_file": "run5_analysis/memory/dlllist_p_exe.txt",
+      "purpose": "DLL inventory for p.exe",
+      "key_findings": [
+        "Network stack: WININET.dll, WS2_32.dll, DNSAPI.dll, IPHLPAPI.DLL, NSI.dll",
+        "Crypto: rsaenh.dll, bcrypt.dll, CRYPTSP.dll, bcryptPrimitives.dll, CRYPTBASE.dll",
+        "Auth: Secur32.dll, SSPICLI.DLL",
+        "Post-launch DLL loading: mpr.dll at 2018-09-05 12:13:26, USER32.dll+GDI32.dll at 2018-09-05 12:14:36"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 11,
+      "command": "vol -f evidence/base-rd01-memory.img windows.dlllist --pid 8712",
+      "output_file": "run5_analysis/memory/dlllist_ps8712.txt",
+      "purpose": "DLL inventory for powershell.exe PID 8712",
+      "key_findings": [
+        "amsi.dll loaded at 2018-08-30 16:43:37 — AMSI present, no bypass confirmed",
+        "Full .NET CLR DLL set loaded — normal for PowerShell host"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 12,
+      "command": "vol -f evidence/base-rd01-memory.img windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "output_file": "run5_analysis/memory/registry_run.txt",
+      "purpose": "Check Run key persistence",
+      "key_findings": [
+        "spsql user Run key: no data entries (empty)",
+        "Only legitimate entries: OneDrive and Dashlane under tdungan user hive"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 13,
+      "command": "vol -f evidence/base-rd01-memory.img windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+      "output_file": "run5_analysis/memory/registry_runonce.txt",
+      "purpose": "Check RunOnce key persistence",
+      "key_findings": [
+        "spsql user RunOnce key: no data entries (empty)"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 14,
+      "command": "vol -f evidence/base-rd01-memory.img windows.svcscan",
+      "output_file": "run5_analysis/memory/svcscan.txt",
+      "purpose": "Service enumeration for persistence",
+      "key_findings": [
+        "F-Response Subject (subject_srv.exe): legitimate forensic agent",
+        "VMware Physical Disk Helper Service: legitimate VM tool",
+        "No services with user-writable-path binaries or suspicious names"
+      ],
+      "status": "success"
+    },
+    {
+      "step": 15,
+      "command": "vol -f evidence/base-rd01-memory.img -o run5_exports/dumpfiles/ windows.dumpfiles --pid 8260",
+      "output_file": "run5_exports/dumpfiles/file.0x8c88af21def0.0x8c88b154ea70.ImageSectionObject.p.exe.img",
+      "purpose": "Extract p.exe binary from memory for hashing and YARA scanning",
+      "key_findings": [
+        "p.exe ImageSectionObject extracted: file.0x8c88af21def0.0x8c88b154ea70.ImageSectionObject.p.exe.img",
+        "mcp__hash_file not available in this session — binary malware classification remains UNCONFIRMED",
+        "mcp__yara_scan not available in this session"
+      ],
+      "status": "partial — extraction succeeded; MCP tools unavailable"
+    }
+  ],
+  "mcp_tool_availability": {
+    "mcp__hash_file": "not available in this session",
+    "mcp__yara_scan": "not available in this session",
+    "impact": "Binary malware classification for F01 (p.exe) is UNCONFIRMED per CLAUDE.md protocol; all behavioral findings remain CONFIRMED"
+  }
+}

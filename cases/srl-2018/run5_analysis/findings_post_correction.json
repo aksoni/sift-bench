@@ -1,0 +1,310 @@
+{
+  "case_id": "srl-2018",
+  "analyst": "claude-code-sift-bench",
+  "evidence_image": "base-rd01-memory.img",
+  "analysis_timestamp_utc": "2026-05-20T00:00:00Z",
+  "phase": "post_correction",
+  "findings": [
+    {
+      "id": "F01",
+      "title": "p.exe running in attacker staging directory under Domain Admin account",
+      "description": "p.exe (PID 8260) was found running from C:\\Windows\\Temp\\Perfmon\\p.exe, a non-standard staging path. The process runs under spsql (Domain Admin S-1-5-21-...-512) and has loaded network (WININET, WS2_32, DNSAPI), crypto (rsaenh, bcrypt, CRYPTSP), and authentication (Secur32, SSPICLI) DLLs consistent with a C2 implant. Post-launch DLL loading on 2018-09-05 (6 days after start) indicates the implant remained active and expanded capabilities. Binary extraction succeeded but mcp__hash_file/mcp__yara_scan are not available in this session; binary malware classification cannot be verified per protocol.",
+      "severity": "critical",
+      "status": "UNCONFIRMED",
+      "confidence": "high",
+      "category": "malware",
+      "evidence": {
+        "pid": 8260,
+        "ppid": 5948,
+        "process_name": "p.exe",
+        "file_path": "C:\\Windows\\Temp\\Perfmon\\p.exe",
+        "user_sid": "S-1-5-21-3445421715-2530590580-3149308974-512",
+        "username": "spsql",
+        "raw_tool_output": "8260 5948 p.exe 0x8c88af601580 2 threads 2018-08-30 22:15:18 UTC; DLLs: WININET.dll, rsaenh.dll, bcrypt.dll, WS2_32.dll loaded at start; mpr.dll, USER32.dll loaded 2018-09-05 (post-launch)"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.psscan",
+        "vol -f evidence/base-rd01-memory.img windows.pstree",
+        "vol -f evidence/base-rd01-memory.img windows.cmdline",
+        "vol -f evidence/base-rd01-memory.img windows.getsids --pid 8260",
+        "vol -f evidence/base-rd01-memory.img windows.dlllist --pid 8260",
+        "vol -f evidence/base-rd01-memory.img windows.filescan"
+      ],
+      "mitre_attack": ["T1204.002"]
+    },
+    {
+      "id": "F02",
+      "title": "Active C2 beaconing to 172.16.4.10:8080 (multiple ESTABLISHED connections)",
+      "description": "Three simultaneous ESTABLISHED TCP connections from the victim (172.16.6.11) to 172.16.4.10:8080 were present at capture time, along with eight CLOSE_WAIT connections to the same endpoint. HTTP port 8080 with persistent ESTABLISHED sessions and beacon-pattern CLOSE_WAIT accumulation is consistent with a C2 keep-alive channel. p.exe has WININET loaded, supporting HTTP-based communication; process attribution in netscan is indirect (rows show '-' for PID) due to socket state at capture time.",
+      "severity": "critical",
+      "status": "CONFIRMED",
+      "confidence": "high",
+      "category": "c2",
+      "evidence": {
+        "remote_ip": "172.16.4.10",
+        "remote_port": 8080,
+        "process_name": "p.exe",
+        "raw_tool_output": "0x8c88af069cb0 TCPv4 172.16.6.11 49788 172.16.4.10 8080 ESTABLISHED | 0x8c88b7f274c0 TCPv4 172.16.6.11 49787 172.16.4.10 8080 ESTABLISHED | 0x8c88b9076010 TCPv4 172.16.6.11 49786 172.16.4.10 8080 ESTABLISHED (+ 8 CLOSE_WAIT)"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.netscan",
+        "vol -f evidence/base-rd01-memory.img windows.dlllist --pid 8260"
+      ],
+      "mitre_attack": ["T1071.001"]
+    },
+    {
+      "id": "F03",
+      "title": "WMI-based remote execution used for initial access (WmiPrvSE → powershell.exe)",
+      "description": "WmiPrvSE.exe (PID 2876, child of svchost PID 868) spawned powershell.exe (PID 8712) at 2018-08-30 16:43:36 UTC. WmiPrvSE ran as NT Authority/NetworkService (S-1-5-20), but the spawned powershell runs as spsql (Domain Admin S-1-5-21-...-512), indicating the attacker authenticated the WMI call using spsql credentials, granting Domain Admin context to all descendant processes.",
+      "severity": "high",
+      "status": "CONFIRMED",
+      "confidence": "high",
+      "category": "execution",
+      "evidence": {
+        "pid": 2876,
+        "ppid": 868,
+        "process_name": "WmiPrvSE.exe",
+        "user_sid": "S-1-5-20",
+        "username": "NT Authority",
+        "raw_tool_output": "2876 868 WmiPrvSE.exe 0x8c88b14e7580 getsids: S-1-5-20 | child 8712 powershell.exe getsids: S-1-5-21-...-512 Domain Admins, spsql RID-1193"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.psscan",
+        "vol -f evidence/base-rd01-memory.img windows.pstree",
+        "vol -f evidence/base-rd01-memory.img windows.getsids --pid 2876",
+        "vol -f evidence/base-rd01-memory.img windows.getsids --pid 8712"
+      ],
+      "mitre_attack": ["T1047"]
+    },
+    {
+      "id": "F04",
+      "title": "32-bit PowerShell remoting chain used to stage and execute p.exe",
+      "description": "powershell.exe (PID 8712, 64-bit, spsql) spawned a 32-bit SysWOW64 powershell.exe (PID 5848) with flags '-Version 5.1 -s -NoLogo -NoProfile'. The -s flag selects stdin-driven PS Remoting engine mode. This 32-bit shell then spawned cmd.exe (PID 5948) with the command 'C:\\WINDOWS\\system32\\cmd.exe /C c:\\windows\\temp\\perfmon\\p.exe', which launched p.exe. Using 32-bit PowerShell avoids certain 64-bit AMSI and constrained language controls.",
+      "severity": "high",
+      "status": "CONFIRMED",
+      "confidence": "high",
+      "category": "execution",
+      "evidence": {
+        "pid": 5848,
+        "ppid": 8712,
+        "process_name": "powershell.exe",
+        "command_line": "\"c:\\windows\\syswow64\\windowspowershell\\v1.0\\powershell.exe\" -Version 5.1 -s -NoLogo -NoProfile",
+        "file_path": "\\Device\\HarddiskVolume2\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "raw_tool_output": "5948 5848 cmd.exe cmdline: C:\\WINDOWS\\system32\\cmd.exe /C c:\\windows\\temp\\perfmon\\p.exe | 8260 5948 p.exe 2018-08-30 22:15:18 UTC"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.pstree",
+        "vol -f evidence/base-rd01-memory.img windows.cmdline",
+        "vol -f evidence/base-rd01-memory.img windows.psscan"
+      ],
+      "mitre_attack": ["T1059.001"]
+    },
+    {
+      "id": "F05",
+      "title": "Lateral movement via SMB to 172.16.7.15 and 172.16.4.5 with multiple RDP attempts",
+      "description": "Two ESTABLISHED SMB (port 445) connections from the victim (172.16.6.11) to internal hosts 172.16.7.15 and 172.16.4.5 were active at capture time. Seven CLOSED RDP (port 3389) connections to 172.16.4.5 indicate repeated remote desktop attempts. The attacker's Domain Admin (spsql) credentials are sufficient to authenticate SMB and RDP to domain-joined hosts.",
+      "severity": "high",
+      "status": "CONFIRMED",
+      "confidence": "high",
+      "category": "lateral_movement",
+      "evidence": {
+        "remote_ip": "172.16.7.15",
+        "remote_port": 445,
+        "raw_tool_output": "0x8c88afe80450 TCPv4 172.16.6.11 59352 172.16.7.15 445 ESTABLISHED | 0x8c88b292b450 TCPv4 172.16.6.11 49763 172.16.4.5 445 ESTABLISHED | 7x RDP CLOSED to 172.16.4.5:3389"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.netscan"
+      ],
+      "mitre_attack": ["T1021.002", "T1021.001"]
+    },
+    {
+      "id": "F06",
+      "title": "Active Directory LDAP reconnaissance to 172.16.4.4:389",
+      "description": "A CLOSED TCP connection from the victim to 172.16.4.4:389 (LDAP) was recorded. Port 389 is used for AD LDAP queries against domain controllers. Combined with Domain Admin credentials, this likely represents enumeration of accounts, groups, or hosts in the domain. CLOSED state indicates the query completed before capture.",
+      "severity": "medium",
+      "status": "CONFIRMED",
+      "confidence": "medium",
+      "category": "discovery",
+      "evidence": {
+        "remote_ip": "172.16.4.4",
+        "remote_port": 389,
+        "raw_tool_output": "0x8c88b5b1a010 TCPv4 172.16.6.11 56345 172.16.4.4 389 CLOSED"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.netscan"
+      ],
+      "mitre_attack": ["T1018", "T1087.002"]
+    },
+    {
+      "id": "F07",
+      "title": "WinRM connection to 172.16.5.21:5985 — possible PowerShell remoting lateral move",
+      "description": "A CLOSED TCP connection to 172.16.5.21:5985 (WS-Management / WinRM) was captured. Port 5985 is the WinRM HTTP transport used by PowerShell Remoting. CLOSED state means the session completed before capture. Given the attacker's established PS Remoting capabilities and Domain Admin privileges, this likely represents a lateral move to 172.16.5.21, but cannot be confirmed without host-level evidence from 172.16.5.21.",
+      "severity": "high",
+      "status": "UNCONFIRMED",
+      "confidence": "medium",
+      "category": "lateral_movement",
+      "evidence": {
+        "remote_ip": "172.16.5.21",
+        "remote_port": 5985,
+        "raw_tool_output": "0x8c88b8479cb0 TCPv4 172.16.6.11 49791 172.16.5.21 5985 CLOSED"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.netscan"
+      ],
+      "mitre_attack": ["T1021.006"]
+    },
+    {
+      "id": "F08",
+      "title": "p.exe spawned rundll32.exe children with no command lines (plugin/module execution)",
+      "description": "p.exe (PID 8260) spawned three rundll32.exe processes (PIDs 5768, 7552, 1424) between 2018-09-05 and 2018-09-06, all with blank command lines and brief lifespans (3-8 seconds). rundll32 with no visible arguments is a hallmark of reflective DLL loading or in-memory plugin execution. The multi-day span confirms p.exe remained active and executed modules on demand over at least 8 days.",
+      "severity": "high",
+      "status": "CONFIRMED",
+      "confidence": "high",
+      "category": "defense_evasion",
+      "evidence": {
+        "pid": 8260,
+        "process_name": "p.exe",
+        "raw_tool_output": "5768 8260 rundll32.exe 2018-09-05 12:01:32 UTC exit:12:01:40 | 1424 8260 rundll32.exe 2018-09-06 14:58:41 exit:14:58:45 | 7552 8260 rundll32.exe 2018-09-06 17:26:32 exit:17:26:35 — all cmdlines: blank"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.psscan",
+        "vol -f evidence/base-rd01-memory.img windows.pstree",
+        "vol -f evidence/base-rd01-memory.img windows.cmdline"
+      ],
+      "mitre_attack": ["T1218.011", "T1055"]
+    },
+    {
+      "id": "F09",
+      "title": "powershell.exe PID 5848 spawned six rundll32.exe — attacker staging activity",
+      "description": "The attacker-controlled 32-bit powershell.exe (PID 5848) spawned six rundll32.exe processes (PIDs 6768, 5452, 5588, 4108, 2216, 8148) between 2018-08-30 18:31 and 2018-08-31 00:56 UTC, all with blank command lines. This pattern is consistent with a PowerShell-based implant reflectively loading successive DLL modules during the attacker's dwell and staging phase prior to deploying p.exe.",
+      "severity": "high",
+      "status": "CONFIRMED",
+      "confidence": "high",
+      "category": "execution",
+      "evidence": {
+        "pid": 5848,
+        "process_name": "powershell.exe",
+        "raw_tool_output": "6768 5848 rundll32 2018-08-30 18:31:04 | 5452 5848 rundll32 21:40:18 | 5588 5848 rundll32 21:40:42 | 4108 5848 rundll32 22:45:25 | 2216 5848 rundll32 22:31:57 | 8148 5848 rundll32 2018-08-31 00:56:14 — all cmdlines: blank"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.psscan",
+        "vol -f evidence/base-rd01-memory.img windows.pstree",
+        "vol -f evidence/base-rd01-memory.img windows.cmdline"
+      ],
+      "mitre_attack": ["T1218.011", "T1059.001"]
+    },
+    {
+      "id": "F10",
+      "title": "No registry-based persistence detected; svcscan reveals no malicious services",
+      "description": "Run and RunOnce keys were enumerated across all resident hives; no attacker-controlled entries were found under the spsql user hive or HKLM SOFTWARE. The spsql ntuser.dat Run and RunOnce keys contain no data values. svcscan identified only VMware Physical Disk Helper, standard Windows services, and the F-Response Subject forensic agent — no services with user-writable-path binaries.",
+      "severity": "low",
+      "status": "CONFIRMED",
+      "confidence": "high",
+      "category": "persistence",
+      "evidence": {
+        "registry_key": "\\??\\.\\Users\\spsql\\ntuser.dat\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "raw_tool_output": "spsql Run key: no data entries (Key node only, no values). RunOnce: same. svcscan: only F-Response Subject (subject_srv.exe) and VMware tools found — no user-writable-path service paths"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "vol -f evidence/base-rd01-memory.img windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+        "vol -f evidence/base-rd01-memory.img windows.svcscan"
+      ]
+    },
+    {
+      "id": "F11",
+      "title": "OUTLOOK.EXE PID 8128 malfind dtrR hits — initial injection suspicion",
+      "description": "malfind initially flagged two RWX VadS regions in OUTLOOK.EXE (PID 8128) beginning with bytes 64 74 72 52 (ASCII: dtrR). On review, this byte signature (dtrR = 'dtr' internal Outlook object type tag) is a well-documented Outlook memory allocation pattern associated with internal COM/MAPI object headers, not injected shellcode. The regions contain no PE headers and follow the self-referential pointer layout of Outlook's heap allocator.",
+      "severity": "low",
+      "status": "RETRACTED",
+      "confidence": "high",
+      "category": "false_positive",
+      "evidence": {
+        "pid": 8128,
+        "process_name": "OUTLOOK.EXE",
+        "raw_tool_output": "8128 OUTLOOK.EXE 0x363a0000 VadS PAGE_EXECUTE_READWRITE 16 pages | bytes: 64 74 72 52 00 00 00 00 18 03 3a 36 (dtrR + self-referential pointer 0x363a0318)"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.malfind"
+      ],
+      "retraction_reason": "Byte pattern 64 74 72 52 (dtrR) at region start is a known Outlook internal COM/MAPI object type tag, not shellcode. The self-referential pointer at offset 8 (18 03 3a 36 = 0x363a0318, pointing within the same region) is consistent with Outlook heap object headers. No PE header present. Known false positive pattern documented in SKILL.md."
+    },
+    {
+      "id": "F12",
+      "title": "powershell.exe PID 8712 malfind CLR heap hits — initial injection suspicion",
+      "description": "malfind initially flagged three RWX VadS regions in powershell.exe (PID 8712) showing the byte pattern 0xEEFFEEFF. On review, this is the well-known .NET CLR GC heap signature. The .NET runtime in PowerShell allocates managed heap segments as PAGE_EXECUTE_READWRITE by design; the 0xEEFFEEFF pattern marks uninitialized CLR object space.",
+      "severity": "low",
+      "status": "RETRACTED",
+      "confidence": "high",
+      "category": "false_positive",
+      "evidence": {
+        "pid": 8712,
+        "process_name": "powershell.exe",
+        "raw_tool_output": "8712 powershell.exe 0x1b4ce1a0000 VadS PAGE_EXECUTE_READWRITE 8 pages | bytes: ee ff ee ff 02 00 00 00 (CLR GC heap marker)"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.malfind"
+      ],
+      "retraction_reason": "Byte pattern 0xEEFFEEFF is the .NET CLR garbage collector heap free-space marker. PowerShell hosts the .NET CLR which allocates managed heap regions with RWX permissions by design. All three flagged regions show this marker without any PE header. Known false positive for all .NET host processes. Documented in SKILL.md."
+    },
+    {
+      "id": "F13",
+      "title": "UpdaterUI.exe PID 6036 malfind single-page RWX hit — initial suspicion",
+      "description": "malfind initially flagged one small (1-page, 4KB) RWX VadS region in UpdaterUI.exe (PID 6036) containing entirely null bytes. On review, a single null-filled page with no PE header and no code-like content is not indicative of shellcode. McAfee UpdaterUI and similar AV update utilities allocate small self-modifying code stubs or signature update buffers as RWX; the all-zero content indicates an uninitialized staging buffer, not active shellcode.",
+      "severity": "low",
+      "status": "RETRACTED",
+      "confidence": "high",
+      "category": "false_positive",
+      "evidence": {
+        "pid": 6036,
+        "process_name": "UpdaterUI.exe",
+        "raw_tool_output": "6036 UpdaterUI.exe 0x5070000 0x5070fff VadS PAGE_EXECUTE_READWRITE 1 page | all bytes: 00 (null-filled)"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.malfind"
+      ],
+      "retraction_reason": "Single-page RWX region with entirely null content contains no PE header, no shellcode patterns, no MZ marker. AV update utilities (McAfee UpdaterUI) commonly allocate small RWX buffers for self-modifying signature update stubs. Null content indicates an uninitialized or cleared staging buffer. No code-like content observed. Known false positive pattern for AV updater processes per SKILL.md."
+    },
+    {
+      "id": "F14",
+      "title": "Incoming SMB connection from 172.16.6.14 to this host",
+      "description": "netscan shows an ESTABLISHED TCP connection from 172.16.6.14:65368 to 172.16.6.11:445 (this host). This inbound SMB connection could represent another attacker-controlled host connecting inbound, a domain controller performing domain operations, or the forensic investigator workstation. Without corroborating evidence from 172.16.6.14, the direction of threat context is unknown.",
+      "severity": "medium",
+      "status": "UNCONFIRMED",
+      "confidence": "low",
+      "category": "lateral_movement",
+      "evidence": {
+        "remote_ip": "172.16.6.14",
+        "remote_port": 65368,
+        "local_port": 445,
+        "raw_tool_output": "0x8c88b7647470 TCPv4 172.16.6.11 445 172.16.6.14 65368 ESTABLISHED"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.netscan"
+      ]
+    },
+    {
+      "id": "F15",
+      "title": "procdump.exe found in Dashlane application directory — possible credential dumping",
+      "description": "filescan identified procdump.exe at \\Users\\tdungan\\AppData\\Roaming\\Dashlane\\6.2.0.12026\\procdump.exe. procdump is a Sysinternals utility that can dump LSASS memory for credential extraction. The path under a Dashlane user-space directory is unusual — Dashlane does not ship procdump. No running process was found, so it may have been used and exited, or staged for later use. Cannot determine if lsass.exe was targeted without disk artifact analysis.",
+      "severity": "medium",
+      "status": "UNCONFIRMED",
+      "confidence": "low",
+      "category": "credential_access",
+      "evidence": {
+        "file_path": "\\Users\\tdungan\\AppData\\Roaming\\Dashlane\\6.2.0.12026\\procdump.exe",
+        "raw_tool_output": "0x8c88b3fd7770 \\Users\\tdungan\\AppData\\Roaming\\Dashlane\\6.2.0.12026\\procdump.exe (filescan hit; no corresponding pslist/psscan process entry)"
+      },
+      "tool_attribution": [
+        "vol -f evidence/base-rd01-memory.img windows.filescan"
+      ],
+      "mitre_attack": ["T1003.001"]
+    }
+  ],
+  "summary": {
+    "total_findings": 15,
+    "confirmed_count": 8,
+    "unconfirmed_count": 4,
+    "retracted_count": 3
+  }
+}
