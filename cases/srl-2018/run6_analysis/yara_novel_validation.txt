@@ -1,0 +1,49 @@
+SIFT-Bench Novel YARA Rule Validation — Run 6 Extracted Artifacts
+Generated: 2026-05-20
+Rules: yara_rules/srl-2018-novel.yar
+Design doc: design/yara-rules-v2.md
+
+This is NOT a new benchmark run. Rule validation against already-extracted
+artifacts from Run 6 — no agent re-execution, no new memory image analysis.
+
+Pre-registered predictions (from design/yara-rules-v2.md, committed 2026-05-20
+before this validation):
+  E1: SIFT_Procdump_Sysinternals_Marker MATCH against procdump.exe (SHA256: 8b87ad36...)
+  E2: SIFT_PS_SysWOW64_Stealth_Memory NO MATCH against PE binaries (targets raw memory image)
+
+---
+
+TARGET 1: p.exe PE dump
+  Path:   cases/srl-2018/run6_exports/dumpfiles/8260.p.exe.0x400000.dmp
+  SHA256: 6f9d6ec7c4efe97e9e53af36de5f5ead7dfb4fe3a42e1fbda71f19d0f53ca29f
+  Rules matched: (none)
+  Evaluation: EXPECTED — p.exe is a packed/encoded payload; Meterpreter DLL-
+              pattern strings are not present in plaintext in the static binary.
+
+TARGET 2: p.exe ImageSectionObject
+  Path:   cases/srl-2018/run6_exports/dumpfiles/file.0x8c88af21def0.0x8c88b154ea70.ImageSectionObject.p.exe.img
+  SHA256: (not pre-registered)
+  Rules matched: (none)
+  Evaluation: EXPECTED — same reason as TARGET 1.
+
+TARGET 3: procdump.exe DataSectionObject
+  Path:   cases/srl-2018/run6_exports/dumpfiles/file.0x8c88b3fd7770.0x8c88b7863c80.DataSectionObject.procdump.exe.dat
+  SHA256: 8b87ad368f48a2414834cedafa3caafb9b07d8710699cb6df105e5a8e2616821
+  Rules matched: SIFT_Procdump_Sysinternals_Marker
+  Evaluation: PRE-REGISTERED MATCH CONFIRMED ✅
+              Sysinternals ProcDump version-resource strings (UTF-16LE) present
+              in the DataSectionObject dump. Confirms binary identity: the artifact
+              found in the Dashlane staging directory (GT F012) is the legitimate
+              Sysinternals ProcDump tool, not a malware lookalike.
+
+---
+
+Outcome summary:
+  E1 MET   — SIFT_Procdump_Sysinternals_Marker MATCH on procdump.exe ✅
+  E2 MET   — SIFT_PS_SysWOW64_Stealth_Memory no match on PE binaries ✅
+             (correct behavior — this rule targets memory images, not PE binaries)
+
+SIFT_PS_SysWOW64_Stealth_Memory is NOT validated here against its target artifact
+(raw memory image base-rd01-memory.img). Scanning the 3GB image with YARA is
+outside the scope of this validation commit; the rule is validated against
+synthetic fixtures in tests/test_yara_novel.py (13/13 passing).
