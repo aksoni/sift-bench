@@ -59,9 +59,27 @@ Committed before Run 5 is executed. Evaluated honestly post-run in RESULTS.md. D
 
 **R5-E4.** Phase 2 self-correction does not retract a malware finding solely for lack of hash/YARA evidence. The correct agent response when evidence is missing is to extract and hash, not retract. If a retraction on these grounds occurs, it indicates the agent couldn't extract the artifact — that must be documented explicitly.
 
-**R5-E5.** Run 5 weighted F1 within **±0.02** of Run 4's 0.8909 — i.e., between **0.871 and 0.911**. Run 4 (tools available, bypassed) is the right baseline for this diff since the config is otherwise identical. Run 3 (0.9204) is not the baseline here — it reflects different CLAUDE.md language. If F1 rises above 0.911, the most likely explanation is that Phase 2 tightening caused the agent to produce standalone DLL findings (F013, F014) rather than consolidating them into the implant finding — a positive surprise that should be investigated. If F1 drops below 0.871, the tightening may have introduced overcaution; investigate which findings were lost.
+**R5-E5.** Run 5 weighted F1 within **±0.02** of Run 4's 0.8909 — i.e., between **0.871 and 0.911**. Run 4 (tools available, bypassed) is the right baseline for this diff since the config is otherwise identical. Run 3 (0.9204) is not the baseline here — it reflects different CLAUDE.md language. If F1 rises above 0.911, the most likely explanation is that Phase 2 tightening caused the agent to produce standalone DLL findings (F013, F014) rather than consolidating them into the implant finding — a positive surprise that should be investigated. If F1 drops below 0.871, check first whether the Phase 2 audit fired and reclassified a malware finding to UNCONFIRMED for missing MCP attribution. If so, that counts as the audit working correctly, not a methodology regression — the pre-committed interpretation is "audit firing on inline evidence = success." Only if the drop is not explained by Phase 2 reclassifications does it indicate overcaution or a genuine loss.
 
 **R5-E6.** No FP regression. FP001 (Outlook dtrR), FP002 (McAfee UpdaterUI), FP003 (CLR heap) all retracted in Run 5. The Phase 1 prohibitions do not affect FP detection logic.
+
+---
+
+## Pre-Flight Gating Rule
+
+After Run 5 completes, `tool_attribution` in the malware findings may be inspected to determine whether MCP calls appear before scoring. The rule governing what to do with that information:
+
+**Score and disclose regardless.** If `tool_attribution` shows MCP bypass again, the run still counts, still gets scored with the frozen v0.4 scorer, and the deviation is disclosed in RESULTS.md the same way Run 4's was. Re-running after observing bad pre-flight signals is exactly the motivated-reasoning failure mode the methodology exists to prevent.
+
+The only permitted use of a pre-scoring look at `tool_attribution` is to understand the *cause* of what happened — not to decide whether the run counts. The run always counts.
+
+---
+
+## Schema Note: `tool_attribution` Disambiguation
+
+`tool_attribution` is a required field in the pinned schema (CLAUDE.md "Output Schema Requirements"), marked "NEVER empty for CONFIRMED findings." The field is populated with whatever tools the agent actually called — Run 4 showed this concretely: F01 listed `python3 yara.compile(...)` rather than `mcp__yara_scan`, a non-MCP invocation, but the field was not empty.
+
+This means the field is unambiguous: the content distinguishes MCP from inline paths. An empty `tool_attribution` on a CONFIRMED finding would be a schema violation caught by self-correction; a non-empty `tool_attribution` containing only CLI calls is the bypass signal. Both cases are interpretable from inspection. The disambiguation is behavioral, not schema-enforced, but Run 4 established the empirical pattern.
 
 ---
 
