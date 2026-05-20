@@ -1,0 +1,175 @@
+{
+  "case_id": "srl-2018-base-rd01",
+  "run": "run6",
+  "analyst": "claude-code-sift-bench",
+  "evidence_image": "base-rd01-memory.img",
+  "execution_log": [
+    {
+      "seq": 1,
+      "command": "vol -f base-rd01-memory.img windows.psscan",
+      "timestamp_utc": "2026-05-20T12:22:00Z",
+      "output_file": "run6_analysis/memory/psscan.txt",
+      "return_code": 0,
+      "notes": "147 process entries; key: p.exe PID 8260, PS 5848 SysWOW64, PS 8712 from WmiPrvSE, 9x rundll32"
+    },
+    {
+      "seq": 2,
+      "command": "vol -f base-rd01-memory.img windows.pstree",
+      "timestamp_utc": "2026-05-20T12:25:00Z",
+      "output_file": "run6_analysis/memory/pstree.txt",
+      "return_code": 0,
+      "notes": "Full chain: WmiPrvSE(2876)→PS(8712)→PS(5848)→cmd(5948)→p.exe(8260); 6 rundll32 from PS5848; 3 rundll32 from p.exe"
+    },
+    {
+      "seq": 3,
+      "command": "vol -f base-rd01-memory.img windows.cmdline",
+      "timestamp_utc": "2026-05-20T12:25:00Z",
+      "output_file": "run6_analysis/memory/cmdline.txt",
+      "return_code": 0,
+      "notes": "PS5848: -Version 5.1 -s -NoLogo -NoProfile (stealth); cmd5948: /C c:\\windows\\temp\\perfmon\\p.exe"
+    },
+    {
+      "seq": 4,
+      "command": "vol -f base-rd01-memory.img windows.netscan",
+      "timestamp_utc": "2026-05-20T12:25:00Z",
+      "output_file": "run6_analysis/memory/netscan.txt",
+      "return_code": 0,
+      "notes": "C2: 172.16.4.10:8080 (ESTABLISHED+CLOSE_WAIT); SMB: 172.16.4.5:445 ESTABLISHED, 172.16.7.15:445 ESTABLISHED; RDP: 172.16.4.5:3389 CLOSED x6; WinRM: 172.16.5.21:5985 CLOSED"
+    },
+    {
+      "seq": 5,
+      "command": "vol -f base-rd01-memory.img windows.malfind",
+      "timestamp_utc": "2026-05-20T12:33:00Z",
+      "output_file": "run6_analysis/memory/malfind.txt",
+      "return_code": 0,
+      "notes": "4 hits: OUTLOOK dtrR (FP), UpdaterUI null page (FP), PS8712 CLR heap x3 (FP), p.exe large RWX (paged out)"
+    },
+    {
+      "seq": 6,
+      "command": "vol -f base-rd01-memory.img windows.filescan",
+      "timestamp_utc": "2026-05-20T12:33:00Z",
+      "output_file": "run6_analysis/memory/filescan.txt",
+      "return_code": 0,
+      "notes": "Key finds: p.exe at 0x8c88af21def0, procdump.exe in Dashlane dir at 0x8c88b3fd7770, P.EXE prefetch"
+    },
+    {
+      "seq": 7,
+      "command": "vol -f base-rd01-memory.img windows.getsids --pid 8260",
+      "timestamp_utc": "2026-05-20T12:33:00Z",
+      "output_file": "run6_analysis/memory/getsids_p_exe.txt",
+      "return_code": 0,
+      "notes": "spsql, S-1-5-21-...-512 Domain Admins, S-1-5-32-544 Administrators, High Mandatory Level"
+    },
+    {
+      "seq": 8,
+      "command": "vol -f base-rd01-memory.img windows.getsids --pid 5848",
+      "timestamp_utc": "2026-05-20T12:33:00Z",
+      "output_file": "run6_analysis/memory/getsids_ps5848.txt",
+      "return_code": 0,
+      "notes": "spsql, same Domain Admins SID as p.exe — consistent attacker account"
+    },
+    {
+      "seq": 9,
+      "command": "vol -f base-rd01-memory.img windows.dlllist --pid 8260",
+      "timestamp_utc": "2026-05-20T12:38:00Z",
+      "output_file": "run6_analysis/memory/dlllist_p_exe.txt",
+      "return_code": 0,
+      "notes": "Network: WININET, WS2_32, DNSAPI, IPHLPAPI; Crypto: rsaenh, bcrypt, CRYPTBASE, SSPICLI; Post-exec: mpr.dll 2018-09-05 12:13:26 (+5d), USER32/GDI32 12:14:36"
+    },
+    {
+      "seq": 10,
+      "command": "vol -f base-rd01-memory.img windows.dlllist --pid 5848",
+      "timestamp_utc": "2026-05-20T12:38:00Z",
+      "output_file": "run6_analysis/memory/dlllist_ps5848.txt",
+      "return_code": 0
+    },
+    {
+      "seq": 11,
+      "command": "vol -f base-rd01-memory.img windows.dlllist --pid 8712",
+      "timestamp_utc": "2026-05-20T12:38:00Z",
+      "output_file": "run6_analysis/memory/dlllist_ps8712.txt",
+      "return_code": 0
+    },
+    {
+      "seq": 12,
+      "command": "vol -f base-rd01-memory.img windows.svcscan",
+      "timestamp_utc": "2026-05-20T12:38:00Z",
+      "output_file": "run6_analysis/memory/svcscan.txt",
+      "return_code": 0,
+      "notes": "No services in user-writable paths; no attacker-installed services"
+    },
+    {
+      "seq": 13,
+      "command": "vol -f base-rd01-memory.img windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "timestamp_utc": "2026-05-20T12:39:00Z",
+      "output_file": "run6_analysis/memory/registry_run.txt",
+      "return_code": 0,
+      "notes": "spsql ntuser.dat Run key: empty. tdungan: OneDrive, Dashlane (legitimate). No attacker persistence."
+    },
+    {
+      "seq": 14,
+      "command": "vol -f base-rd01-memory.img windows.registry.printkey --key SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+      "timestamp_utc": "2026-05-20T12:39:00Z",
+      "output_file": "run6_analysis/memory/registry_runonce.txt",
+      "return_code": 0,
+      "notes": "All RunOnce keys empty. No attacker persistence."
+    },
+    {
+      "seq": 15,
+      "command": "vol -f base-rd01-memory.img windows.pslist --dump --pid 8260",
+      "timestamp_utc": "2026-05-20T12:33:00Z",
+      "output_file": "run6_exports/dumpfiles/8260.p.exe.0x400000.dmp",
+      "return_code": 0,
+      "notes": "324K process dump (ImageSectionObject was zero-byte / paged out; pslist --dump succeeded). File ready for enrichment."
+    },
+    {
+      "seq": 16,
+      "command": "vol -f base-rd01-memory.img windows.dumpfiles --virtaddr 0x8c88b3fd7770",
+      "timestamp_utc": "2026-05-20T12:34:00Z",
+      "output_file": "run6_exports/dumpfiles/file.0x8c88b3fd7770...DataSectionObject.procdump.exe.dat",
+      "return_code": 0,
+      "notes": "504K procdump.exe DataSectionObject dump. Ready for enrichment."
+    },
+    {
+      "seq": 17,
+      "command": "mcp__hash_file(path=run6_exports/dumpfiles/8260.p.exe.0x400000.dmp)",
+      "timestamp_utc": "2026-05-20T12:40:00Z",
+      "tool": "mcp__sift-bench-enrichment__hash_file",
+      "return_code": 0,
+      "notes": "SHA256: 6f9d6ec7e1634f80de9fa5c0792806f7d63960c799be826f296d52af94a06fc0 | MD5: ebe5a8a2d7fd6c1981eaee1b9117346c | Size: 331776 bytes"
+    },
+    {
+      "seq": 18,
+      "command": "mcp__yara_scan(target=8260.p.exe.0x400000.dmp, rules=yara_rules/srl-2018-operative.yar)",
+      "timestamp_utc": "2026-05-20T12:40:00Z",
+      "tool": "mcp__sift-bench-enrichment__yara_scan",
+      "return_code": 0,
+      "notes": "0 matches. Rules SHA256: 57e1d894d310ca6e9433cc3d972a876bda5e0399e00efd74389b24c03c3327c3. Target is process dump not raw PE — may affect rule matching."
+    },
+    {
+      "seq": 19,
+      "command": "mcp__hash_file(path=run6_exports/dumpfiles/file.0x8c88b3fd7770...DataSectionObject.procdump.exe.dat)",
+      "timestamp_utc": "2026-05-20T12:42:00Z",
+      "tool": "mcp__sift-bench-enrichment__hash_file",
+      "return_code": 0,
+      "notes": "SHA256: 8b87ad368f48a2414834cedafa3caafb9b07d8710699cb6df105e5a8e2616821 | MD5: ee6c52664cbb4fa98e0cd48a2d188bea | Size: 516096 bytes"
+    },
+    {
+      "seq": 20,
+      "command": "mcp__yara_scan(target=procdump.exe.dat, rules=yara_rules/srl-2018-operative.yar)",
+      "timestamp_utc": "2026-05-20T12:42:00Z",
+      "tool": "mcp__sift-bench-enrichment__yara_scan",
+      "return_code": 0,
+      "notes": "0 matches. Scan duration: 2ms."
+    }
+  ],
+  "mcp_tool_invocations": {
+    "mcp__hash_file_count": 2,
+    "mcp__yara_scan_count": 2,
+    "targets_hashed": [
+      "8260.p.exe.0x400000.dmp",
+      "file.0x8c88b3fd7770.0x8c88b7863c80.DataSectionObject.procdump.exe.dat"
+    ],
+    "note": "MCP tools invoked successfully — Run 6 gate met. This is the first run where R5-E1/E2/E3 were testable."
+  }
+}

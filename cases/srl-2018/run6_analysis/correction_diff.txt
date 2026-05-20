@@ -1,0 +1,188 @@
+5,6c5,6
+<   "analysis_timestamp_utc": "2026-05-20T12:40:00Z",
+<   "phase": "pre_correction",
+---
+>   "analysis_timestamp_utc": "2026-05-20T13:00:00Z",
+>   "phase": "post_correction",
+11c11
+<       "description": "p.exe (PID 8260) found at c:\\windows\\temp\\perfmon\\p.exe — a non-standard staging path mimicking a legitimate Windows perfmon directory. Process is running under the spsql account which holds Domain Admin SID (S-1-5-21-3445421715-2530590580-3149308974-512). SHA256 confirmed via mcp__hash_file; zero YARA matches from operative ruleset (informative: process dump rather than raw binary).",
+---
+>       "description": "p.exe (PID 8260) found at c:\\windows\\temp\\perfmon\\p.exe \u2014 a non-standard staging path mimicking a legitimate Windows perfmon directory. Process is running under the spsql account which holds Domain Admin SID (S-1-5-21-3445421715-2530590580-3149308974-512). SHA256 confirmed via mcp__hash_file; zero YARA matches from operative ruleset (informative: process dump rather than raw binary).",
+34c34,37
+<       "mitre_attack": ["T1204.002", "T1036.005"]
+---
+>       "mitre_attack": [
+>         "T1204.002",
+>         "T1036.005"
+>       ]
+39c42
+<       "description": "powershell.exe (PID 8712) was spawned by WmiPrvSE.exe (PID 2876), indicating WMI-based lateral movement or remote execution. This is the initial foothold on rd01 — an attacker-controlled WMI command triggered the PowerShell execution chain that ultimately ran p.exe. WmiPrvSE spawning PowerShell is a well-known lateral movement indicator.",
+---
+>       "description": "powershell.exe (PID 8712) was spawned by WmiPrvSE.exe (PID 2876), indicating WMI-based lateral movement or remote execution. This is the initial foothold on rd01 \u2014 an attacker-controlled WMI command triggered the PowerShell execution chain that ultimately ran p.exe. WmiPrvSE spawning PowerShell is a well-known lateral movement indicator.",
+55c58,61
+<       "mitre_attack": ["T1047", "T1021.003"]
+---
+>       "mitre_attack": [
+>         "T1047",
+>         "T1021.003"
+>       ]
+60c66
+<       "description": "powershell.exe (PID 5848) running from SysWOW64 (32-bit process on 64-bit system) with stealth flags: -Version 5.1 -s -NoLogo -NoProfile. The -s flag indicates stdin-based command input (typical of remote C2 shells). Running as spsql with Domain Admin SID. Process has been active since 2018-08-30 16:43:42 UTC — over 8 hours before the memory capture — and spawned six rundll32 instances and the p.exe delivery cmd.exe.",
+---
+>       "description": "powershell.exe (PID 5848) running from SysWOW64 (32-bit process on 64-bit system) with stealth flags: -Version 5.1 -s -NoLogo -NoProfile. The -s flag indicates stdin-based command input (typical of remote C2 shells). Running as spsql with Domain Admin SID. Process has been active since 2018-08-30 16:43:42 UTC \u2014 over 8 hours before the memory capture \u2014 and spawned six rundll32 instances and the p.exe delivery cmd.exe.",
+80c86,89
+<       "mitre_attack": ["T1059.001", "T1078.002"]
+---
+>       "mitre_attack": [
+>         "T1059.001",
+>         "T1078.002"
+>       ]
+84c93
+<       "title": "Active C2 channel to 172.16.4.10:8080 — multiple connections",
+---
+>       "title": "Active C2 channel to 172.16.4.10:8080 \u2014 multiple connections",
+94c103
+<         "raw_tool_output": "172.16.6.11:49788 → 172.16.4.10:8080 ESTABLISHED | 172.16.6.11:49787 → 172.16.4.10:8080 ESTABLISHED | multiple CLOSE_WAIT"
+---
+>         "raw_tool_output": "172.16.6.11:49788 \u2192 172.16.4.10:8080 ESTABLISHED | 172.16.6.11:49787 \u2192 172.16.4.10:8080 ESTABLISHED | multiple CLOSE_WAIT"
+99c108,111
+<       "mitre_attack": ["T1071.001", "T1095"]
+---
+>       "mitre_attack": [
+>         "T1071.001",
+>         "T1095"
+>       ]
+120c132,134
+<       "mitre_attack": ["T1078.002"]
+---
+>       "mitre_attack": [
+>         "T1078.002"
+>       ]
+125c139
+<       "description": "Six rundll32.exe processes were spawned by powershell.exe (PID 5848) across the intrusion timeline: PIDs 6768 (2018-08-30 18:31), 5452 (21:40), 5588 (21:40), 2216 (22:31), 4108 (22:45), 8148 (2018-08-31 00:56). All exited within seconds. This pattern is consistent with in-memory shellcode staging or C2 tasking — rundll32 used as a LOLBin to execute attacker payloads without dropping new files.",
+---
+>       "description": "Six rundll32.exe processes were spawned by powershell.exe (PID 5848) across the intrusion timeline: PIDs 6768 (2018-08-30 18:31), 5452 (21:40), 5588 (21:40), 2216 (22:31), 4108 (22:45), 8148 (2018-08-31 00:56). All exited within seconds. This pattern is consistent with in-memory shellcode staging or C2 tasking \u2014 rundll32 used as a LOLBin to execute attacker payloads without dropping new files.",
+133c147
+<         "raw_tool_output": "6768 5848 rundll32.exe exited 18:31 | 5452 5848 21:40 | 5588 5848 21:40 | 2216 5848 22:31 | 4108 5848 22:45 | 8148 5848 00:56 — all exited within 30s"
+---
+>         "raw_tool_output": "6768 5848 rundll32.exe exited 18:31 | 5452 5848 21:40 | 5588 5848 21:40 | 2216 5848 22:31 | 4108 5848 22:45 | 8148 5848 00:56 \u2014 all exited within 30s"
+139c153,155
+<       "mitre_attack": ["T1218.011"]
+---
+>       "mitre_attack": [
+>         "T1218.011"
+>       ]
+152c168
+<         "raw_tool_output": "172.16.6.11:49763 → 172.16.4.5:445 ESTABLISHED | 172.16.6.11:63826/63834/63828 → 172.16.4.5:3389 CLOSED"
+---
+>         "raw_tool_output": "172.16.6.11:49763 \u2192 172.16.4.5:445 ESTABLISHED | 172.16.6.11:63826/63834/63828 \u2192 172.16.4.5:3389 CLOSED"
+157c173,176
+<       "mitre_attack": ["T1021.002", "T1021.001"]
+---
+>       "mitre_attack": [
+>         "T1021.002",
+>         "T1021.001"
+>       ]
+161,162c180,181
+<       "title": "Full attacker process chain: WmiPrvSE → PS(8712) → PS(5848) → cmd → p.exe",
+<       "description": "Pstree reveals the complete attacker execution chain: WmiPrvSE.exe (2876) spawned powershell.exe (8712) at 16:43:36 UTC, which spawned SysWOW64 powershell.exe (5848) with stealth flags at 16:43:42 UTC, which spawned cmd.exe (5948) at 22:15:18 UTC executing p.exe. This chain documents WMI-based initial execution → C2 shell establishment → implant deployment across a 5.5-hour window on 2018-08-30.",
+---
+>       "title": "Full attacker process chain: WmiPrvSE \u2192 PS(8712) \u2192 PS(5848) \u2192 cmd \u2192 p.exe",
+>       "description": "Pstree reveals the complete attacker execution chain: WmiPrvSE.exe (2876) spawned powershell.exe (8712) at 16:43:36 UTC, which spawned SysWOW64 powershell.exe (5848) with stealth flags at 16:43:42 UTC, which spawned cmd.exe (5948) at 22:15:18 UTC executing p.exe. This chain documents WMI-based initial execution \u2192 C2 shell establishment \u2192 implant deployment across a 5.5-hour window on 2018-08-30.",
+171c190
+<         "raw_tool_output": "WmiPrvSE(2876)→PS(8712,16:43:36)→PS(5848,SysWOW64,-s,16:43:42)→cmd(5948,22:15:18)→p.exe(8260,22:15:18)"
+---
+>         "raw_tool_output": "WmiPrvSE(2876)\u2192PS(8712,16:43:36)\u2192PS(5848,SysWOW64,-s,16:43:42)\u2192cmd(5948,22:15:18)\u2192p.exe(8260,22:15:18)"
+178c197,202
+<       "mitre_attack": ["T1047", "T1059.001", "T1059.003", "T1204.002"]
+---
+>       "mitre_attack": [
+>         "T1047",
+>         "T1059.001",
+>         "T1059.003",
+>         "T1204.002"
+>       ]
+183c207
+<       "description": "windows.dlllist for p.exe (PID 8260) shows a complete network and cryptography stack: WININET.dll (HTTP/HTTPS), WS2_32.dll (Winsock), DNSAPI.dll, IPHLPAPI.DLL, SSPICLI.DLL (Kerberos/NTLM), rsaenh.dll, bcrypt.dll, CRYPTBASE.dll. Critically, mpr.dll was loaded at 2018-09-05 12:13:26 UTC — 5+ days after process start (2018-08-30 22:15:18), followed by USER32/GDI32 family at 12:14:36. Post-execution DLL loading indicates the implant remained active and received new tasking requiring additional capabilities.",
+---
+>       "description": "windows.dlllist for p.exe (PID 8260) shows a complete network and cryptography stack: WININET.dll (HTTP/HTTPS), WS2_32.dll (Winsock), DNSAPI.dll, IPHLPAPI.DLL, SSPICLI.DLL (Kerberos/NTLM), rsaenh.dll, bcrypt.dll, CRYPTBASE.dll. Critically, mpr.dll was loaded at 2018-09-05 12:13:26 UTC \u2014 5+ days after process start (2018-08-30 22:15:18), followed by USER32/GDI32 family at 12:14:36. Post-execution DLL loading indicates the implant remained active and received new tasking requiring additional capabilities.",
+197c221,223
+<       "mitre_attack": ["T1071.001"]
+---
+>       "mitre_attack": [
+>         "T1071.001"
+>       ]
+202c228
+<       "description": "procdump.exe found at \\Users\\tdungan\\AppData\\Roaming\\Dashlane\\6.2.0.12026\\procdump.exe — a credential dumping tool staged in an unusual location within the legitimate Dashlane password manager folder, likely to blend in with user-installed software. SHA256 confirmed via mcp__hash_file. Zero YARA matches from operative ruleset (process data dump).",
+---
+>       "description": "procdump.exe found at \\Users\\tdungan\\AppData\\Roaming\\Dashlane\\6.2.0.12026\\procdump.exe \u2014 a credential dumping tool staged in an unusual location within the legitimate Dashlane password manager folder, likely to blend in with user-installed software. SHA256 confirmed via mcp__hash_file. Zero YARA matches from operative ruleset (process data dump).",
+218c244,247
+<       "mitre_attack": ["T1003.001", "T1036.005"]
+---
+>       "mitre_attack": [
+>         "T1003.001",
+>         "T1036.005"
+>       ]
+237c266,268
+<       "mitre_attack": ["T1218.011"]
+---
+>       "mitre_attack": [
+>         "T1218.011"
+>       ]
+241c272
+<       "title": "SMB lateral movement to 172.16.7.15:445 — second target subnet",
+---
+>       "title": "SMB lateral movement to 172.16.7.15:445 \u2014 second target subnet",
+250c281
+<         "raw_tool_output": "172.16.6.11:59352 → 172.16.7.15:445 ESTABLISHED"
+---
+>         "raw_tool_output": "172.16.6.11:59352 \u2192 172.16.7.15:445 ESTABLISHED"
+255c286,288
+<       "mitre_attack": ["T1021.002"]
+---
+>       "mitre_attack": [
+>         "T1021.002"
+>       ]
+268c301
+<         "raw_tool_output": "172.16.6.11:49791 → 172.16.5.21:5985 CLOSED"
+---
+>         "raw_tool_output": "172.16.6.11:49791 \u2192 172.16.5.21:5985 CLOSED"
+273c306,308
+<       "mitre_attack": ["T1021.006"]
+---
+>       "mitre_attack": [
+>         "T1021.006"
+>       ]
+296c331
+<       "title": "OUTLOOK.EXE dtrR RWX region — malfind hit",
+---
+>       "title": "OUTLOOK.EXE dtrR RWX region \u2014 malfind hit",
+305c340
+<         "raw_tool_output": "8128 OUTLOOK.EXE 0x363a0000 PAGE_EXECUTE_READWRITE VadS | hexdump: 64 74 72 52 00 00 00 00 — dtrR pattern"
+---
+>         "raw_tool_output": "8128 OUTLOOK.EXE 0x363a0000 PAGE_EXECUTE_READWRITE VadS | hexdump: 64 74 72 52 00 00 00 00 \u2014 dtrR pattern"
+310c345
+<       "retraction_reason": "Hexdump shows 64 74 72 52 (dtrR) — documented VSTO COM dispatch table marker present in all Office processes. Not injected code. Known false positive pattern in malfind output for Microsoft Office applications."
+---
+>       "retraction_reason": "Hexdump shows 64 74 72 52 (dtrR) \u2014 documented VSTO COM dispatch table marker present in all Office processes. Not injected code. Known false positive pattern in malfind output for Microsoft Office applications."
+314c349
+<       "title": "UpdaterUI.exe RWX region — malfind hit",
+---
+>       "title": "UpdaterUI.exe RWX region \u2014 malfind hit",
+332c367
+<       "title": "powershell.exe PID 8712 malfind hits — CLR heap false positive",
+---
+>       "title": "powershell.exe PID 8712 malfind hits \u2014 CLR heap false positive",
+341c376
+<         "raw_tool_output": "8712 powershell.exe 0x1b4ce1a0000 PAGE_EXECUTE_READWRITE | hexdump: ee ff ee ff 02 00 00 00 — CLR heap marker"
+---
+>         "raw_tool_output": "8712 powershell.exe 0x1b4ce1a0000 PAGE_EXECUTE_READWRITE | hexdump: ee ff ee ff 02 00 00 00 \u2014 CLR heap marker"
+346c381
+<       "retraction_reason": "All three flagged regions contain 0xEEFFEEFF at offset +8 — the documented .NET CLR GC heap sentinel. powershell.exe is a managed .NET process; RWX CLR heap segments are expected. No injected code present. Known false positive pattern for .NET/PowerShell processes."
+---
+>       "retraction_reason": "All three flagged regions contain 0xEEFFEEFF at offset +8 \u2014 the documented .NET CLR GC heap sentinel. powershell.exe is a managed .NET process; RWX CLR heap segments are expected. No injected code present. Known false positive pattern for .NET/PowerShell processes."
+355c390
+< }
+---
+> }
+\ No newline at end of file
