@@ -7,6 +7,7 @@ SIFT-Bench measures evidence quality, false-positive handling, negative assertio
 Solo submission to the [Find Evil! hackathon](https://findevil.devpost.com) (Apr 15 – Jun 15, 2026).
 
 [![tests](https://github.com/aksoni/sift-bench/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/aksoni/sift-bench/actions/workflows/tests.yml)
+![tested-on-sift](https://img.shields.io/badge/tested%20on-SIFT%203.0%20%28Ubuntu%2024.04%29-blue)
 
 ---
 
@@ -95,10 +96,12 @@ sift-bench/
 ## Reproducing
 
 **Requirements:**
-- SANS SIFT Workstation (Ubuntu, x86-64) or equivalent with Volatility 3 ≥ 2.27 on PATH as `vol`
+- SANS SIFT Workstation 3.0 (Ubuntu 24.04, x86-64) — tested environment. Volatility 3 ≥ 2.27 is available as `vol` on PATH via pipx.
 - Claude Code ≥ 2.1
 - Python 3.10+ (for scorer; no external dependencies)
 - A memory image to analyze (the SRL-2018 base-rd01 image used here is from the SANS FOR508 course and is not redistributable)
+
+> **Non-SIFT hosts:** If `vol` is not on PATH, install via `pipx install volatility3` or invoke directly as `python3 /opt/volatility3-*/vol.py`. Update the `vol` invocations in the run commands accordingly. All other tools (`fls`, `icat`, `bulk_extractor`) are standard DFIR packages available via apt.
 
 **Setup:**
 
