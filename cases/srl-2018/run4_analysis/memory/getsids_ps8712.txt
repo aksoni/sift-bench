@@ -1,0 +1,16 @@
+Progress:    0.00		Scanning FileLayer using PageMapScannerProgress:   23.33		Scanning FileLayer using PageMapScannerProgress:  100.00		Stacking attempts finished             Progress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:   37.50		Scanning layer_name using PdbSignatureScannerProgress:   37.60		Scanning layer_name using PdbSignatureScannerProgress:   37.70		Scanning layer_name using PdbSignatureScannerProgress:   37.79		Scanning layer_name using PdbSignatureScannerProgress:   37.89		Scanning layer_name using PdbSignatureScannerProgress:   37.99		Scanning layer_name using PdbSignatureScannerProgress:   38.09		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:   26.07		Scanning layer_name using PdbSignatureScannerProgress:   26.17		Scanning layer_name using PdbSignatureScannerProgress:   26.27		Scanning layer_name using PdbSignatureScannerProgress:   26.37		Scanning layer_name using PdbSignatureScannerProgress:   26.46		Scanning layer_name using PdbSignatureScannerProgress:   26.56		Scanning layer_name using PdbSignatureScannerProgress:   26.66		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:    0.00		Scanning layer_name using PdbSignatureScannerProgress:  100.00		PDB scanning finished                        Volatility 3 Framework 2.27.0
+
+PID	Process	SID	Name
+
+8712	powershell.exe	S-1-5-21-3445421715-2530590580-3149308974-1193	spsql
+8712	powershell.exe	S-1-5-21-3445421715-2530590580-3149308974-513	Domain Users
+8712	powershell.exe	S-1-1-0	Everyone
+8712	powershell.exe	S-1-5-32-545	Users
+8712	powershell.exe	S-1-5-32-544	Administrators
+8712	powershell.exe	S-1-5-2	Network
+8712	powershell.exe	S-1-5-11	Authenticated Users
+8712	powershell.exe	S-1-5-15	This Organization
+8712	powershell.exe	S-1-5-21-3445421715-2530590580-3149308974-512	Domain Admins
+8712	powershell.exe	S-1-18-1	Authentication Authority Asserted Identity
+8712	powershell.exe	S-1-5-21-3445421715-2530590580-3149308974-572	-
+8712	powershell.exe	S-1-16-12288	High Mandatory Level

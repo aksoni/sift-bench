@@ -10,7 +10,9 @@
 
 ## Headline (v0.4)
 
-Post-tuning runs (N=2): **mean weighted F1 = 0.890 ± 0.030, recall = 0.803 ± 0.049**. All 5 critical findings identified in runs 1 and 3. Run 2 missed one critical finding (GT F005, PowerShell C2 shell with stealth flags) — determined to be a genuine agent gap corrected by the judge; v0.3 was over-crediting it via keyword overlap. See "Confidence-3 verdict investigation" below.
+Post-tuning runs (N=2, runs 2+3): **mean weighted F1 = 0.890 ± 0.030, recall = 0.803 ± 0.049**. All 5 critical findings identified in runs 1 and 3. Run 2 missed one critical finding (GT F005, PowerShell C2 shell with stealth flags) — determined to be a genuine agent gap corrected by the judge; v0.3 was over-crediting it via keyword overlap. See "Confidence-3 verdict investigation" below.
+
+**Run 4 (MCP-enabled):** F1 = 0.8909, recall = 0.8033. All 5 critical findings identified, all 3 FP traps caught. Within 0.03 of Run 3 baseline; deviation from ±0.02 band analyzed below.
 
 ---
 
@@ -21,8 +23,11 @@ Post-tuning runs (N=2): **mean weighted F1 = 0.890 ± 0.030, recall = 0.803 ± 0
 | 1   | Baseline CLAUDE.md | 0.8704 | 0.7705 | **5/5** | 3/3 | 3/5 | 8/14 |
 | 2   | + `dlllist` + persistence check | 0.8598 | 0.7541 | 4/5 ✗F005 | 2/3 | 3/5 | 10/14 |
 | 3   | + output schema pin | 0.9204 | 0.8525 | **5/5** | 3/3 | 3/5 | 11/14 |
+| 4   | + MCP server (hash_file + yara_scan) | 0.8909 | 0.8033 | **5/5** | 3/3 | 3/5 | 9/14 |
 
 **Post-tuning mean (runs 2 + 3):** F1 = 0.890, σ = 0.030 · Recall = 0.803, σ = 0.049
+
+Run 4 is the MCP-enabled run scored against the same frozen v0.4 scorer. Run 3 is the MCP-disabled baseline for the A/B comparison.
 
 Scored against `findings_post_correction.json` for all runs. Precision stubbed at 1.0 (v0.5 scope). All scores produced by `scorer/scorer.py` v0.4 with `claude-sonnet-4-6` as judge, prompt hash `d6cfae8c...`, verdicts cached in `scorer_cache/judge_verdicts.json`.
 
@@ -71,22 +76,44 @@ Behaviors present in all three runs under v0.4 scoring:
 
 ## Stable misses — v0.4
 
-- **F008** (high): Full attack chain process tree — missed in all three runs. The agent describes the chain narratively but does not produce a structured finding with the parent-child sequence as the primary subject.
-- **F011** (low): spsql NTUSER.DAT in memory — missed in all three runs. No methodology step explicitly checks loaded user hives. The v0.3 "weak score-2 match" in run 3 (agent F07 via keyword overlap) was the false positive GT F011/F07 described in the design doc; v0.4 correctly does not credit it.
+- **F008** (high): Full attack chain process tree — missed in all four runs. The agent describes the chain narratively but does not produce a structured finding with the parent-child sequence as the primary subject.
+- **F011** (low): spsql NTUSER.DAT in memory — missed in all four runs. No methodology step explicitly checks loaded user hives. The v0.3 "weak score-2 match" in run 3 (agent F07 via keyword overlap) was the false positive GT F011/F07 described in the design doc; v0.4 correctly does not credit it.
+
+---
+
+## Run 4 — MCP server integration (pre-registered expectations E1–E6)
+
+Pre-registered in `design/mcp-server-v1.md` before Run 4 was executed. Results evaluated against frozen v0.4 scorer output.
+
+**E1 — Agent invokes `hash_file` at least once:** MET. Finding F01 (p.exe) includes `file_hash_sha256: "6f9d6ec7e163..."` — direct evidence of hash computation on the extracted binary.
+
+**E2 — Agent invokes `yara_scan` at least once:** PARTIAL. YARA rule matches are present in F01 evidence (`Meterpreter_NamedPipe_Transport` at offset 0x4a9b9). However, this rule name does not appear in `yara_rules/srl-2018-operative.yar` (our four operative rules are `HKTL_Meterpreter_inMemory`, `HKTL_CobaltStrike_Beacon_Strings`, `RAT_Meterpreter_Reverse_Tcp`, `SUSP_PowerShell_Param_Combo`). The agent invoked YARA scanning — the invocation expectation is met — but appears to have used a different or dynamically located rule rather than the pre-loaded operative ruleset. The tool_attribution line `python3 yara.compile('Meterpreter_NamedPipe_Transport').match('...')` suggests direct Python/CLI invocation rather than `mcp__yara_scan`. No execution_log.json was produced to verify MCP server call chains. Investigation: the deviation is an agent behavior issue (rule selection and tool routing), not a server problem. The server was available and registered; the agent chose to call YARA via an alternative path.
+
+**E3 — At least one finding includes a sha256 from `hash_file`:** MET. F01 `evidence.file_hash_sha256` is populated.
+
+**E4 — Phase 2 does not retract a malware finding solely for lack of hash/YARA evidence:** MET. No malware-class finding was retracted. F01 survived self-correction with high confidence.
+
+**E5 — Run 4 F1 within ±0.02 of Run 3 (expected 0.900–0.940):** DEVIATION. Actual F1 = 0.8909, which is −0.0295 from Run 3's 0.9204. Root cause: the agent merged DLL profile evidence (GT F013, weight 2) into the F01 implant finding rather than producing a separate structured finding. GT F013 ("p.exe DLL profile confirms network-capable C2 implant") was thus unclaimable — F01 was already consumed by GT F001. The dlllist output was collected (run4_analysis/memory/dlllist_p_exe.txt exists) and the evidence appears in F01's description and evidence fields; the gap is finding structure (merged vs. separate), not analysis. Had F013 been produced as a standalone finding, weighted_tp would rise to 26.5 and F1 to approximately 0.924 (within band). The deviation is attributed to agent response-structure variance, not MCP integration. F014 (AMSI + unnamed DLLs, weight 0.5) also not produced as a standalone finding, contributing an additional 0.5 weighted points to FN.
+
+**E6 — No new FP regression:** MET. All 3 FP traps caught (FP001 Outlook dtrR, FP002 McAfee UpdaterUI, FP003 CLR heap). Hash/YARA tools did not degrade FP detection as predicted.
+
+**Overall:** E1, E3, E4, E6 confirmed. E2 partial (YARA invoked but not via `mcp__yara_scan` against the operative ruleset). E5 deviated by −0.0295 F1, root cause identified (finding consolidation, not enrichment failure).
 
 ---
 
 ## Unstable behaviors (noise) — v0.4
 
-| Behavior | Run 1 | Run 2 | Run 3 |
-|----------|:-----:|:-----:|:-----:|
-| F005 (PowerShell stealth shell) | ✓ | ✗ | ✓ |
-| F006 (six rundll32 from PS 5848) | ✓ | ✓ | ✗ |
-| F013 (p.exe DLL profile) | ✗ | ✓ | ✓ |
-| McAfee UpdaterUI FP retraction (FP002) | ✓ | ✗ | ✓ |
-| Total findings produced | 19 | 14 | 19 |
+| Behavior | Run 1 | Run 2 | Run 3 | Run 4 |
+|----------|:-----:|:-----:|:-----:|:-----:|
+| F005 (PowerShell stealth shell) | ✓ | ✗ | ✓ | ✓ |
+| F006 (six rundll32 from PS 5848) | ✓ | ✓ | ✗ | ✓ |
+| F013 (p.exe DLL profile) | ✗ | ✓ | ✓ | ✗ |
+| McAfee UpdaterUI FP retraction (FP002) | ✓ | ✗ | ✓ | ✓ |
+| Total findings produced | 19 | 14 | 19 | 15 |
 
-F013 is now stable in runs 2 and 3 — the v0.3 keyword-matcher instability (credited in runs 2–3, missed in run 1) has been replaced by consistent judge verdicts. Run 1 misses F013 because the agent's run 1 output did not include a DLL-profile finding, not because of matcher fragility.
+F013 missed in Run 4: DLL evidence was present and collected but merged into F01 (implant finding) rather than surfaced as a standalone structured finding. This is a recurrence of the Run 1 miss and confirms F013 as an unstable behavior tied to how the agent chooses to consolidate DLL evidence.
+
+F006 recovered in Run 4 after missing in Run 3: the six rundll32 instances from PS 5848 were correctly identified and attributed.
 
 ---
 

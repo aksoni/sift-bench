@@ -33,8 +33,9 @@ Scored by **scorer v0.4** (LLM-as-judge semantic matching, `claude-sonnet-4-6`, 
 | 1 | Baseline CLAUDE.md | 0.8704 | 0.7705 | **5/5** | 3/3 | 3/5 |
 | 2 | + `dlllist` + persistence check | 0.8598 | 0.7541 | 4/5 | 2/3 | 3/5 |
 | 3 | + output schema pin | 0.9204 | 0.8525 | **5/5** | 3/3 | 3/5 |
+| 4 | + MCP server (hash_file + yara_scan) | 0.8909 | 0.8033 | **5/5** | 3/3 | 3/5 |
 
-**Post-tuning (N=2): mean F1 = 0.890 ± 0.030, recall = 0.803 ± 0.049.** All 5 critical findings identified in runs 1 and 3.
+**Post-tuning baseline (N=2, runs 2+3): mean F1 = 0.890 ± 0.030, recall = 0.803 ± 0.049.** All 5 critical findings identified in runs 1 and 3. Run 4 (MCP-enabled) scored 0.8909 F1; see [`RESULTS.md`](RESULTS.md) for E1–E6 evaluation.
 
 v0.4 numbers are lower than v0.3 (0.971 post-tuning mean) because the judge removes false credits that keyword overlap was granting — in particular, a fourth undocumented case in run 2 where the agent's DLL-profile finding was being credited against the stealth-shell finding on shared process vocabulary. The lower number is the more honest one.
 
@@ -151,7 +152,7 @@ The judge verdict cache (`scorer_cache/judge_verdicts.json`) is committed to the
 - Scorer precision is stubbed at 1.0 pending v0.5 implementation
 - F011 (spsql NTUSER.DAT) is a stable miss across all three runs — methodology gap, recoverable with an additional step
 - N=2 post-tuning runs; larger N would tighten the confidence interval (currently σ = 0.030 under v0.4)
-- MCP server (YARA + hash enrichment) currently disabled in baseline runs to keep them comparable to runs without enrichment infrastructure
+- MCP server (YARA + hash enrichment) was disabled in baseline runs 1–3 to keep them comparable; Run 4 is the MCP-enabled comparison
 
 ---
 
