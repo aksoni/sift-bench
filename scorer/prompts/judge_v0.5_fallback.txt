@@ -1,0 +1,68 @@
+You are evaluating whether two findings from a memory forensics analysis
+describe the same underlying observation. They may use different vocabulary,
+different levels of specificity, or different framing.
+
+The ground truth finding below had no strong match in the primary evaluation
+pass. Your task is to check whether the agent finding describes the same
+forensic observation, even if described in different terms, from a different
+angle, or at a different level of specificity than would normally trigger a
+keyword match.
+
+A match means both findings reference the same process, file, registry key,
+network connection, or behavioral mechanism as the primary subject. Shared
+vocabulary without shared subject is NOT a match. The agent finding being a
+more specific or more general version of the ground truth IS a match.
+
+If two findings describe different mechanisms (spawning vs. injection,
+dropping vs. moving, parent vs. child, etc.) involving the same tool or
+process, they are NOT a match even if they share subject vocabulary.
+
+Severity disagreement between findings (e.g., GT marked "high" vs. agent
+marked "critical") is NOT disqualifying. Judge whether the same observation
+is being described, not whether both parties agree on its impact.
+
+Examples:
+
+EXAMPLE 1 — NOT A MATCH (different mechanisms, shared vocabulary):
+  GT: "Six rundll32.exe processes spawned as children of PowerShell, used as
+       shellcode carriers"
+  Agent: "Reflective PowerShell code loaded into a rundll32 host process"
+  Verdict: {{"match": false, "confidence": 5,
+            "reasoning": "Both involve rundll32 and PowerShell but describe
+            opposite mechanisms — children spawned vs. code injected into host.
+            Different observations."}}
+
+EXAMPLE 2 — MATCH (same observation, different specificity):
+  GT: "p.exe DLL profile shows WININET, crypto, and HTTP stack consistent with
+       C2 client"
+  Agent: "p.exe loaded DLLs include wininet.dll, crypt32.dll, suggesting
+          network beacon capability"
+  Verdict: {{"match": true, "confidence": 5,
+            "reasoning": "Same file (p.exe), same DLL evidence, same inference.
+            Agent finding is slightly less specific but clearly the same
+            observation."}}
+
+EXAMPLE 3 — MATCH (same observation, different framing):
+  GT: "Six short-lived rundll32.exe instances from PowerShell C2 shell"
+  Agent: "Six rundll32.exe processes spawned by powershell.exe PID 5848 across
+          the intrusion timeline; all exited within seconds"
+  Verdict: {{"match": true, "confidence": 5,
+            "reasoning": "Both describe the same observation: six short-lived
+            rundll32.exe children of the PowerShell C2 shell. Agent finding
+            adds PID and timing detail but describes the same mechanism."}}
+
+Now evaluate:
+
+GROUND TRUTH FINDING:
+  ID: {gt_id}
+  Title: {gt_title}
+  Description: {gt_description}
+  Evidence: {gt_evidence}
+
+AGENT FINDING:
+  ID: {agent_id}
+  Title: {agent_title}
+  Description: {agent_description}
+  Evidence: {agent_evidence}
+
+Return JSON only, no preamble or markdown: {{"match": bool, "confidence": 1-5, "reasoning": "..."}}

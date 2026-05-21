@@ -1,0 +1,67 @@
+You are evaluating whether a finding from a memory forensics analysis is
+supported by specific, citable evidence — or whether it makes claims that
+go beyond what the tool output could support.
+
+A finding is LEGITIMATE if a DFIR analyst could trace its core claim to
+one or more specific observable artifacts: a PID, process name, file path,
+command line, network tuple (IP:port), registry key, DLL name, memory
+address, or verbatim tool output excerpt. The finding does not need to be
+correct or important — only traceable to evidence.
+
+A finding is NOT LEGITIMATE if it makes claims that are unsupported by or
+inconsistent with the kind of evidence a memory forensics tool would produce:
+fabricated process names, invented PIDs, network addresses with no connection
+record, malware classifications with no forensic indicator cited, or confident
+conclusions that outrun the evidence.
+
+Uncertainty and hedging ("may indicate", "consistent with") do not make a
+finding illegitimate — the question is whether the underlying artifact claim
+is traceable, not whether the analyst's interpretation is certain.
+
+Examples:
+
+EXAMPLE 1 — LEGITIMATE:
+  Finding: "powershell.exe (PID 5848) spawned six rundll32.exe child
+            processes between 18:31 and 00:56 UTC; all exited within
+            seconds (PIDs 6768, 5452, 5588, 2216, 4108, 8148)"
+  Verdict: {{"legitimate": true, "confidence": 5,
+            "reasoning": "Cites specific PID, child PIDs, and timestamps
+            consistent with pstree/psscan output. Every claim is traceable
+            to process enumeration tool output."}}
+
+EXAMPLE 2 — NOT LEGITIMATE:
+  Finding: "p.exe used Mimikatz to dump LSASS credentials and exfiltrate
+            them to the C2 server"
+  Verdict: {{"legitimate": false, "confidence": 5,
+            "reasoning": "No specific artifact supports the Mimikatz or
+            LSASS dump claim. No file path, command line, or network event
+            is cited. This is an interpretive leap without traceable
+            forensic evidence."}}
+
+EXAMPLE 3 — LEGITIMATE (hedged but traceable):
+  Finding: "p.exe has wininet.dll and crypt32.dll loaded, consistent with
+            an HTTP-based C2 implant"
+  Verdict: {{"legitimate": true, "confidence": 5,
+            "reasoning": "DLL names are specific artifacts observable via
+            dlllist. The C2 inference is hedged and flows from the artifact.
+            Claim is traceable."}}
+
+EXAMPLE 4 — NOT LEGITIMATE (correct topic, fabricated specifics):
+  Finding: "Registry key HKLM\\Software\\Microsoft\\Windows\\CurrentVersion
+            \\Run\\Updater points to C:\\Windows\\Temp\\svc.exe"
+  Verdict: {{"legitimate": false, "confidence": 4,
+            "reasoning": "Cites a specific registry path and file that
+            would need to be confirmed by a registry scan. If no registry
+            scan was run or no such key was found in tool output, this is
+            a fabricated artifact. Confidence 4 because it depends on
+            whether the tool output is available to verify."}}
+
+Now evaluate:
+
+AGENT FINDING:
+  ID: {agent_id}
+  Title: {agent_title}
+  Description: {agent_description}
+  Evidence: {agent_evidence}
+
+Return JSON only, no preamble or markdown: {{"legitimate": bool, "confidence": 1-5, "reasoning": "..."}}
