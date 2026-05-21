@@ -12,10 +12,35 @@ class JudgeVerdict:
     reasoning: str
 
 
-def make_cache_key(gt_id: str, agent_id: str, model_snapshot_id: str, prompt_template: str) -> str:
-    prompt_hash = hashlib.sha256(prompt_template.encode()).hexdigest()
-    raw = f"{gt_id}|{agent_id}|{model_snapshot_id}|{prompt_hash}"
-    return hashlib.sha256(raw.encode()).hexdigest()
+@dataclass
+class PrecisionVerdict:
+    legitimate: bool
+    confidence: int
+    reasoning: str
+
+
+def _sha256(s: str) -> str:
+    return hashlib.sha256(s.encode()).hexdigest()
+
+
+def _content_hash(finding: dict) -> str:
+    return _sha256(json.dumps(finding, sort_keys=True))
+
+
+def make_cache_key(gt_finding: dict, agent_finding: dict, model_snapshot_id: str, prompt_template: str) -> str:
+    # Content-addressed: hashes finding content, not IDs, to prevent cross-run stale verdict collisions
+    raw = f"match_v0.5|{_content_hash(gt_finding)}|{_content_hash(agent_finding)}|{model_snapshot_id}|{_sha256(prompt_template)}"
+    return _sha256(raw)
+
+
+def make_precision_cache_key(agent_finding: dict, model_snapshot_id: str, prompt_template: str) -> str:
+    raw = f"precision_v0.5|{_content_hash(agent_finding)}|{model_snapshot_id}|{_sha256(prompt_template)}"
+    return _sha256(raw)
+
+
+def make_fallback_cache_key(gt_finding: dict, agent_finding: dict, model_snapshot_id: str, prompt_template: str) -> str:
+    raw = f"fallback_v0.5|{_content_hash(gt_finding)}|{_content_hash(agent_finding)}|{model_snapshot_id}|{_sha256(prompt_template)}"
+    return _sha256(raw)
 
 
 class JudgeCache:
@@ -38,6 +63,25 @@ class JudgeCache:
     def put(self, cache_key: str, verdict: JudgeVerdict, meta: Optional[dict] = None) -> None:
         self._store[cache_key] = {
             "match": verdict.match,
+            "confidence": verdict.confidence,
+            "reasoning": verdict.reasoning,
+        }
+        if meta:
+            self._store[cache_key]["_meta"] = meta
+
+    def get_precision(self, cache_key: str) -> Optional[PrecisionVerdict]:
+        entry = self._store.get(cache_key)
+        if entry is None:
+            return None
+        return PrecisionVerdict(
+            legitimate=entry["legitimate"],
+            confidence=entry["confidence"],
+            reasoning=entry["reasoning"],
+        )
+
+    def put_precision(self, cache_key: str, verdict: PrecisionVerdict, meta: Optional[dict] = None) -> None:
+        self._store[cache_key] = {
+            "legitimate": verdict.legitimate,
             "confidence": verdict.confidence,
             "reasoning": verdict.reasoning,
         }

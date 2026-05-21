@@ -30,7 +30,7 @@ def judge_pair(
     gt_id = gt_finding.get("id", "")
     agent_id = agent_finding.get("id", "")
 
-    cache_key = make_cache_key(gt_id, agent_id, model_snapshot, prompt_template)
+    cache_key = make_cache_key(gt_finding, agent_finding, model_snapshot, prompt_template)
     if cache_key in cache:
         return cache.get(cache_key)
 
