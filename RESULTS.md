@@ -4,7 +4,7 @@
 
 **Ground truth:** v1.1 — 14 findings (5 critical must-find, 3 high, 3 medium, 3 low), 3 false-positive traps, 5 negative assertions. Severity weights: critical=4, high=2, medium=1, low=0.5.
 
-**Current scorer:** v0.4 — LLM-as-judge match gating. See "Scorer evolution" below. v0.3 numbers retained for comparison.
+**Current scorer:** v0.4 — LLM-as-judge match gating. See "Scorer evolution" below. v0.3 numbers retained for comparison. Scorer v0.5 (real precision, per-pair fallback, content-addressed cache keys) implemented and pending re-scoring; numbers in this document will be updated when re-scoring completes.
 
 ---
 

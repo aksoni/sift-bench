@@ -27,20 +27,22 @@ Most agentic DFIR demos run an agent and show the output. SIFT-Bench does three 
 
 Benchmark: SANS FOR508 Stark Research Labs case SRL-2018, base-rd01 memory image. Ground truth v1.1: 14 findings (5 critical), 3 false-positive traps, 5 negative assertions.
 
-Scored by **scorer v0.4** (LLM-as-judge semantic matching, `claude-sonnet-4-6`, verdicts cached in `scorer_cache/`):
+Scored by **scorer v0.4** (LLM-as-judge semantic matching, `claude-sonnet-4-6`, verdicts cached in `scorer_cache/`). Scorer v0.5 (real precision, per-pair fallback, content-addressed cache) in progress — numbers below will be updated after re-scoring:
 
-| Run | Config | F1 | Recall | Critical (must-find) | FP traps | Negative assertions |
-|-----|--------|---:|-------:|---------------------:|---------:|---------------------:|
-| 1 | Baseline CLAUDE.md | 0.8704 | 0.7705 | **5/5** | 3/3 | 3/5 |
-| 2 | + `dlllist` + persistence check | 0.8598 | 0.7541 | 4/5 | 2/3 | 3/5 |
-| 3 | + output schema pin | 0.9204 | 0.8525 | **5/5** | 3/3 | 3/5 |
-| 4 | + MCP server (hash_file + yara_scan) | 0.8909 | 0.8033 | **5/5** | 3/3 | 3/5 |
+| Run | Config | F1 | Recall | Critical (must-find) | FP traps | Neg. assertions | Matched |
+|-----|--------|---:|-------:|---------------------:|---------:|----------------:|--------:|
+| 1 | Baseline CLAUDE.md | 0.8704 | 0.7705 | **5/5** | 3/3 | 3/5 | 8/14 |
+| 2 | + `dlllist` + persistence check | 0.8598 | 0.7541 | 4/5 ✗F005 | 2/3 | 3/5 | 10/14 |
+| 3 | + output schema pin | 0.9204 | 0.8525 | **5/5** | 3/3 | 3/5 | 11/14 |
+| 4 | + MCP server (hash_file + yara_scan) | 0.8909 | 0.8033 | **5/5** | 3/3 | 3/5 | 9/14 |
+| 5 | + strengthened MCP prohibitions (gate failed ¹) | 0.8598 | 0.7541 | 4/5 ✗F003 | 3/3 | 4/5 | 10/14 |
+| 6 | gate met — MCP tools live | **0.9391** | 0.8852 | **5/5** | 3/3 | 3/5 | 11/14 |
 
-**Post-tuning baseline (N=2, runs 2+3): mean F1 = 0.890 ± 0.030, recall = 0.803 ± 0.049.** All 5 critical findings identified in runs 1 and 3. Run 4 (MCP-enabled) scored 0.8909 F1; see [`RESULTS.md`](RESULTS.md) for E1–E6 evaluation.
+¹ Run 5 gate failed: `.mcp.json` at wrong path; server not loaded. MCP routing expectations (E1–E3) first tested in Run 6.
 
-v0.4 numbers are lower than v0.3 (0.971 post-tuning mean) because the judge removes false credits that keyword overlap was granting — in particular, a fourth undocumented case in run 2 where the agent's DLL-profile finding was being credited against the stealth-shell finding on shared process vocabulary. The lower number is the more honest one.
+**Best result: Run 6, F1 = 0.9391** — first run with MCP enrichment tools live end-to-end. All 5 critical findings, all FP traps caught. Post-tuning baseline (N=2, runs 2+3): mean F1 = 0.890 ± 0.030. See [`RESULTS.md`](RESULTS.md) for full E1–E6 evaluation, run-by-run breakdown, and scorer evolution.
 
-See [`RESULTS.md`](RESULTS.md) for the full run-by-run breakdown, v0.3 vs v0.4 comparison, confidence-3 verdict investigation, scorer evolution (four iterations), and known limitations.
+v0.4 numbers are lower than v0.3 (0.971 post-tuning mean) because the judge removes false credits that keyword overlap was granting. The lower number is the more honest one.
 
 ---
 
@@ -70,25 +72,41 @@ sift-bench/
 ├── ground_truth/
 │   └── base-rd01-v1.1.json      Hand-authored ground truth + version history
 ├── scorer.py                    CLI entrypoint (delegates to scorer/ package)
-├── scorer/                      Scorer v0.4 package
+├── scorer/                      Scorer v0.5 package (real precision + fallback)
 │   ├── scorer.py                Matching logic + score() function
-│   ├── judge.py                 LLM-as-judge call with retry + cache
-│   ├── judge_cache.py           Content-addressed verdict cache
-│   └── prompts/judge_v0.4.txt  Few-shot judge prompt (hash-pinned)
+│   ├── judge.py                 LLM-as-judge: judge_pair, judge_fallback_pair, judge_precision
+│   ├── judge_cache.py           Content-addressed verdict cache + PrecisionVerdict
+│   ├── checklist.py             Methodology checklist scorer (9-step)
+│   ├── self_correction.py       Self-correction effectiveness scorer
+│   └── prompts/
+│       ├── judge_v0.4.txt       Primary match prompt (few-shot)
+│       ├── judge_v0.5_fallback.txt   Fallback match prompt
+│       └── judge_v0.5_precision.txt  Evidence-traceability precision prompt
 ├── scorer_cache/
 │   └── judge_verdicts.json      Cached verdicts (committed; enables no-API reruns)
+├── design/                      Pre-registered design docs
+│   ├── scorer-v0.4.md
+│   ├── scorer-v0.5.md           v0.5 design (committed before implementation)
+│   └── judge_test_cases.json    Locked judge regression cases
 ├── tests/
-│   └── validate_judge.py        Regression suite for the judge prompt
-├── mcp_server/                  YARA + hash enrichment MCP server (week 2)
-├── yara_rules/                  Detection rules (week 2)
+│   ├── test_scoring_additions.py  20 checklist + self-correction unit tests
+│   └── validate_judge.py          Judge prompt regression suite (v0.4 + v0.5)
+├── mcp_server/                  YARA + hash enrichment MCP server
+├── yara_rules/                  Detection rules
 └── cases/
     └── srl-2018/                Per-case working area
         ├── run1_analysis/       Baseline run outputs
         ├── run1_reports/
-        ├── run2_analysis/       Post-tuning run outputs
+        ├── run2_analysis/
         ├── run2_reports/
-        ├── run3_analysis/       Schema-pinned run outputs
-        └── run3_reports/
+        ├── run3_analysis/
+        ├── run3_reports/
+        ├── run4_analysis/       MCP-enabled run (gate failed)
+        ├── run4_reports/
+        ├── run5_analysis/       Strengthened prohibitions (gate failed)
+        ├── run5_reports/
+        ├── run6_analysis/       Gate met — MCP tools live (best result)
+        └── run6_reports/
 ```
 
 ---
