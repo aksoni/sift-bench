@@ -1,7 +1,8 @@
 """
-SIFT-Bench scorer v0.4: weighted F1 against ground truth.
-match_finding now uses LLM-as-judge (judge_pair) instead of keyword-only scoring.
-Precision remains stubbed at 1.0 (v0.5 scope).
+SIFT-Bench scorer v0.5: real precision via LLM-as-judge + per-pair fallback.
+Content-addressed cache keys replace the ID-based v0.4 keys.
+weighted_f1 is a harmonic mean of count-based precision and severity-weighted
+recall — both in [0,1] but an asymmetric hybrid; see precision_note in results.
 """
 
 import json
@@ -12,7 +13,7 @@ from pathlib import Path
 import anthropic
 
 from .checklist import score_checklist
-from .judge import JudgeApiError, judge_pair
+from .judge import JudgeApiError, judge_fallback_pair, judge_pair, judge_precision
 from .judge_cache import JudgeCache, JudgeVerdict
 from .self_correction import score_self_correction
 
@@ -104,10 +105,6 @@ def match_finding(
     Pre-filters to top-3 by keyword overlap, then asks the judge for each in
     order (pre-filter score desc, agent_id lex asc). First candidate with
     verdict.match=True and confidence>=4 wins.
-
-    FP traps and persistence negatives are handled in score() via separate
-    check_fp_retracted / check_na_addressed calls — not here. (Deleted from
-    v0.3 to avoid double-counting and unreachable branches.)
     """
     gt_keywords = extract_keywords(gt_finding)
     gt_title_words = set(gt_finding.get("title", "").lower().split())
@@ -116,7 +113,6 @@ def match_finding(
         "not", "no", "from", "via", "with",
     }
 
-    # Pre-filter: score every candidate by keyword overlap
     scored = []
     for af in agent_findings:
         af_text = get_text(af)
@@ -127,7 +123,6 @@ def match_finding(
         if score > 0:
             scored.append((score, af))
 
-    # Top-K=3: deterministic order — pre-filter score desc, agent_id lex asc
     top3 = sorted(scored, key=lambda x: (-x[0], x[1].get("id", "")))[:3]
 
     for prefilter_score, af in top3:
@@ -199,6 +194,8 @@ def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
     weights = gt.get("severity_weights", {"critical": 4, "high": 2, "medium": 1, "low": 0.5})
 
     prompt_template = (Path(__file__).parent / "prompts" / "judge_v0.4.txt").read_text()
+    fallback_prompt = (Path(__file__).parent / "prompts" / "judge_v0.5_fallback.txt").read_text()
+    precision_prompt = (Path(__file__).parent / "prompts" / "judge_v0.5_precision.txt").read_text()
     client = anthropic.Anthropic()
     cache = JudgeCache()
 
@@ -222,6 +219,7 @@ def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
     )
 
     try:
+        # Primary pass
         for gt_f in gt_findings_by_weight:
             severity = gt_f.get("severity", "medium")
             weight = weights.get(severity, 1)
@@ -248,6 +246,7 @@ def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
                     "judge_confidence": verdict.confidence,
                     "judge_reasoning": verdict.reasoning,
                     "must_find": gt_f.get("must_find", False),
+                    "via_fallback": False,
                 })
                 results["weighted_tp"] += weight
             else:
@@ -259,6 +258,84 @@ def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
                     "must_find": gt_f.get("must_find", False),
                 })
                 results["weighted_fn"] += weight
+
+        # Disjoint coverage assertion: matched and missed must partition all GT findings
+        matched_ids = {m["gt_id"] for m in results["findings_matched"]}
+        missed_ids = {m["gt_id"] for m in results["findings_missed"]}
+        all_gt_ids = {f["id"] for f in gt["findings"]}
+        assert matched_ids.isdisjoint(missed_ids), (
+            f"GT id in both matched and missed: {matched_ids & missed_ids}"
+        )
+        assert matched_ids | missed_ids == all_gt_ids, (
+            f"GT ids not fully covered: missing {all_gt_ids - (matched_ids | missed_ids)}"
+        )
+
+        # Fallback pass: per-pair judge over all unclaimed for each unmatched GT finding
+        unmatched_gt = [f for f in gt_findings_by_weight if f["id"] in missed_ids]
+        for gt_f in unmatched_gt:
+            unclaimed = [af for af in agent_findings if id(af) not in claimed]
+            for af in unclaimed:
+                verdict = judge_fallback_pair(
+                    gt_f, af,
+                    cache=cache,
+                    client=client,
+                    model_snapshot=MODEL_SNAPSHOT,
+                    fallback_prompt_template=fallback_prompt,
+                )
+                if verdict.match and verdict.confidence >= 4:
+                    claimed.add(id(af))
+                    severity = gt_f.get("severity", "medium")
+                    weight = weights.get(severity, 1)
+                    results["findings_missed"] = [
+                        m for m in results["findings_missed"] if m["gt_id"] != gt_f["id"]
+                    ]
+                    results["findings_matched"].append({
+                        "gt_id": gt_f["id"],
+                        "gt_title": gt_f["title"],
+                        "severity": severity,
+                        "weight": weight,
+                        "matched_to": af.get("id", af.get("title", "unknown")[:50]),
+                        "judge_confidence": verdict.confidence,
+                        "judge_reasoning": verdict.reasoning,
+                        "must_find": gt_f.get("must_find", False),
+                        "via_fallback": True,
+                    })
+                    results["weighted_tp"] += weight
+                    results["weighted_fn"] -= weight
+                    break
+
+        # Precision pass: judge unclaimed findings for evidence traceability
+        count_tp = len(results["findings_matched"])
+        count_fp = 0
+        count_legit_unmatched = 0
+        count_uncertain = 0
+        precision_verdicts = []
+
+        for af in agent_findings:
+            if id(af) in claimed:
+                continue
+            agent_id = af.get("id", "unknown")
+            pv = judge_precision(
+                af,
+                cache=cache,
+                client=client,
+                model_snapshot=MODEL_SNAPSHOT,
+                precision_prompt_template=precision_prompt,
+            )
+            if pv.confidence >= 4:
+                if pv.legitimate:
+                    count_legit_unmatched += 1
+                else:
+                    count_fp += 1
+            else:
+                count_uncertain += 1
+            precision_verdicts.append({
+                "agent_id": agent_id,
+                "legitimate": pv.legitimate,
+                "confidence": pv.confidence,
+                "reasoning": pv.reasoning,
+            })
+
     except JudgeApiError:
         cache.save()
         raise
@@ -282,18 +359,28 @@ def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
     total_weight = results["weighted_tp"] + results["weighted_fn"]
     results["weighted_recall"] = round(results["weighted_tp"] / total_weight, 4) if total_weight > 0 else 0.0
 
-    # Precision stub: 1.0 for now (needs LLM-as-judge to check false claims)
-    results["weighted_precision"] = 1.0  # TODO: LLM-as-judge v0.5
+    adjudicable = count_tp + count_fp
+    results["weighted_precision"] = round(count_tp / adjudicable, 4) if adjudicable > 0 else 1.0
 
     p = results["weighted_precision"]
     r = results["weighted_recall"]
     results["weighted_f1"] = round(2 * p * r / (p + r), 4) if (p + r) > 0 else 0.0
 
+    results["count_tp"] = count_tp
+    results["count_fp"] = count_fp
+    results["count_legit_unmatched"] = count_legit_unmatched
+    results["count_uncertain"] = count_uncertain
+    results["precision_verdicts"] = precision_verdicts
+    results["precision_note"] = (
+        "Precision is count-based (unit weight per agent finding); "
+        "recall is severity-weighted. weighted_f1 is their harmonic mean — "
+        "mathematically valid but an asymmetric hybrid, not a single-scheme F1."
+    )
+
     results["must_find_hit"] = sum(1 for m in results["findings_matched"] if m["must_find"])
     results["must_find_total"] = sum(1 for f in gt["findings"] if f.get("must_find", False))
     results["must_find_missed"] = [m["gt_id"] for m in results["findings_missed"] if m["must_find"]]
 
-    # Optional sub-scorers
     if log_path is not None:
         results["checklist"] = score_checklist(log_path)
     if pre_correction_path is not None:
@@ -305,22 +392,26 @@ def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
 def print_report(results):
     """Pretty-print the scoring results."""
     print("=" * 60)
-    print("SIFT-BENCH SCORING REPORT (v0.4 — LLM-as-judge)")
+    print("SIFT-BENCH SCORING REPORT (v0.5 — real precision)")
     print("=" * 60)
 
     print(f"\n--- Weighted F1: {results['weighted_f1']:.4f} ---")
-    print(f"    Precision: {results['weighted_precision']:.4f} (stub — needs LLM-as-judge)")
-    print(f"    Recall:    {results['weighted_recall']:.4f}")
+    print(f"    Precision (count-based): {results['weighted_precision']:.4f}")
+    print(f"    Recall (severity-weighted): {results['weighted_recall']:.4f}")
+    print(f"    Note: {results.get('precision_note', '')}")
 
     print(f"\nMust-find critical findings: {results['must_find_hit']}/{results['must_find_total']}")
     if results["must_find_missed"]:
         print(f"  MISSED: {results['must_find_missed']}")
 
-    print(f"\nFindings matched: {len(results['findings_matched'])}/{len(results['findings_matched']) + len(results['findings_missed'])}")
-    for m in results["findings_matched"]:
+    matched = results["findings_matched"]
+    total_gt = len(matched) + len(results["findings_missed"])
+    print(f"\nFindings matched: {len(matched)}/{total_gt}")
+    for m in matched:
         marker = " *" if m["must_find"] else ""
+        via = " [fallback]" if m.get("via_fallback") else ""
         print(f"  ✓ {m['gt_id']} ({m['severity']}){marker}: {m['gt_title'][:60]}")
-        print(f"    → matched to: {m['matched_to']}  [judge_confidence={m['judge_confidence']}]")
+        print(f"    → matched to: {m['matched_to']}  [conf={m['judge_confidence']}]{via}")
 
     if results["findings_missed"]:
         print(f"\nFindings missed: {len(results['findings_missed'])}")
@@ -342,6 +433,12 @@ def print_report(results):
 
     print(f"\nAgent produced {results['agent_finding_count']} total findings")
     print(f"Weighted TP: {results['weighted_tp']}, Weighted FN: {results['weighted_fn']}")
+
+    print(f"\n--- Precision detail (count-based) ---")
+    print(f"    TP (matched):         {results.get('count_tp', '?')}")
+    print(f"    FP (illegitimate):    {results.get('count_fp', '?')}")
+    print(f"    Legit-unmatched:      {results.get('count_legit_unmatched', '?')}  (dropped from denominator)")
+    print(f"    Uncertain (conf<4):   {results.get('count_uncertain', '?')}  (dropped from denominator)")
 
     if "checklist" in results:
         cl = results["checklist"]
