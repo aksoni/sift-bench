@@ -16,6 +16,7 @@ from .checklist import score_checklist
 from .judge import JudgeApiError, JudgeParseError, judge_fallback_pair, judge_pair, judge_precision
 from .judge_cache import JudgeCache, JudgeVerdict
 from .self_correction import score_self_correction
+from .validate_findings import FindingsSchemaError, validate_findings
 
 MODEL_SNAPSHOT = "claude-sonnet-4-6"
 
@@ -197,7 +198,16 @@ def check_na_addressed(na, agent_findings):
 def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
     """Score agent findings against ground truth. Returns results dict."""
     gt = load_json(gt_path)
-    agent_findings = normalize_findings(load_json(findings_path))
+    raw_findings = load_json(findings_path)
+    # Pre-flight: validate findings shape against the permissive schema.
+    # Permissive accepts both flat-array (Run 1) and wrapped-object (Runs 2-6)
+    # shapes, so all six historical runs pass. Catches malformations that
+    # would otherwise let get_status() silently degrade to "UNKNOWN".
+    try:
+        validate_findings(raw_findings, strict=False)
+    except FindingsSchemaError as e:
+        raise FindingsSchemaError(f"{findings_path}: {e}") from e
+    agent_findings = normalize_findings(raw_findings)
     weights = gt.get("severity_weights", {"critical": 4, "high": 2, "medium": 1, "low": 0.5})
 
     prompt_template = (Path(__file__).parent / "prompts" / "judge_v0.4.txt").read_text()
