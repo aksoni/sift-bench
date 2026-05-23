@@ -180,6 +180,55 @@ class ToolExecutorTests(unittest.TestCase):
                 capture_output=True,
             )
 
+    # ── Single-token output flag forms ──────────────────────────────────────
+
+    def test_long_flag_equals_path_blocked(self):
+        """`--output=PATH` form should be inspected, not skipped."""
+        blocked_path = str(self.evidence_dir / "out.txt")
+        with self.assertRaises(EvidenceDirWriteError):
+            self.executor.run(
+                ["find", ".", f"--output={blocked_path}"],
+                capture_output=True,
+            )
+
+    def test_long_flag_equals_safe_path_allowed(self):
+        """`--output=PATH` outside evidence dirs must still run."""
+        safe_path = str(self.tmp / "ok.txt")
+        result = self.executor.run(
+            ["grep", "--version", f"--output={safe_path}"],
+            capture_output=True,
+        )
+        # grep --version doesn't actually use --output= but it shouldn't error
+        # out on our pre-check — exit code is grep's business, not ours.
+        self.assertIn(result.returncode, (0, 1, 2))
+
+    def test_short_flag_concatenated_path_blocked(self):
+        """`-oPATH` form (short flag glued to value) should be inspected."""
+        blocked_path = str(self.evidence_dir / "out.txt")
+        with self.assertRaises(EvidenceDirWriteError):
+            self.executor.run(
+                ["grep", "x", f"-o{blocked_path}", "/dev/null"],
+                capture_output=True,
+            )
+
+    def test_short_flag_concatenated_safe_path_allowed(self):
+        """`-oPATH` outside evidence dirs must still run."""
+        safe_path = str(self.tmp / "ok.txt")
+        result = self.executor.run(
+            ["grep", "x", f"-o{safe_path}", "/dev/null"],
+            capture_output=True,
+        )
+        self.assertIn(result.returncode, (0, 1, 2))
+
+    def test_equals_in_non_output_arg_does_not_falsepositive(self):
+        """A non-output arg containing `=` should not be flagged."""
+        # `--include=*.txt` is not an output flag; must not raise.
+        result = self.executor.run(
+            ["grep", "--include=*.txt", "x", "/dev/null"],
+            capture_output=True,
+        )
+        self.assertIn(result.returncode, (0, 1, 2))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

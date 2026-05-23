@@ -55,7 +55,9 @@ ALLOWED_COMMANDS: frozenset[str] = frozenset({
     "xxd", "hexdump", "openssl",
 })
 
-# Flags that introduce an output path as the next argument
+# Flags that introduce an output path as the next argument.
+# These are matched both as standalone flags (`--output PATH`) and as the
+# left-hand side of single-token forms (`--output=PATH`).
 OUTPUT_FLAGS: frozenset[str] = frozenset({
     "-o", "--output",
     "-d", "--outdir", "--output-dir",
@@ -147,23 +149,56 @@ class ToolExecutor:
             )
 
     def _check_output_args(self, args: list[str]) -> None:
-        """Inspect arguments following output flags for evidence-directory paths."""
+        """Inspect output-flag arguments for evidence-directory paths.
+
+        Catches three forms:
+          1. `--output PATH`     (flag and value as separate tokens)
+          2. `--output=PATH`     (single token, `=` separator)
+          3. `-oPATH`            (short flag glued to its value, e.g. `-o/tmp/x`)
+        """
         for i, arg in enumerate(args):
+            candidate = None
+
             if arg in OUTPUT_FLAGS and i + 1 < len(args):
+                # Form 1: `--output PATH`
                 candidate = args[i + 1]
-                resolved = os.path.realpath(candidate)
-                if self._is_blocked(resolved):
-                    self._log(
-                        command=args,
-                        allowed=False,
-                        block_reason="evidence_dir_write",
-                        blocked_value=candidate,
-                        returncode=None, duration_ms=None, stdout_bytes=None, stderr_bytes=None,
-                    )
-                    raise EvidenceDirWriteError(
-                        f"Output path '{candidate}' (resolved: '{resolved}') is inside "
-                        f"a protected evidence directory. Write blocked."
-                    )
+            elif "=" in arg:
+                # Form 2: `--output=PATH`
+                head, _, tail = arg.partition("=")
+                if head in OUTPUT_FLAGS and tail:
+                    candidate = tail
+            else:
+                # Form 3: `-oPATH` (short flag concatenated with value).
+                # Only consider single-dash short flags from the allowlist so
+                # we don't false-positive on long flags like `--outdir` (which
+                # is itself in OUTPUT_FLAGS and handled by Form 1).
+                for flag in OUTPUT_FLAGS:
+                    if (
+                        flag.startswith("-")
+                        and not flag.startswith("--")
+                        and len(flag) == 2
+                        and arg.startswith(flag)
+                        and len(arg) > len(flag)
+                    ):
+                        candidate = arg[len(flag):]
+                        break
+
+            if candidate is None:
+                continue
+
+            resolved = os.path.realpath(candidate)
+            if self._is_blocked(resolved):
+                self._log(
+                    command=args,
+                    allowed=False,
+                    block_reason="evidence_dir_write",
+                    blocked_value=candidate,
+                    returncode=None, duration_ms=None, stdout_bytes=None, stderr_bytes=None,
+                )
+                raise EvidenceDirWriteError(
+                    f"Output path '{candidate}' (resolved: '{resolved}') is inside "
+                    f"a protected evidence directory. Write blocked."
+                )
 
     def _is_blocked(self, resolved_path: str) -> bool:
         # Blocked by prefix
