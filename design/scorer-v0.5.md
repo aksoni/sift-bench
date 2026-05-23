@@ -233,6 +233,53 @@ are different mechanisms and must be documented separately.
 
 ---
 
+## Cache Invalidation Contract
+
+`scorer_cache/judge_verdicts.json` is content-addressed (see Fix 2), so most
+changes do not require a manual wipe — they simply produce different keys and
+miss the cache, leaving orphan entries that are inert but harmless. A few
+changes require deliberate action.
+
+**Safe to leave orphans (no manual wipe required):**
+
+- **Prompt edit.** A new `sha256(prompt_template)` appears in the key suffix, so
+  every pair re-fetches. Old entries are unreachable but not wrong.
+- **Finding content edit in a re-run.** Content hash changes; new key, cache
+  miss, re-fetch. Old entry is unreachable.
+- **Model snapshot bump** (e.g., `claude-sonnet-4-6` → `claude-sonnet-4-7`).
+  Model snapshot ID is in the key; full miss on first re-score. Same as a
+  prompt edit in effect.
+
+**Requires a manual wipe (delete `scorer_cache/judge_verdicts.json`):**
+
+- **Cache value schema change** (e.g., adding a new field to `JudgeVerdict` that
+  downstream code reads, or changing the meaning of an existing field). Existing
+  entries are *readable* but semantically stale; new fields will read as
+  missing. A defensive `kind` tag on entry values (see item 8 in the project
+  task list) reduces this risk to the case of an actual semantic change.
+- **Verdict logic change in a way that should not be cached forward** — e.g.,
+  fixing a judge prompt bug where past `match=True` verdicts were systematically
+  wrong. Even though the prompt hash differs, if reviewers want to assert that
+  the new verdicts are derived fresh from a clean state, a wipe is required.
+- **Cache key function change.** If `make_cache_key` itself is edited (algorithm
+  change, prefix string change, etc.), every entry becomes unreachable. Leaving
+  them is harmless but adds dead bytes; a wipe is recommended for hygiene.
+
+**Never required:**
+
+- **Adding a new run.** Content-addressed keys partition by finding content, so
+  Run 7's verdicts cannot collide with Runs 1–6.
+- **Re-ordering which runs get scored.** This was the v0.4 → v0.5 fix; ordering
+  cannot affect verdicts under content-addressed keys.
+
+**Audit before any wipe:** committing the cache means external reviewers can
+re-derive bit-identical scores without an API key. Wiping it forces a full
+re-fetch on the next run, which costs API time and (for them) money. Prefer
+content-addressed orphaning over wipes whenever the change is correctness-
+preserving.
+
+---
+
 ## Stop Rule
 
 v0.5 complete and all 6 runs re-scored before **June 7, 2026**. If missed, v0.4 stays canonical
