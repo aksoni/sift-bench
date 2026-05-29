@@ -6,11 +6,13 @@
 
 **Current scorer:** v0.4 — LLM-as-judge match gating. See "Scorer evolution" below. v0.3 numbers retained for comparison. Scorer v0.5 (real precision, per-pair fallback, content-addressed cache keys) implemented and pending re-scoring; numbers in this document will be updated when re-scoring completes.
 
+**Metric note:** Under scorer v0.4, precision is approximated at 1.0, so the reported scores are **recall-weighted benchmark scores** rather than true F1. The column is labelled "v0.4 Score" throughout to make this explicit. Scorer v0.5 implements evidence-traceability precision and will replace these values.
+
 ---
 
 ## Headline (v0.4)
 
-Post-tuning runs (N=2, runs 2+3): **mean weighted F1 = 0.890 ± 0.030, recall = 0.803 ± 0.049**. All 5 critical findings identified in runs 1 and 3. Run 2 missed one critical finding (GT F005, PowerShell C2 shell with stealth flags) — determined to be a genuine agent gap corrected by the judge; v0.3 was over-crediting it via keyword overlap. See "Confidence-3 verdict investigation" below.
+Post-tuning runs (N=2, runs 2+3): **mean v0.4 score = 0.890 ± 0.030, recall = 0.803 ± 0.049** (recall is severity-weighted; critical=4, high=2, medium=1, low=0.5). All 5 critical findings identified in runs 1 and 3. Run 2 missed one critical finding (GT F005, PowerShell C2 shell with stealth flags) — determined to be a genuine agent gap corrected by the judge; v0.3 was over-crediting it via keyword overlap. See "Confidence-3 verdict investigation" below.
 
 **Run 4 (MCP-enabled):** F1 = 0.8909, recall = 0.8033. All 5 critical findings identified, all 3 FP traps caught. E5 deviated (−0.03 from Run 3); E1–E3 all deviated — both MCP tools bypassed by the agent in favor of direct Python invocation. See "Run 4" section below for full E1–E6 disclosure.
 
@@ -22,20 +24,23 @@ Post-tuning runs (N=2, runs 2+3): **mean weighted F1 = 0.890 ± 0.030, recall = 
 
 ## Run table (v0.4)
 
-| Run | Config | Weighted F1 | Recall | Critical (must-find) | FP traps | Negative assertions | Findings matched |
+| Run | Config | v0.4 Score | Recall¹ | Critical (must-find) | FP traps | Negative assertions | Findings matched |
 |-----|--------|------------:|-------:|---------------------:|---------:|--------------------:|-----------------:|
 | 1   | Baseline CLAUDE.md | 0.8704 | 0.7705 | **5/5** | 3/3 | 3/5 | 8/14 |
 | 2   | + `dlllist` + persistence check | 0.8598 | 0.7541 | 4/5 ✗F005 | 2/3 | 3/5 | 10/14 |
 | 3   | + output schema pin | 0.9204 | 0.8525 | **5/5** | 3/3 | 3/5 | 11/14 |
 | 4   | + MCP server (hash_file + yara_scan) | 0.8909 | 0.8033 | **5/5** | 3/3 | 3/5 | 9/14 |
-| 5   | + strengthened prohibitions (gate failed) | 0.8598 | 0.7541 | 4/5 ✗F003 | 3/3 | 4/5 | 10/14 |
+| 5   | + strengthened prohibitions (gate² failed) | 0.8598 | 0.7541 | 4/5 ✗F003 | 3/3 | 4/5 | 10/14 |
 | 6   | gate met — MCP tools live | **0.9391** | 0.8852 | **5/5** | 3/3 | 3/5 | 11/14 |
 
-**Post-tuning mean (runs 2 + 3):** F1 = 0.890, σ = 0.030 · Recall = 0.803, σ = 0.049
+¹ Recall is severity-weighted (critical=4, high=2, medium=1, low=0.5) so it does not increase monotonically with raw matched count.  
+² **Gate** = pre-run check confirming Claude Code had loaded the MCP server and could call the enrichment tools.
+
+**Post-tuning mean (runs 2 + 3):** v0.4 score = 0.890, σ = 0.030 · Recall = 0.803, σ = 0.049
 
 Run 4 is the MCP-enabled run scored against the same frozen v0.4 scorer. Run 3 is the MCP-disabled baseline for the A/B comparison.
 
-Scored against `findings_post_correction.json` for all runs. Precision stubbed at 1.0 (v0.5 scope). All scores produced by `scorer/scorer.py` v0.4 with `claude-sonnet-4-6` as judge, prompt hash `d6cfae8c...`, verdicts cached in `scorer_cache/judge_verdicts.json`.
+Scored against `findings_post_correction.json` for all runs. Precision approximated at 1.0 under v0.4 (v0.5 scope — see metric note above). All scores produced by `scorer/scorer.py` v0.4 with `claude-sonnet-4-6` as judge, prompt hash `d6cfae8c...`, verdicts cached in `scorer_cache/judge_verdicts.json`.
 
 ## Methodology checklist + self-correction table (v0.4)
 
@@ -116,7 +121,7 @@ Pre-registered in `design/mcp-server-v1.md` before Run 4 was executed. Results e
 
 **E4 — Phase 2 does not retract a malware finding solely for lack of hash/YARA evidence:** MET. No malware-class finding was retracted. F01 survived self-correction with high confidence.
 
-**E5 — Run 4 F1 within ±0.02 of Run 3 (expected 0.900–0.940):** DEVIATION. Actual F1 = 0.8909, −0.0295 from Run 3's 0.9204. Recall gap: 0.8033 vs 0.8525 = −0.049. The gap is fully accounted for: Run 4 loses F012 (weight 1), F013 (weight 2), F014 (weight 0.5) relative to Run 3 and gains F006 (weight 2), for a net −1.5 weight / 30.5 total = −0.049 recall. The DLL-consolidation explanation covers F013 and F014 (agent merged DLL profile into F01 rather than producing standalone findings); F012 (procdump.exe in Dashlane directory) is a separate miss with no enrichment-related explanation. There is no unexplained residual: the arithmetic closes exactly. Note: the −0.131 recall figure in an earlier draft of this section was incorrect — it used Run 3's v0.3 recall (0.934) instead of v0.4 (0.8525).
+**E5 — Run 4 v0.4 score within ±0.02 of Run 3 (expected 0.900–0.940):** DEVIATION. Actual score = 0.8909, −0.0295 from Run 3's 0.9204. Recall gap: 0.8033 vs 0.8525 = −0.049. The gap is fully accounted for: Run 4 loses F012 (weight 1), F013 (weight 2), F014 (weight 0.5) relative to Run 3 and gains F006 (weight 2), for a net −1.5 weight / 30.5 total = −0.049 recall. The DLL-consolidation explanation covers F013 and F014 (agent merged DLL profile into F01 rather than producing standalone findings); F012 (procdump.exe in Dashlane directory) is a separate miss with no enrichment-related explanation. There is no unexplained residual: the arithmetic closes exactly. Note: the −0.131 recall figure in an earlier draft of this section was incorrect — it used Run 3's v0.3 recall (0.934) instead of v0.4 (0.8525).
 
 **E6 — No new FP regression:** MET. All 3 FP traps caught (FP001 Outlook dtrR, FP002 McAfee UpdaterUI, FP003 CLR heap). Hash/YARA bypass did not degrade FP detection.
 
@@ -154,7 +159,7 @@ Pre-registered in `design/mcp-tool-routing-v1.1.md` before Run 5 was executed.
 
 **R5-E4 — Phase 2 does not retract a malware finding solely for lack of hash/YARA evidence:** MET — with a meaningful qualification. F01 (p.exe malware) was not retracted; it was reclassified UNCONFIRMED. This is the correct behavior under the strengthened Phase 2 clause: without MCP-attributed hash or YARA evidence, the clause requires the finding to be UNCONFIRMED rather than silently accepting unattributed output. The agent did not fall back to inline computation; it correctly acknowledged the evidence gap. This is the audit clause working as designed, demonstrated under tool-absence rather than tool-bypass.
 
-**R5-E5 — Run 5 weighted F1 within ±0.02 of Run 4 (0.871–0.911):** DEVIATION DOWNWARD. Actual F1 = 0.8598 (−0.031 from Run 4's 0.8909, outside the band by 0.013). Recall = 0.7541 vs Run 4's 0.8033 = −0.049. GT F003 (WMI lateral movement, weight=4) missed — the agent described WMI execution but the judge declined to match it to the Run 5 WMI finding, likely due to the finding's UNCONFIRMED status or thin evidence framing. GT F013 (p.exe DLL profile, weight=2) also missed — collapsed into the UNCONFIRMED F01 finding. F01 itself matched GT F001 at confidence=5 despite being UNCONFIRMED: the judge correctly evaluated content over classification label, confirming that UNCONFIRMED status is transparent to the scorer.
+**R5-E5 — Run 5 v0.4 score within ±0.02 of Run 4 (0.871–0.911):** DEVIATION DOWNWARD. Actual score = 0.8598 (−0.031 from Run 4's 0.8909, outside the band by 0.013). Recall = 0.7541 vs Run 4's 0.8033 = −0.049. GT F003 (WMI lateral movement, weight=4) missed — the agent described WMI execution but the judge declined to match it to the Run 5 WMI finding, likely due to the finding's UNCONFIRMED status or thin evidence framing. GT F013 (p.exe DLL profile, weight=2) also missed — collapsed into the UNCONFIRMED F01 finding. F01 itself matched GT F001 at confidence=5 despite being UNCONFIRMED: the judge correctly evaluated content over classification label, confirming that UNCONFIRMED status is transparent to the scorer.
 
 **R5-E6 — No FP regression:** MET. All 3 FP traps retracted (F11, F12, F13 all status=RETRACTED). Phase 1 prohibitions did not affect FP detection.
 
@@ -176,7 +181,7 @@ Gate verified and committed at `41d7c71` (`cases/srl-2018/run6_analysis/mcp_veri
 
 **R6-E4 — Phase 2 does not retract a malware finding solely for lack of hash/YARA evidence:** MET. F01 (p.exe) and F10 (procdump.exe) remained CONFIRMED with `confidence=high` after self-correction. Phase 2 found no issues — pre- and post-correction findings files are structurally identical.
 
-**R6-E5 — Run 6 weighted F1 within ±0.02 of Run 4 baseline (0.871–0.911):** DEVIATION UPWARD. Actual F1 = 0.9391 (recall = 0.8852), above band by +0.028. Breakdown vs Run 4 (weighted_tp = 24.5):
+**R6-E5 — Run 6 v0.4 score within ±0.02 of Run 4 baseline (0.871–0.911):** DEVIATION UPWARD. Actual score = 0.9391 (recall = 0.8852), above band by +0.028. Breakdown vs Run 4 (weighted_tp = 24.5):
 - Run 6 recovers GT F003 (WMI lateral execution, weight=4): CONFIRMED framing in Run 6 vs absent in Run 5; clean evidence trail enabled judge match at confidence=5.
 - Run 6 recovers GT F013 (p.exe DLL profile, weight=2): F09 produced as standalone finding rather than merged into F01.
 - Run 6 loses GT F006 (six rundll32 from PS 5848, weight=2): finding F06 is present in Run 6 with correct evidence, but was not credited by scorer — K=3 pre-filter likely excluded F06 from candidates for GT F006 (keyword competition with higher-ranked candidates); the finding content is sound.
@@ -223,7 +228,7 @@ Under v0.3 scoring: Run 1 → Run 2 was +0.105 F1. Under v0.4, the same methodol
 
 ## Run table (v0.3, historical)
 
-| Run | Config | Weighted F1 | Recall | Critical (must-find) | FP traps | Negative assertions | Findings matched |
+| Run | Config | v0.3 Score | Recall | Critical (must-find) | FP traps | Negative assertions | Findings matched |
 |-----|--------|------------:|-------:|---------------------:|---------:|--------------------:|-----------------:|
 | 1   | Baseline CLAUDE.md | 0.870 | 0.771 | **5/5** | 3/3 | 3/5 | 8/14 |
 | 2   | + `dlllist` + persistence check | 0.975 | 0.951 | **5/5** | 2/3 | 3/5 | 12/14 |
@@ -251,27 +256,34 @@ The design commit locked expected verdicts for the three failure-mode pairs *bef
 2. **LLM-as-judge gate:** call `claude-sonnet-4-6` on each candidate in order. First candidate returning `match=True, confidence ≥ 4` is credited; lower-confidence verdicts are logged as warnings.
 3. **False-positive trap verification:** structured anchor matching (process name + PID) — unchanged from v0.3, judge not used here.
 4. **Negative assertion verification:** keyword matching on absence claims — unchanged from v0.3.
-5. **Scoring:** weighted TP/FN from GT severity weights. Precision stubbed at 1.0 (v0.5 scope).
+5. **Scoring:** weighted TP/FN from GT severity weights. Precision approximated at 1.0 under v0.4; v0.5 implements evidence-traceability precision via LLM judge.
 
 ---
 
 ## Known limitations
 
-- **Precision is stubbed at 1.0** pending v0.5 LLM-as-judge implementation.
-- **K=3 pre-filter ceiling.** If the correct agent finding ranks below 3rd by keyword overlap, the judge never sees it. Across runs 1–3 no such case was identified, but it is an architectural constraint.
-- **N=3 runs, single case.** Sufficient to characterize the agent's behavior on this image; generalization to other cases is a stretch goal.
-- **Near-determinism caveat.** `temperature=0` is near-deterministic, not bit-identical at the model level. The cache makes *reruns* bit-identical; first scoring of a new pair is subject to small floating-point variation in inference.
+- **v0.4 precision approximation.** Precision is approximated at 1.0 under v0.4; v0.4 scores are recall-weighted benchmark scores, not true F1. Scorer v0.5 (implemented; pending re-scoring) adds evidence-traceability precision.
+- **K=3 pre-filter ceiling.** If the correct agent finding ranks below 3rd by keyword overlap, the judge never sees it. One likely instance identified in Run 6 (GT F006). An architectural constraint across all runs.
+- **N=2 post-tuning runs, single case.** Sufficient to characterize agent behavior on this image; generalization to other cases is a stretch goal. N=2 gives σ = 0.030 for the post-tuning mean.
+- **Near-determinism caveat.** `temperature=0` is near-deterministic, not bit-identical at the model level. The committed cache makes *reruns* bit-identical; first scoring of a new pair is subject to small floating-point variation in inference.
 
 ---
 
 ## Reproducing
 
 ```bash
-# Requires ANTHROPIC_API_KEY (first run hits API; subsequent runs use cache)
-python scorer.py ground_truth/base-rd01-v1.1.json cases/srl-2018/run3_analysis/findings_post_correction.json
+# Score best run from committed cache — no API key needed, bit-identical output
+python scorer.py \
+  ground_truth/base-rd01-v1.1.json \
+  cases/srl-2018/run6_analysis/findings_post_correction.json
 
-# Rerun from cache only (bit-identical, no API calls)
-python scorer.py ground_truth/base-rd01-v1.1.json cases/srl-2018/run3_analysis/findings_post_correction.json
+# Score an earlier run (same cache; all verdicts committed)
+python scorer.py \
+  ground_truth/base-rd01-v1.1.json \
+  cases/srl-2018/run3_analysis/findings_post_correction.json
+
+# Run unit tests (94 tests; no memory image or API key needed)
+python -m unittest discover -s tests
 ```
 
-Cache file `scorer_cache/judge_verdicts.json` is committed to the repo. A reviewer without API access can rerun all three scoring passes and get bit-identical output.
+Cache file `scorer_cache/judge_verdicts.json` is committed to the repo. A reviewer without an API key can rerun all scoring passes and get bit-identical output. Scoring a findings file not already in the cache requires `ANTHROPIC_API_KEY`.
