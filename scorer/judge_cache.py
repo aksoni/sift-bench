@@ -43,6 +43,21 @@ def make_fallback_cache_key(gt_finding: dict, agent_finding: dict, model_snapsho
     return _sha256(raw)
 
 
+class CacheKindMismatch(RuntimeError):
+    """A get_* call hit an entry whose `kind` doesn't match the caller."""
+
+
+def _infer_kind(entry: dict) -> str:
+    """Identify a legacy (un-tagged) entry by which value fields it carries."""
+    if "match" in entry:
+        return "match"
+    if "legitimate" in entry:
+        return "precision"
+    raise CacheKindMismatch(
+        f"Cannot infer kind from entry; keys present: {sorted(entry.keys())}"
+    )
+
+
 class JudgeCache:
     def __init__(self, path: "str | Path" = "scorer_cache/judge_verdicts.json"):
         self._path = Path(path)
@@ -50,10 +65,17 @@ class JudgeCache:
         if self._path.exists() and self._path.stat().st_size > 0:
             self._store = json.loads(self._path.read_text())
 
+    # ── match / fallback verdicts ──────────────────────────────────────────
+
     def get(self, cache_key: str) -> Optional[JudgeVerdict]:
         entry = self._store.get(cache_key)
         if entry is None:
             return None
+        kind = entry.get("kind") or _infer_kind(entry)
+        if kind not in ("match", "fallback"):
+            raise CacheKindMismatch(
+                f"get() called on a {kind!r} entry at key {cache_key[:12]}…"
+            )
         return JudgeVerdict(
             match=entry["match"],
             confidence=entry["confidence"],
@@ -61,7 +83,9 @@ class JudgeCache:
         )
 
     def put(self, cache_key: str, verdict: JudgeVerdict, meta: Optional[dict] = None) -> None:
+        kind = "fallback" if (meta and meta.get("via_fallback")) else "match"
         self._store[cache_key] = {
+            "kind": kind,
             "match": verdict.match,
             "confidence": verdict.confidence,
             "reasoning": verdict.reasoning,
@@ -69,10 +93,17 @@ class JudgeCache:
         if meta:
             self._store[cache_key]["_meta"] = meta
 
+    # ── precision verdicts ─────────────────────────────────────────────────
+
     def get_precision(self, cache_key: str) -> Optional[PrecisionVerdict]:
         entry = self._store.get(cache_key)
         if entry is None:
             return None
+        kind = entry.get("kind") or _infer_kind(entry)
+        if kind != "precision":
+            raise CacheKindMismatch(
+                f"get_precision() called on a {kind!r} entry at key {cache_key[:12]}…"
+            )
         return PrecisionVerdict(
             legitimate=entry["legitimate"],
             confidence=entry["confidence"],
@@ -81,12 +112,15 @@ class JudgeCache:
 
     def put_precision(self, cache_key: str, verdict: PrecisionVerdict, meta: Optional[dict] = None) -> None:
         self._store[cache_key] = {
+            "kind": "precision",
             "legitimate": verdict.legitimate,
             "confidence": verdict.confidence,
             "reasoning": verdict.reasoning,
         }
         if meta:
             self._store[cache_key]["_meta"] = meta
+
+    # ── persistence ────────────────────────────────────────────────────────
 
     def save(self) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)

@@ -13,9 +13,10 @@ from pathlib import Path
 import anthropic
 
 from .checklist import score_checklist
-from .judge import JudgeApiError, judge_fallback_pair, judge_pair, judge_precision
+from .judge import JudgeApiError, JudgeParseError, judge_fallback_pair, judge_pair, judge_precision
 from .judge_cache import JudgeCache, JudgeVerdict
 from .self_correction import score_self_correction
+from .validate_findings import FindingsSchemaError, validate_findings
 
 MODEL_SNAPSHOT = "claude-sonnet-4-6"
 
@@ -126,14 +127,21 @@ def match_finding(
     top3 = sorted(scored, key=lambda x: (-x[0], x[1].get("id", "")))[:3]
 
     for prefilter_score, af in top3:
-        verdict = judge_pair(
-            gt_finding,
-            af,
-            cache=cache,
-            client=client,
-            model_snapshot=model_snapshot,
-            prompt_template=prompt_template,
-        )
+        try:
+            verdict = judge_pair(
+                gt_finding,
+                af,
+                cache=cache,
+                client=client,
+                model_snapshot=model_snapshot,
+                prompt_template=prompt_template,
+            )
+        except JudgeParseError as e:
+            logging.warning(
+                "Skipping unparseable primary verdict for %s / %s: %s",
+                gt_finding.get("id"), af.get("id"), e,
+            )
+            continue
         if verdict.match and verdict.confidence >= 4:
             return af, verdict
         if verdict.confidence == 3:
@@ -190,7 +198,16 @@ def check_na_addressed(na, agent_findings):
 def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
     """Score agent findings against ground truth. Returns results dict."""
     gt = load_json(gt_path)
-    agent_findings = normalize_findings(load_json(findings_path))
+    raw_findings = load_json(findings_path)
+    # Pre-flight: validate findings shape against the permissive schema.
+    # Permissive accepts both flat-array (Run 1) and wrapped-object (Runs 2-6)
+    # shapes, so all six historical runs pass. Catches malformations that
+    # would otherwise let get_status() silently degrade to "UNKNOWN".
+    try:
+        validate_findings(raw_findings, strict=False)
+    except FindingsSchemaError as e:
+        raise FindingsSchemaError(f"{findings_path}: {e}") from e
+    agent_findings = normalize_findings(raw_findings)
     weights = gt.get("severity_weights", {"critical": 4, "high": 2, "medium": 1, "low": 0.5})
 
     prompt_template = (Path(__file__).parent / "prompts" / "judge_v0.4.txt").read_text()
@@ -275,13 +292,20 @@ def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
         for gt_f in unmatched_gt:
             unclaimed = [af for af in agent_findings if id(af) not in claimed]
             for af in unclaimed:
-                verdict = judge_fallback_pair(
-                    gt_f, af,
-                    cache=cache,
-                    client=client,
-                    model_snapshot=MODEL_SNAPSHOT,
-                    fallback_prompt_template=fallback_prompt,
-                )
+                try:
+                    verdict = judge_fallback_pair(
+                        gt_f, af,
+                        cache=cache,
+                        client=client,
+                        model_snapshot=MODEL_SNAPSHOT,
+                        fallback_prompt_template=fallback_prompt,
+                    )
+                except JudgeParseError as e:
+                    logging.warning(
+                        "Skipping unparseable fallback verdict for %s / %s: %s",
+                        gt_f.get("id"), af.get("id"), e,
+                    )
+                    continue
                 if verdict.match and verdict.confidence >= 4:
                     claimed.add(id(af))
                     severity = gt_f.get("severity", "medium")
@@ -315,13 +339,27 @@ def score(gt_path, findings_path, log_path=None, pre_correction_path=None):
             if id(af) in claimed:
                 continue
             agent_id = af.get("id", "unknown")
-            pv = judge_precision(
-                af,
-                cache=cache,
-                client=client,
-                model_snapshot=MODEL_SNAPSHOT,
-                precision_prompt_template=precision_prompt,
-            )
+            try:
+                pv = judge_precision(
+                    af,
+                    cache=cache,
+                    client=client,
+                    model_snapshot=MODEL_SNAPSHOT,
+                    precision_prompt_template=precision_prompt,
+                )
+            except JudgeParseError as e:
+                logging.warning(
+                    "Skipping unparseable precision verdict for %s: %s — counting as uncertain",
+                    agent_id, e,
+                )
+                count_uncertain += 1
+                precision_verdicts.append({
+                    "agent_id": agent_id,
+                    "legitimate": None,
+                    "confidence": 0,
+                    "reasoning": f"parse_error: {e}",
+                })
+                continue
             if pv.confidence >= 4:
                 if pv.legitimate:
                     count_legit_unmatched += 1

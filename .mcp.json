@@ -6,10 +6,7 @@
       "args": [
         "-m",
         "mcp_server"
-      ],
-      "env": {
-        "PYTHONPATH": "/home/abhisoni/sift-bench"
-      }
+      ]
     }
   }
 }
