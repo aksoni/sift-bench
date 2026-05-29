@@ -144,6 +144,21 @@ class StrictTests(unittest.TestCase):
         with self.assertRaises(FindingsSchemaError):
             validate_findings(_well_formed_strict_doc([f]), strict=True)
 
+    def test_title_over_100_chars_rejected(self):
+        f = _well_formed_strict_finding(title="x" * 101)
+        with self.assertRaises(FindingsSchemaError):
+            validate_findings(_well_formed_strict_doc([f]), strict=True)
+
+    def test_confirmed_with_empty_tool_attribution_rejected(self):
+        f = _well_formed_strict_finding(status="CONFIRMED", tool_attribution=[])
+        with self.assertRaises(FindingsSchemaError):
+            validate_findings(_well_formed_strict_doc([f]), strict=True)
+
+    def test_unconfirmed_with_empty_tool_attribution_allowed(self):
+        # The non-empty requirement only applies to CONFIRMED findings.
+        f = _well_formed_strict_finding(status="UNCONFIRMED", tool_attribution=[])
+        validate_findings(_well_formed_strict_doc([f]), strict=True)
+
     def test_retracted_without_reason_rejected(self):
         f = _well_formed_strict_finding(status="RETRACTED")
         with self.assertRaises(FindingsSchemaError) as ctx:

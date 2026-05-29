@@ -108,7 +108,7 @@ _STRICT_FINDING = {
     ],
     "properties": {
         "id":          {"type": "string", "minLength": 1},
-        "title":       {"type": "string", "minLength": 1, "maxLength": 200},
+        "title":       {"type": "string", "minLength": 1, "maxLength": 100},
         "description": {"type": "string", "minLength": 1},
         "severity":    {"enum": ["critical", "high", "medium", "low"]},
         "status":      {"enum": ["CONFIRMED", "UNCONFIRMED", "RETRACTED"]},
@@ -128,6 +128,11 @@ _STRICT_FINDING = {
             # retraction_reason required when status=RETRACTED
             "if":   {"properties": {"status": {"const": "RETRACTED"}}},
             "then": {"required": ["retraction_reason"]},
+        },
+        {
+            # tool_attribution must be non-empty when status=CONFIRMED
+            "if":   {"properties": {"status": {"const": "CONFIRMED"}}},
+            "then": {"properties": {"tool_attribution": {"minItems": 1}}},
         },
     ],
 }
