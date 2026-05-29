@@ -4,9 +4,92 @@
 
 **Ground truth:** v1.1 — 14 findings (5 critical must-find, 3 high, 3 medium, 3 low), 3 false-positive traps, 5 negative assertions. Severity weights: critical=4, high=2, medium=1, low=0.5.
 
-**Current scorer:** v0.4 — LLM-as-judge match gating. See "Scorer evolution" below. v0.3 numbers retained for comparison. Scorer v0.5 (real precision, per-pair fallback, content-addressed cache keys) implemented and pending re-scoring; numbers in this document will be updated when re-scoring completes.
+**Current scorer:** v0.5 — LLM-as-judge match gating + **real evidence-traceability precision** + per-pair fallback + content-addressed cache keys. All 6 runs re-scored 2026-05-29 (see "v0.5 re-scoring" below). v0.4 and v0.3 numbers retained for comparison. The v0.4 → v0.5 change also corrects the Run 6 F006 misdiagnosis (cache-key collision, not K=3 keyword competition — see "F006 correction" below).
 
-**Metric note:** Under scorer v0.4, precision is approximated at 1.0, so the reported scores are **recall-weighted benchmark scores** rather than true F1. The column is labelled "v0.4 Score" throughout to make this explicit. Scorer v0.5 implements evidence-traceability precision and will replace these values.
+**Metric note (v0.5):** Precision is now *computed* via an evidence-traceability judge rather than stubbed. It came out **1.0 for all six runs** because the judge found zero illegitimate unclaimed findings — every unclaimed agent finding was either evidence-supported-but-out-of-GT-scope ("legit-unmatched") or below the confidence-4 bar ("uncertain"). So `weighted_f1` still tracks severity-weighted recall in practice, but the 1.0 precision is now substantiated, not assumed. Precision is count-based while recall is severity-weighted, so `weighted_f1` is a documented asymmetric hybrid, not a single-scheme F1.
+
+---
+
+## v0.5 re-scoring (current)
+
+Pre-registered in `design/scorer-v0.5.md` (committed 2026-05-21, before any v0.5 code). All 6 runs
+re-scored 2026-05-29 against `ground_truth/base-rd01-v1.1.json` with `claude-sonnet-4-6` as judge.
+Content-addressed cache keys invalidate every v0.4 cache entry, so this was a 100% cache-miss
+regeneration; the resulting verdicts are committed in `scorer_cache/judge_verdicts.json` for
+key-free reproduction. Full prediction evaluation in `analysis/v05_rescoring/predictions_eval.md`.
+
+### Run table (v0.5)
+
+| Run | Config | v0.5 F1 | Recall¹ | Precision² | Critical (must-find) | FP traps | Findings matched | F006 |
+|-----|--------|--------:|--------:|-----------:|---------------------:|---------:|-----------------:|:----:|
+| 1   | Baseline CLAUDE.md | 0.8704 | 0.7705 | 1.0000 | **5/5** | 3/3 | 8/14  | ✓ primary |
+| 2   | + `dlllist` + persistence check | 0.8598 | 0.7541 | 1.0000 | 4/5 ✗F005 | 2/3 | 10/14 | ✓ primary |
+| 3   | + output schema pin | 0.9107 | 0.8361 | 1.0000 | **5/5** | 3/3 | 10/14 | ✗ (genuine gap) |
+| 4   | + MCP server | 0.8909 | 0.8033 | 1.0000 | **5/5** | 3/3 | 9/14  | ✓ primary |
+| 5   | + strengthened prohibitions (gate failed) | 0.8269 | 0.7049 | 1.0000 | 4/5 ✗F005 | 3/3 | 9/14  | ✓ primary |
+| 6   | gate met — MCP tools live | **0.9833** | 0.9672 | 1.0000 | **5/5** | 3/3 | 12/14 | ✓ primary |
+
+¹ Severity-weighted (critical=4, high=2, medium=1, low=0.5); total GT weight = 30.5.
+² Count-based evidence-traceability precision (computed, not stubbed). `count_fp = 0` for all runs.
+
+Each row passed two internal consistency checks: `count_tp + count_fp + legit-unmatched + uncertain
+== agent_finding_count`, and `Σ(matched severity weights) == weighted_tp`.
+
+### Headline (v0.5)
+
+**Run 6 (best config — MCP tools live, gate verified): F1 = 0.9833, recall = 0.9672, precision = 1.0,
+5/5 critical, 3/3 FP traps, 12/14 matched.** GT F006 recovers at the **primary** pass once the v0.4
+cache-key collision is removed. Post-tuning runs (2+3) mean F1 = 0.885, recall = 0.795.
+
+The defining v0.5 finding is that **real precision = 1.0 for every run** (`count_fp = 0` throughout):
+the precision judge never found an illegitimate unclaimed finding. The agent's "extra" findings
+(beyond the 14-item GT) consistently cite verifiable artifacts — they are out-of-GT-scope, not
+hallucinated. The v0.4 precision stub of 1.0 turns out to have been coincidentally correct; v0.5
+substantiates it.
+
+### Pre-registered predictions E1–E4
+
+Locked in `design/scorer-v0.5.md` before any judge call; evaluated only after all 6 runs scored.
+
+| # | Prediction | Verdict | Note |
+|---|------------|:-------:|------|
+| E1 | True F1 < v0.4 F1 for **all** runs | **DEVIATED** | Held for none-as-stated: R1/R2/R4 flat, R3/R5 down, R6 up. With `count_fp = 0` everywhere, precision adds no penalty; F1 moves are recall-driven, not precision-driven. The premise (real precision pulls F1 down) was falsified. |
+| E2 | Run 6 > Run 3 F1 ordering survives | **MET** | 0.9833 > 0.9107. |
+| E3 | Run 6 has the smallest precision drop | **DEVIATED** | All precision drops are 0 (precision = 1.0 everywhere). No differential to rank; the predicted mechanism is absent. |
+| E4 | Run 1 has a larger precision drop than Run 3 | **DEVIATED** | Both drops are 0 — equal, not larger. Same root cause as E3. |
+
+**Acceptance criterion (not a prediction):** *GT F006 in Run 6 matched via the primary pass.* **MET** —
+`via_fallback = false`. This validates the cache-collision diagnosis; if F006 had only recovered via
+the fallback pass, the cache theory would have been wrong. It did not — primary-pass recovery confirms
+the stale-verdict collision was the cause.
+
+**E1/E3/E4 share one root cause:** the precision judge returned zero illegitimate verdicts across all
+six runs. The deviations are disclosed, not smoothed: the hypothesis that real precision would
+penalise unclaimed findings did not survive contact with the data, because the agent's unclaimed
+findings are evidence-grounded.
+
+### Recall deltas vs v0.4 (weight-level)
+
+The primary matching pass is algorithmically unchanged from v0.4 except for the cache key. Match-set
+differences therefore come from (a) the F006 collision fix and (b) fresh judge verdicts replacing
+v0.4's frozen cache on borderline pairs.
+
+| Run | v0.4 wtp | v0.5 wtp | Δwtp | v0.4 matched | v0.5 matched |
+|-----|---------:|---------:|-----:|-------------:|-------------:|
+| 1 | 23.5 | 23.5 | 0.0  | 8  | 8  |
+| 2 | 23.0 | 23.0 | 0.0  | 10 | 10 |
+| 3 | 26.0 | 25.5 | −0.5 | 11 | 10 |
+| 4 | 24.5 | 24.5 | 0.0  | 9  | 9  |
+| 5 | 23.0 | 21.5 | −1.5 | 10 | 9  |
+| 6 | 27.0 | 29.5 | +2.5 | 11 | 12 |
+
+- **R6 +2.5:** F006 recovery (high, +2) plus one additional low-weight finding — the designed effect
+  of the cache-key fix.
+- **R3 −0.5, R5 −1.5:** small net losses, attributable to either v0.4 ID-cache cross-run collisions
+  that spuriously credited a pair (now correctly declined under content-addressed keys) or to the
+  documented `temperature=0` near-determinism flipping a borderline confidence-3/4 verdict. Either
+  way it is not a methodology regression: no critical finding or FP-trap outcome changes. Per-finding
+  verdicts are in `analysis/v05_rescoring/run{N}_score.json`.
 
 ---
 
@@ -184,8 +267,8 @@ Gate verified and committed at `41d7c71` (`cases/srl-2018/run6_analysis/mcp_veri
 **R6-E5 — Run 6 v0.4 score within ±0.02 of Run 4 baseline (0.871–0.911):** DEVIATION UPWARD. Actual score = 0.9391 (recall = 0.8852), above band by +0.028. Breakdown vs Run 4 (weighted_tp = 24.5):
 - Run 6 recovers GT F003 (WMI lateral execution, weight=4): CONFIRMED framing in Run 6 vs absent in Run 5; clean evidence trail enabled judge match at confidence=5.
 - Run 6 recovers GT F013 (p.exe DLL profile, weight=2): F09 produced as standalone finding rather than merged into F01.
-- Run 6 loses GT F006 (six rundll32 from PS 5848, weight=2): finding F06 is present in Run 6 with correct evidence, but was not credited by scorer — K=3 pre-filter likely excluded F06 from candidates for GT F006 (keyword competition with higher-ranked candidates); the finding content is sound.
-- Net: +6 − 2 = +4 weight over Run 4 → recall 0.8852 vs 0.8033 (+0.082). F1 rise from 0.8909 to 0.9391 reflects cleaner CONFIRMED classification enabling better judge matching for all GT items.
+- Run 6 loses GT F006 (six rundll32 from PS 5848, weight=2): under v0.4 scoring, finding F06 was present in Run 6 with correct evidence but was not credited. **The original attribution here (K=3 pre-filter keyword competition) was wrong — see "F006 correction" below.** The true cause was a v0.4 cache-key collision; under v0.5 content-addressed keys, F006 matches Run 6 at the primary pass.
+- Net: +6 − 2 = +4 weight over Run 4 → recall 0.8852 vs 0.8033 (+0.082). F1 rise from 0.8909 to 0.9391 reflects cleaner CONFIRMED classification enabling better judge matching for all GT items. (Under v0.5, with the F006 collision fixed, Run 6 recall rises further to 0.9672 and F1 to 0.9833.)
 
 **R6-E6 — No FP regression:** MET. All 3 FP traps retracted (F15 Outlook dtrR, F16 McAfee UpdaterUI, F17 CLR heap). MCP invocations and CONFIRMED status changes did not affect false-positive detection.
 
@@ -202,16 +285,59 @@ Gate verified and committed at `41d7c71` (`cases/srl-2018/run6_analysis/mcp_veri
 | Behavior | Run 1 | Run 2 | Run 3 | Run 4 | Run 5 | Run 6 |
 |----------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | F005 (PowerShell stealth shell) | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
-| F006 (six rundll32 from PS 5848) | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
+| F006 (six rundll32 from PS 5848) | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ → ✓³ |
 | F013 (p.exe DLL profile) | ✗ | ✓ | ✓ | ✗ | ✗ | ✓ |
 | McAfee UpdaterUI FP retraction (FP002) | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | Total findings produced | 19 | 14 | 19 | 15 | 15 | 17 |
 
-**F006 and F013 are anti-correlated across runs.** When the DLL profile finding (F013) is captured as a standalone structured finding (Runs 2, 3, 6), the six-rundll32 finding (F006) tends to miss the scorer's K=3 keyword pre-filter — likely because "rundll32" terms are consumed by the DLL-heavy candidate pool. Conversely, when F013 is consolidated into F01 (Runs 1, 4, 5), F006 stands out cleanly. This is an architectural constraint of the K=3 pre-filter, not an agent quality regression in Run 6: run6 finding F06 has correct evidence for GT F006, but was not surfaced as a top-3 keyword candidate.
+**F006 across runs — corrected.** An earlier draft of this section claimed F006 and F013 were
+anti-correlated and attributed Run 6's F006 miss to the K=3 keyword pre-filter ("rundll32" terms
+consumed by a DLL-heavy candidate pool). **This was verified incorrect — see "F006 correction"
+below.** Run 6's agent finding F06 ranked 1st in the pre-filter (score=8, well inside K=3); the miss
+was a v0.4 cache-key collision, not pre-filter competition. Under v0.5 (content-addressed keys) F006
+matches Run 6 at the primary pass. Run 3's F006 miss is the genuinely different case: a real agent gap
+(no finding describing the six rundll32 instances), correctly reflected by the pre-filter and not
+recovered by the v0.5 fallback either. The two misses are distinct mechanisms and must not be
+conflated.
 
 **F013 pattern:** missed in Runs 1, 4, 5 (DLL evidence merged into F01); present in Runs 2, 3, 6 (produced as standalone F09). The MCP enrichment requirement may have prompted the agent to produce a more structured DLL-profile finding rather than embedding it in the malware finding.
 
 **F005 recovered in Runs 4–6** after the single miss in Run 2 — consistent with methodology improvements (explicit `dlllist` and persistence-check instructions) making the C2 shell observation more salient.
+
+³ Run 6 F006 shows ✗ under v0.4 and ✓ under v0.5 — the v0.4 ✗ was a cache-key collision, not an agent miss (see "F006 correction" immediately below).
+
+---
+
+## F006 correction (Run 6 misdiagnosis)
+
+The committed v0.4 RESULTS.md attributed Run 6's GT F006 miss to the **K=3 keyword pre-filter** —
+claiming agent finding F06 was crowded out of the top-3 candidate pool by DLL-heavy findings. **This
+is verified incorrect.** A fresh pre-filter simulation against Run 6's findings places agent F06 at
+**rank 1, score 8** — comfortably inside K=3. The judge *was* asked to evaluate the F006 pair.
+
+The real cause was a **cache-key collision** in v0.4. The v0.4 key was ID-based
+(`sha256("F006|F06|model|prompt_hash")`). Run 3 had been scored before Run 6 against the shared
+persistent cache, and Run 3's F06 ("p.exe DLL inventory") had populated exactly that key with a
+`match=False` verdict. When Run 6's F06 ("Six rundll32.exe instances from PowerShell C2 shell")
+hashed to the same ID-based key, the scorer returned Run 3's stale verdict **without ever calling the
+judge on Run 6's actual content**. The collision was an artifact of scoring order against a shared
+cache: scoring the runs in the opposite order, or with a fresh cache per run, would have produced a
+different (or no) collision.
+
+**Two distinct F006 mechanisms, now documented separately:**
+
+- **Run 3 — genuine agent gap.** Run 3's agent did not produce a finding describing the six
+  short-lived rundll32 instances. The pre-filter correctly surfaced no matching top-3 candidate. F006
+  is a true miss in Run 3, and the v0.5 per-pair fallback did **not** recover it (consistent with the
+  design doc's note that the fallback has no demonstrated recovery on this dataset).
+- **Run 6 — cache-key collision.** The agent produced the correct finding (rank 1); only the stale
+  cached verdict suppressed it. v0.5's content-addressed keys (`sha256` over finding *content*, with
+  `match`/`fallback`/`precision` type prefixes) eliminate the collision. On re-scoring, GT F006
+  matches Run 6 at the **primary** pass (`via_fallback = false`, confidence 5) — the pre-registered
+  acceptance criterion for the cache redesign, MET.
+
+This correction lands in the same commit as the v0.5 numbers, per the `design/scorer-v0.5.md`
+pre-registration.
 
 ---
 
@@ -248,6 +374,18 @@ v0.3 post-tuning mean (runs 2 + 3): F1 = 0.971, σ = 0.006. These numbers are re
 
 The design commit locked expected verdicts for the three failure-mode pairs *before* any judge call, preserving the adversarial property of the regression suite. All three passed on the first real API call with confidence=5.
 
+**v0.4 → v0.5: real precision, per-pair fallback, content-addressed cache keys.** Three changes,
+pre-registered in `design/scorer-v0.5.md`. (1) *Real precision* — the v0.4 precision stub (hardcoded
+1.0) is replaced by an evidence-traceability judge that asks, per unclaimed agent finding, whether it
+cites verifiable artifacts; `precision = count_tp / (count_tp + count_fp)`. On this dataset
+`count_fp = 0` for all runs, so precision computes to 1.0 — the stub's value, now substantiated. (2)
+*Per-pair fallback* — unmatched GT findings get a second judge pass over all unclaimed agent findings;
+no recovery on the current 6 runs (insurance for future cases). (3) *Content-addressed cache keys* —
+keys hash finding *content* (`sha256(json.dumps(finding, sort_keys=True))`) with `match`/`fallback`/
+`precision` type prefixes, replacing the v0.4 ID-based keys that caused the Run 6 F006 cross-run
+collision. All v0.4 entries are invalidated; v0.5's first pass is a 100% cache-miss regeneration,
+re-committed for key-free reproduction.
+
 ---
 
 ## Scorer methodology (v0.4)
@@ -263,7 +401,7 @@ The design commit locked expected verdicts for the three failure-mode pairs *bef
 ## Known limitations
 
 - **v0.4 precision approximation.** Precision is approximated at 1.0 under v0.4; v0.4 scores are recall-weighted benchmark scores, not true F1. Scorer v0.5 (implemented; pending re-scoring) adds evidence-traceability precision.
-- **K=3 pre-filter ceiling.** If the correct agent finding ranks below 3rd by keyword overlap, the judge never sees it. One likely instance identified in Run 6 (GT F006). An architectural constraint across all runs.
+- **K=3 pre-filter ceiling.** If the correct agent finding ranks below 3rd by keyword overlap, the judge never sees it. This remains a genuine architectural constraint (Run 3 GT F006 is a real agent gap the pre-filter cannot rescue). Note: Run 6 GT F006 was **previously misattributed** to this ceiling — it was actually a v0.4 cache-key collision (agent F06 ranked 1st). See "F006 correction."
 - **N=2 post-tuning runs, single case.** Sufficient to characterize agent behavior on this image; generalization to other cases is a stretch goal. N=2 gives σ = 0.030 for the post-tuning mean.
 - **Near-determinism caveat.** `temperature=0` is near-deterministic, not bit-identical at the model level. The committed cache makes *reruns* bit-identical; first scoring of a new pair is subject to small floating-point variation in inference.
 
@@ -286,4 +424,8 @@ python scorer.py \
 python -m unittest discover -s tests
 ```
 
-Cache file `scorer_cache/judge_verdicts.json` is committed to the repo. A reviewer without an API key can rerun all scoring passes and get bit-identical output. Scoring a findings file not already in the cache requires `ANTHROPIC_API_KEY`.
+Cache file `scorer_cache/judge_verdicts.json` is committed to the repo (now holding the v0.5
+content-addressed verdicts — match, fallback, and precision). A reviewer without an API key can rerun
+all scoring passes and get bit-identical output. Scoring a findings file not already in the cache
+requires `ANTHROPIC_API_KEY`. Per-run v0.5 score JSONs are in `analysis/v05_rescoring/`, and the
+pre-registered prediction evaluation (E1–E4) is in `analysis/v05_rescoring/predictions_eval.md`.

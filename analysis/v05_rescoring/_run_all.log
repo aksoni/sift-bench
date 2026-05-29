@@ -1,0 +1,194 @@
+=== Scoring run1 (log=Y, pre=Y) ===
+{
+  "scalars": {
+    "weighted_tp": 23.5,
+    "weighted_fn": 7.0,
+    "agent_finding_count": 19,
+    "weighted_recall": 0.7705,
+    "weighted_precision": 1.0,
+    "weighted_f1": 0.8704,
+    "count_tp": 8,
+    "count_fp": 0,
+    "count_legit_unmatched": 8,
+    "count_uncertain": 3,
+    "precision_note": "Precision is count-based (unit weight per agent finding); recall is severity-weighted. weighted_f1 is their harmonic mean \u2014 mathematically valid but an asymmetric hybrid, not a single-scheme F1.",
+    "must_find_hit": 5,
+    "must_find_total": 5
+  },
+  "n_matched": 8,
+  "n_missed": 6,
+  "must_find": "5/5",
+  "must_find_missed": [],
+  "fp_traps_caught": 3,
+  "fp_traps_total": 3,
+  "na_caught": 3,
+  "f006_matched": true,
+  "f006_via_fallback": false,
+  "log_used": true,
+  "pre_used": true
+}
+=== Scoring run2 (log=Y, pre=Y) ===
+WARNING:root:Low-confidence verdict (3) for F005 / F07 — not matched
+{
+  "scalars": {
+    "weighted_tp": 23.0,
+    "weighted_fn": 7.5,
+    "agent_finding_count": 14,
+    "weighted_recall": 0.7541,
+    "weighted_precision": 1.0,
+    "weighted_f1": 0.8598,
+    "count_tp": 10,
+    "count_fp": 0,
+    "count_legit_unmatched": 4,
+    "count_uncertain": 0,
+    "precision_note": "Precision is count-based (unit weight per agent finding); recall is severity-weighted. weighted_f1 is their harmonic mean \u2014 mathematically valid but an asymmetric hybrid, not a single-scheme F1.",
+    "must_find_hit": 4,
+    "must_find_total": 5
+  },
+  "n_matched": 10,
+  "n_missed": 4,
+  "must_find": "4/5",
+  "must_find_missed": [
+    "F005"
+  ],
+  "fp_traps_caught": 2,
+  "fp_traps_total": 3,
+  "na_caught": 3,
+  "f006_matched": true,
+  "f006_via_fallback": false,
+  "log_used": true,
+  "pre_used": true
+}
+=== Scoring run3 (log=Y, pre=Y) ===
+{
+  "scalars": {
+    "weighted_tp": 25.5,
+    "weighted_fn": 5.0,
+    "agent_finding_count": 19,
+    "weighted_recall": 0.8361,
+    "weighted_precision": 1.0,
+    "weighted_f1": 0.9107,
+    "count_tp": 10,
+    "count_fp": 0,
+    "count_legit_unmatched": 9,
+    "count_uncertain": 0,
+    "precision_note": "Precision is count-based (unit weight per agent finding); recall is severity-weighted. weighted_f1 is their harmonic mean \u2014 mathematically valid but an asymmetric hybrid, not a single-scheme F1.",
+    "must_find_hit": 5,
+    "must_find_total": 5
+  },
+  "n_matched": 10,
+  "n_missed": 4,
+  "must_find": "5/5",
+  "must_find_missed": [],
+  "fp_traps_caught": 3,
+  "fp_traps_total": 3,
+  "na_caught": 3,
+  "f006_matched": false,
+  "f006_via_fallback": null,
+  "log_used": true,
+  "pre_used": true
+}
+=== Scoring run4 (log=N, pre=Y) ===
+WARNING:root:Low-confidence verdict (3) for F007 / F08 — not matched
+{
+  "scalars": {
+    "weighted_tp": 24.5,
+    "weighted_fn": 6.0,
+    "agent_finding_count": 15,
+    "weighted_recall": 0.8033,
+    "weighted_precision": 1.0,
+    "weighted_f1": 0.8909,
+    "count_tp": 9,
+    "count_fp": 0,
+    "count_legit_unmatched": 6,
+    "count_uncertain": 0,
+    "precision_note": "Precision is count-based (unit weight per agent finding); recall is severity-weighted. weighted_f1 is their harmonic mean \u2014 mathematically valid but an asymmetric hybrid, not a single-scheme F1.",
+    "must_find_hit": 5,
+    "must_find_total": 5
+  },
+  "n_matched": 9,
+  "n_missed": 5,
+  "must_find": "5/5",
+  "must_find_missed": [],
+  "fp_traps_caught": 3,
+  "fp_traps_total": 3,
+  "na_caught": 3,
+  "f006_matched": true,
+  "f006_via_fallback": false,
+  "log_used": false,
+  "pre_used": true
+}
+=== Scoring run5 (log=Y, pre=Y) ===
+{
+  "scalars": {
+    "weighted_tp": 21.5,
+    "weighted_fn": 9.0,
+    "agent_finding_count": 15,
+    "weighted_recall": 0.7049,
+    "weighted_precision": 1.0,
+    "weighted_f1": 0.8269,
+    "count_tp": 9,
+    "count_fp": 0,
+    "count_legit_unmatched": 6,
+    "count_uncertain": 0,
+    "precision_note": "Precision is count-based (unit weight per agent finding); recall is severity-weighted. weighted_f1 is their harmonic mean \u2014 mathematically valid but an asymmetric hybrid, not a single-scheme F1.",
+    "must_find_hit": 4,
+    "must_find_total": 5
+  },
+  "n_matched": 9,
+  "n_missed": 5,
+  "must_find": "4/5",
+  "must_find_missed": [
+    "F003"
+  ],
+  "fp_traps_caught": 3,
+  "fp_traps_total": 3,
+  "na_caught": 4,
+  "f006_matched": true,
+  "f006_via_fallback": false,
+  "log_used": true,
+  "pre_used": true
+}
+=== Scoring run6 (log=Y, pre=Y) ===
+WARNING:root:Low-confidence verdict (3) for F007 / F07 — not matched
+{
+  "scalars": {
+    "weighted_tp": 29.5,
+    "weighted_fn": 1.0,
+    "agent_finding_count": 17,
+    "weighted_recall": 0.9672,
+    "weighted_precision": 1.0,
+    "weighted_f1": 0.9833,
+    "count_tp": 12,
+    "count_fp": 0,
+    "count_legit_unmatched": 5,
+    "count_uncertain": 0,
+    "precision_note": "Precision is count-based (unit weight per agent finding); recall is severity-weighted. weighted_f1 is their harmonic mean \u2014 mathematically valid but an asymmetric hybrid, not a single-scheme F1.",
+    "must_find_hit": 5,
+    "must_find_total": 5
+  },
+  "n_matched": 12,
+  "n_missed": 2,
+  "must_find": "5/5",
+  "must_find_missed": [],
+  "fp_traps_caught": 3,
+  "fp_traps_total": 3,
+  "na_caught": 3,
+  "f006_matched": true,
+  "f006_via_fallback": false,
+  "log_used": true,
+  "pre_used": true
+}
+
+===== CONSOLIDATED =====
+ run   recall  precision       f1   must    fp   F006  viaFB
+   1   0.7705     1.0000   0.8704    5/5 3/  3   True  False
+   2   0.7541     1.0000   0.8598    4/5 2/  3   True  False
+   3   0.8361     1.0000   0.9107    5/5 3/  3  False   None
+   4   0.8033     1.0000   0.8909    5/5 3/  3   True  False
+   5   0.7049     1.0000   0.8269    4/5 3/  3   True  False
+   6   0.9672     1.0000   0.9833    5/5 3/  3   True  False
+
+All top-level scalar keys present in run1 result:
+['agent_finding_count', 'count_fp', 'count_legit_unmatched', 'count_tp', 'count_uncertain', 'must_find_hit', 'must_find_total', 'precision_note', 'weighted_f1', 'weighted_fn', 'weighted_precision', 'weighted_recall', 'weighted_tp']
+DONE

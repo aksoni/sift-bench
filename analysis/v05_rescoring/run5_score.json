@@ -1,0 +1,309 @@
+{
+  "findings_matched": [
+    {
+      "gt_id": "F001",
+      "gt_title": "Malicious executable p.exe in attacker staging directory",
+      "severity": "critical",
+      "weight": 4,
+      "matched_to": "F01",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same process: p.exe with PID 8260, running from C:\\Windows\\Temp\\Perfmon\\p.exe, launched by cmd.exe (PPID 5948), created 2018-08-30. The agent finding adds detail about the user account (spsql/Domain Admin) and loaded DLLs suggesting C2 capability, while the GT focuses on the RWX memory region and prefetch evidence. These are complementary observations about the same primary subject \u2014 the malicious p.exe process in the attacker staging directory.",
+      "must_find": true,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F002",
+      "gt_title": "Attack conducted under spsql account with Domain Admin privileges",
+      "severity": "critical",
+      "weight": 4,
+      "matched_to": "F03",
+      "judge_confidence": 4,
+      "judge_reasoning": "Both findings describe the same core observation: the attacker's PowerShell process running under the spsql account with Domain Admin privileges. The GT focuses on PID 5848 while the agent finding references PID 8712, which may be a different PowerShell instance, but both identify the spsql account (RID-1193, Domain Admin) as the execution context for the attacker's PowerShell. The agent finding provides additional mechanism detail (WMI-based spawning via WmiPrvSE) while the GT focuses on the privilege/integrity level. The shared subject \u2014 spsql account with Domain Admin context running attacker PowerShell \u2014 is the primary observation in both findings, making this a match despite the PID discrepancy and differing levels of mechanistic detail.",
+      "must_find": true,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F004",
+      "gt_title": "C2 communications to 172.16.4.10 on port 8080",
+      "severity": "critical",
+      "weight": 4,
+      "matched_to": "F02",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same network observation: multiple TCP connections from 172.16.6.11 to 172.16.4.10 on port 8080 in ESTABLISHED and CLOSE_WAIT states, with no clear PID association preserved. The agent finding is more specific (breaking down connection counts and attributing indirectly to p.exe), while the GT notes the orphaned PID situation similarly. The core subject \u2014 C2 communications to the same remote endpoint on the same port with the same connection states \u2014 is identical.",
+      "must_find": true,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F005",
+      "gt_title": "PowerShell C2 shell with stealth flags",
+      "severity": "critical",
+      "weight": 4,
+      "matched_to": "F04",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same process: powershell.exe PID 5848, a 32-bit SysWOW64 instance spawned by PID 8712 with identical command-line flags (-Version 5.1 -s -NoLogo -NoProfile). Both identify it as a C2/remoting shell used to drop/execute p.exe via cmd.exe. The agent finding provides additional detail about the -s flag semantics and AMSI evasion rationale, while the GT emphasizes duration and rundll32 children, but the primary subject and core observation are identical.",
+      "must_find": true,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F006",
+      "gt_title": "Six short-lived rundll32.exe instances from PowerShell C2 shell",
+      "severity": "high",
+      "weight": 2,
+      "matched_to": "F09",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the exact same observation: powershell.exe PID 5848 spawning six rundll32.exe child processes (PIDs 6768, 5452, 5588, 4108, 2216, 8148) over the same time window (2018-08-30 18:31 to 2018-08-31 00:56 UTC). The mechanism (PowerShell spawning rundll32 children), the parent PID, the child PIDs, and the timestamps all match precisely. The agent finding adds detail about blank command lines and frames it as reflective DLL loading during a staging phase, while the GT notes short lifetimes and mixed 32/64-bit architecture \u2014 these are complementary details about the same underlying observation, not different mechanisms.",
+      "must_find": false,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F007",
+      "gt_title": "Outbound lateral movement via SMB and RDP",
+      "severity": "medium",
+      "weight": 1,
+      "matched_to": "F05",
+      "judge_confidence": 4,
+      "judge_reasoning": "Both findings describe outbound lateral movement from the same host to the same two internal targets (172.16.7.15 on port 445/SMB and 172.16.4.5 on port 3389/RDP), identifying this host as a pivot point. The agent finding is more specific \u2014 it adds a second ESTABLISHED SMB connection to 172.16.4.5 and notes seven CLOSED RDP connections rather than one \u2014 but the core observation (SMB and RDP lateral movement to those two internal hosts) is the same. The minor discrepancy in connection counts and states does not change the fundamental subject or mechanism being described.",
+      "must_find": false,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F009",
+      "gt_title": "No registry-based persistence installed",
+      "severity": "medium",
+      "weight": 1,
+      "matched_to": "F10",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same negative observation: no registry-based persistence was installed by the attacker. Both specifically reference the spsql user hive Run keys being empty and svcscan finding no malicious services. The agent finding is more specific (enumerating exact registry paths, naming specific benign services found) but the core observation is identical to the ground truth.",
+      "must_find": false,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F012",
+      "gt_title": "procdump.exe present in Dashlane directory",
+      "severity": "medium",
+      "weight": 1,
+      "matched_to": "F15",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same artifact: procdump.exe located at the identical file path within the Dashlane application directory. Both reference it as a Sysinternals credential dumping tool and flag it for investigation in the context of a compromise. The agent finding is more specific (noting no running process, speculating on staging), while the GT notes the possibility it could be a legitimate Dashlane component. These are complementary framings of the same observation, not different mechanisms or subjects.",
+      "must_find": false,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F010",
+      "gt_title": "PowerShell (PID 8712) malfind hits are .NET CLR heap segments, not injection",
+      "severity": "low",
+      "weight": 0.5,
+      "matched_to": "F12",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same observation: malfind flagging three RWX regions in powershell.exe (PID 8712) that are actually benign .NET CLR managed heap segments, identified by the 0xFFEEFFEE/0xEEFFEEFF signature. Same process, same PID, same tool, same mechanism (CLR heap allocation), same conclusion (benign). The agent finding is slightly less detailed (omits the null-byte prefix and self-referential pointer metadata) but clearly describes the same observation.",
+      "must_find": false,
+      "via_fallback": false
+    }
+  ],
+  "findings_missed": [
+    {
+      "gt_id": "F003",
+      "gt_title": "WMI lateral movement used to access this host",
+      "severity": "critical",
+      "weight": 4,
+      "must_find": true
+    },
+    {
+      "gt_id": "F008",
+      "gt_title": "Full attack chain process tree",
+      "severity": "high",
+      "weight": 2,
+      "must_find": false
+    },
+    {
+      "gt_id": "F013",
+      "gt_title": "p.exe DLL profile confirms network-capable C2 implant",
+      "severity": "high",
+      "weight": 2,
+      "must_find": false
+    },
+    {
+      "gt_id": "F011",
+      "gt_title": "spsql NTUSER.DAT loaded in memory",
+      "severity": "low",
+      "weight": 0.5,
+      "must_find": false
+    },
+    {
+      "gt_id": "F014",
+      "gt_title": "PowerShell C2 shell has AMSI loaded and multiple unnamed DLLs",
+      "severity": "low",
+      "weight": 0.5,
+      "must_find": false
+    }
+  ],
+  "fp_traps_caught": [
+    "FP001",
+    "FP002",
+    "FP003"
+  ],
+  "fp_traps_missed": [],
+  "na_caught": [
+    "NA002",
+    "NA003",
+    "NA004",
+    "NA005"
+  ],
+  "na_missed": [
+    "NA001"
+  ],
+  "weighted_tp": 21.5,
+  "weighted_fn": 9.0,
+  "agent_finding_count": 15,
+  "weighted_recall": 0.7049,
+  "weighted_precision": 1.0,
+  "weighted_f1": 0.8269,
+  "count_tp": 9,
+  "count_fp": 0,
+  "count_legit_unmatched": 6,
+  "count_uncertain": 0,
+  "precision_verdicts": [
+    {
+      "agent_id": "F06",
+      "legitimate": true,
+      "confidence": 5,
+      "reasoning": "The finding cites a specific network tuple (172.16.4.4:389) with a local endpoint (172.16.6.11:56345), protocol (TCPv4), connection state (CLOSED), and memory address (0x8c88b5b1a010), all directly traceable to netscan/netstat tool output. The interpretation that port 389 is LDAP and associated with AD reconnaissance is a reasonable, hedged inference from the artifact. All core claims are grounded in the verbatim tool output excerpt provided."
+    },
+    {
+      "agent_id": "F07",
+      "legitimate": true,
+      "confidence": 5,
+      "reasoning": "The finding cites a specific network tuple (172.16.5.21:5985) with local endpoint (172.16.6.11:49791), memory address (0x8c88b8479cb0), connection state (CLOSED), and verbatim tool output consistent with netscan/netstat plugin output. Port 5985 as WinRM/WS-Management is a well-known standard association. The lateral movement interpretation is appropriately hedged ('likely represents', 'cannot be confirmed without host-level evidence'). All core claims are directly traceable to the cited tool output."
+    },
+    {
+      "agent_id": "F08",
+      "legitimate": true,
+      "confidence": 5,
+      "reasoning": "The finding cites specific PIDs (5768, 7552, 1424) with parent PID 8260 (p.exe), timestamps, exit times, and blank command lines \u2014 all directly traceable to process enumeration tool output (e.g., pstree/cmdline). The brief lifespans (3-8 seconds) are calculable from the cited start/exit timestamps. The interpretation that blank rundll32 command lines suggest reflective DLL loading is a hedged, reasonable inference from the observable artifacts. All core claims are traceable to the raw tool output excerpt provided."
+    },
+    {
+      "agent_id": "F11",
+      "legitimate": true,
+      "confidence": 4,
+      "reasoning": "The finding cites specific, traceable artifacts: PID 8128, process name OUTLOOK.EXE, memory address 0x363a0000, VAD type VadS, protection PAGE_EXECUTE_READWRITE, and verbatim byte sequence '64 74 72 52 00 00 00 00 18 03 3a 36' from malfind output. The self-referential pointer claim (0x363a0318) is also derivable from the raw bytes shown. The interpretive claim that 'dtrR' is a known Outlook COM/MAPI object tag is an analytical inference that goes beyond what malfind itself would assert, but it is hedged appropriately and the underlying artifact (the byte pattern and RWX region) is fully traceable. Confidence is 4 rather than 5 because the 'well-documented pattern' assertion about dtrR being a known Outlook allocator tag is an external knowledge claim that cannot be verified from the tool output alone, but this does not undermine the legitimacy of the core forensic artifact citation."
+    },
+    {
+      "agent_id": "F13",
+      "legitimate": true,
+      "confidence": 5,
+      "reasoning": "The finding cites specific, traceable artifacts: PID 6036, process name UpdaterUI.exe, memory address range 0x5070000-0x5070fff, VAD type VadS, protection PAGE_EXECUTE_READWRITE, size of 1 page, and the content observation of all-null bytes \u2014 all consistent with malfind output. The interpretive conclusion that null-filled, header-less, code-free RWX pages are not indicative of shellcode is a reasonable, hedged analytical judgment that flows directly from the observable artifact. The McAfee context is offered as explanatory framing, not as a fabricated artifact claim."
+    },
+    {
+      "agent_id": "F14",
+      "legitimate": true,
+      "confidence": 5,
+      "reasoning": "The finding cites a specific network tuple (172.16.6.14:65368 -> 172.16.6.11:445) with ESTABLISHED state, a memory address (0x8c88b7647470), and verbatim netscan tool output. All claims are directly traceable to the raw tool output excerpt. The interpretive hedging about possible explanations is appropriately cautious and does not overreach the evidence."
+    }
+  ],
+  "precision_note": "Precision is count-based (unit weight per agent finding); recall is severity-weighted. weighted_f1 is their harmonic mean \u2014 mathematically valid but an asymmetric hybrid, not a single-scheme F1.",
+  "must_find_hit": 4,
+  "must_find_total": 5,
+  "must_find_missed": [
+    "F003"
+  ],
+  "checklist": {
+    "steps": [
+      {
+        "id": 1,
+        "name": "psscan",
+        "status": "pass",
+        "plugin_found": "windows.psscan"
+      },
+      {
+        "id": 2,
+        "name": "pstree",
+        "status": "pass",
+        "plugin_found": "windows.pstree"
+      },
+      {
+        "id": 3,
+        "name": "cmdline",
+        "status": "pass",
+        "plugin_found": "windows.cmdline"
+      },
+      {
+        "id": 4,
+        "name": "netscan",
+        "status": "pass",
+        "plugin_found": "windows.netscan"
+      },
+      {
+        "id": 5,
+        "name": "malfind",
+        "status": "pass",
+        "plugin_found": "windows.malfind"
+      },
+      {
+        "id": 6,
+        "name": "filescan",
+        "status": "pass",
+        "plugin_found": "windows.filescan"
+      },
+      {
+        "id": 7,
+        "name": "getsids",
+        "status": "pass",
+        "plugin_found": "windows.getsids"
+      },
+      {
+        "id": 8,
+        "name": "dlllist",
+        "status": "pass",
+        "plugin_found": "windows.dlllist"
+      },
+      {
+        "id": 9,
+        "name": "persistence",
+        "status": "pass",
+        "plugin_found": "windows.registry.printkey"
+      }
+    ],
+    "passed": 9,
+    "total": 9,
+    "coverage": 1.0,
+    "note": null
+  },
+  "self_correction": {
+    "pre_finding_count": 15,
+    "post_finding_count": 15,
+    "pre_confirmed_count": 11,
+    "post_confirmed_count": 8,
+    "net_change": -3,
+    "findings_retracted": [
+      "F11",
+      "F12",
+      "F13"
+    ],
+    "retracted_count": 3,
+    "silent_removals": [],
+    "findings_added": [],
+    "added_count": 0,
+    "additions_tp": [],
+    "additions_fp": [],
+    "fp_traps_retracted": [
+      {
+        "trap_id": "FP001",
+        "trap_name": "Outlook dtrR injection false positive",
+        "finding_id": "F11"
+      },
+      {
+        "trap_id": "FP003",
+        "trap_name": "PowerShell CLR heap false positive",
+        "finding_id": "F12"
+      },
+      {
+        "trap_id": "FP002",
+        "trap_name": "McAfee UpdaterUI false positive",
+        "finding_id": "F13"
+      }
+    ],
+    "fp_traps_retracted_count": 3,
+    "f1_delta_note": "Not computed automatically. Run scorer on pre-correction findings to obtain pre-F1; post-F1 is in <run>_score.json.",
+    "gt_provided": true
+  }
+}

@@ -1,0 +1,340 @@
+{
+  "findings_matched": [
+    {
+      "gt_id": "F001",
+      "gt_title": "Malicious executable p.exe in attacker staging directory",
+      "severity": "critical",
+      "weight": 4,
+      "matched_to": "F03",
+      "judge_confidence": 4,
+      "judge_reasoning": "Both findings describe the same core observation: p.exe staged in c:\\windows\\temp\\perfmon\\ and executed via cmd.exe. They share the same process name, path, parent process (cmd.exe), and staging directory. The agent finding adds detail about filescan evidence and directory handles, while the GT finding emphasizes the RWX memory region from malfind. The agent finding also mentions rundll32.exe executions as additional context, but the primary subject \u2014 p.exe execution from the Perfmon staging directory via cmd.exe \u2014 is the same observation. Minor differences in emphasis and additional details do not disqualify this as a match.",
+      "must_find": true,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F002",
+      "gt_title": "Attack conducted under spsql account with Domain Admin privileges",
+      "severity": "critical",
+      "weight": 4,
+      "matched_to": "F09",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same core observation: the spsql account (SID ending in -1193) with Domain Admin privileges running at High Mandatory Level integrity is the account under which the attacker's activity executes, specifically including PID 5848 (powershell.exe). The agent finding is more expansive, covering the full process chain, while the GT focuses on PID 5848 specifically, but both share the same primary subject (spsql account compromise with Domain Admin privileges) and the same evidence base. The agent adds context about lateral movement abuse but does not contradict the GT observation.",
+      "must_find": true,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F003",
+      "gt_title": "WMI lateral movement used to access this host",
+      "severity": "critical",
+      "weight": 4,
+      "matched_to": "F01",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same core observation: WmiPrvSE.exe (PID 2876) spawning powershell.exe (PID 8712) as evidence of WMI-based lateral movement to this host. The process names, PIDs, and mechanism (WMI remote execution spawning PowerShell) are identical. The agent finding adds additional detail (privilege context, credential identity, anti-forensics via wiped command line) that the GT does not mention, but this is a more specific version of the same observation, not a different observation. Both confirm WMI lateral movement as the primary subject.",
+      "must_find": true,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F004",
+      "gt_title": "C2 communications to 172.16.4.10 on port 8080",
+      "severity": "critical",
+      "weight": 4,
+      "matched_to": "F05",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same network observation: multiple TCP connections from 172.16.6.11 to 172.16.4.10 on port 8080, with no PID association (orphaned/dissociated connections), interpreted as C2 infrastructure. The agent finding is more specific (breaking down connection states into 1 ESTABLISHED, 6 CLOSE_WAIT, 2 CLOSED vs GT's general ESTABLISHED and CLOSE_WAIT), names specific C2 frameworks, and reports a slightly higher connection count, but the core observation \u2014 orphaned connections to the same remote IP:port interpreted as C2 \u2014 is identical.",
+      "must_find": true,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F005",
+      "gt_title": "PowerShell C2 shell with stealth flags",
+      "severity": "critical",
+      "weight": 4,
+      "matched_to": "F02",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same PowerShell process: PID 5848, spawned by PID 8712, running from SysWOW64 with identical command-line flags (-Version 5.1 -s -NoLogo -NoProfile). The agent finding focuses on the two-stage chain and the technical significance of the -s flag and 32-bit architecture, while the GT adds details about duration, child processes, and C2 role. These are the same underlying observation with different levels of detail and framing.",
+      "must_find": true,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F006",
+      "gt_title": "Six short-lived rundll32.exe instances from PowerShell C2 shell",
+      "severity": "high",
+      "weight": 2,
+      "matched_to": "F04",
+      "judge_confidence": 4,
+      "judge_reasoning": "Both findings describe the same core observation: six rundll32.exe processes spawned as children of powershell.exe (PID 5848). The GT focuses on the short-lived nature and timing of these six instances, while the agent finding embeds them within a broader context of nine total rundll32 instances and interprets the blank command lines as shellcode injection. The primary subject \u2014 six rundll32.exe children of powershell.exe PID 5848 \u2014 is identical. The mechanism interpretation differs slightly (staged DLL execution vs. shellcode injection), but both are describing the same spawning relationship and the same set of processes. The agent finding is more expansive but clearly encompasses the GT observation. Confidence is 4 rather than 5 because the agent attributes a different mechanism (shellcode injection via CreateRemoteThread) versus the GT's interpretation (staged DLL execution/reconnaissance), but this does not disqualify the match since the underlying observed processes and parent-child relationship are the same.",
+      "must_find": false,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F007",
+      "gt_title": "Outbound lateral movement via SMB and RDP",
+      "severity": "medium",
+      "weight": 1,
+      "matched_to": "F06",
+      "judge_confidence": 4,
+      "judge_reasoning": "Both findings describe outbound SMB connections to the same two internal hosts (172.16.7.15:445 and 172.16.4.5) used for lateral movement. The core observation \u2014 this host pivoting laterally via SMB to those two IPs \u2014 is shared. The agent finding attributes SMB to both IPs on port 445, while the GT finding attributes RDP (port 3389) to 172.16.4.5 and SMB (port 445) to 172.16.7.15. This is a minor discrepancy in protocol/port for one host, but the overall lateral movement observation involving the same two destination IPs is clearly the same finding. Confidence is 4 rather than 5 due to the protocol mismatch for 172.16.4.5 (agent says SMB:445, GT says RDP:3389).",
+      "must_find": false,
+      "via_fallback": false
+    },
+    {
+      "gt_id": "F010",
+      "gt_title": "PowerShell (PID 8712) malfind hits are .NET CLR heap segments, not injection",
+      "severity": "low",
+      "weight": 0.5,
+      "matched_to": "FP01",
+      "judge_confidence": 5,
+      "judge_reasoning": "Both findings describe the same observation: three PAGE_EXECUTE_READWRITE regions (8, 1, 2 pages) in powershell.exe PID 8712 flagged by malfind, assessed as benign .NET CLR JIT allocations with no PE headers or shellcode. The agent finding is slightly less specific (omits the 0xFFEEFFEE heap signature detail) but reaches the same conclusion about the same process, same PID, same region sizes, and same benign assessment.",
+      "must_find": false,
+      "via_fallback": false
+    }
+  ],
+  "findings_missed": [
+    {
+      "gt_id": "F008",
+      "gt_title": "Full attack chain process tree",
+      "severity": "high",
+      "weight": 2,
+      "must_find": false
+    },
+    {
+      "gt_id": "F013",
+      "gt_title": "p.exe DLL profile confirms network-capable C2 implant",
+      "severity": "high",
+      "weight": 2,
+      "must_find": false
+    },
+    {
+      "gt_id": "F009",
+      "gt_title": "No registry-based persistence installed",
+      "severity": "medium",
+      "weight": 1,
+      "must_find": false
+    },
+    {
+      "gt_id": "F012",
+      "gt_title": "procdump.exe present in Dashlane directory",
+      "severity": "medium",
+      "weight": 1,
+      "must_find": false
+    },
+    {
+      "gt_id": "F011",
+      "gt_title": "spsql NTUSER.DAT loaded in memory",
+      "severity": "low",
+      "weight": 0.5,
+      "must_find": false
+    },
+    {
+      "gt_id": "F014",
+      "gt_title": "PowerShell C2 shell has AMSI loaded and multiple unnamed DLLs",
+      "severity": "low",
+      "weight": 0.5,
+      "must_find": false
+    }
+  ],
+  "fp_traps_caught": [
+    "FP001",
+    "FP002",
+    "FP003"
+  ],
+  "fp_traps_missed": [],
+  "na_caught": [
+    "NA003",
+    "NA004",
+    "NA005"
+  ],
+  "na_missed": [
+    "NA001",
+    "NA002"
+  ],
+  "weighted_tp": 23.5,
+  "weighted_fn": 7.0,
+  "agent_finding_count": 19,
+  "weighted_recall": 0.7705,
+  "weighted_precision": 1.0,
+  "weighted_f1": 0.8704,
+  "count_tp": 8,
+  "count_fp": 0,
+  "count_legit_unmatched": 8,
+  "count_uncertain": 3,
+  "precision_verdicts": [
+    {
+      "agent_id": "F07",
+      "legitimate": true,
+      "confidence": 4,
+      "reasoning": "The finding cites a specific network tuple (172.16.5.21:5985/WinRM) and connection state (CLOSED) observable via windows.netscan output. These are concrete, traceable artifacts from a network scan plugin. The interpretation about Domain Admin credentials and remote command execution is inferential but appropriately hedged as capability rather than confirmed activity. The confidence is 4 rather than 5 because the finding references Domain Admin credentials without citing a specific artifact (e.g., a process token or credential dump) that would confirm those credentials were in use for this connection \u2014 that portion is an unsupported leap. However, the core network connection claim is traceable."
+    },
+    {
+      "agent_id": "F08",
+      "legitimate": true,
+      "confidence": 3,
+      "reasoning": "The finding cites a specific network tuple (172.16.4.4:389) observable via windows.netscan, and LDAP port 389 is a well-known, verifiable artifact. The connection state (CLOSED) is also a standard netscan output field. The inference about Domain Controller and AD enumeration is hedged ('consistent with', 'likely') and flows reasonably from the artifact. Confidence is moderate (3) rather than high because the finding does not cite the specific process name/PID associated with the connection, which netscan would normally provide, leaving the attribution claim partially unsupported. The core network artifact claim is traceable, but the absence of process attribution details weakens the overall evidentiary chain."
+    },
+    {
+      "agent_id": "F10",
+      "legitimate": true,
+      "confidence": 4,
+      "reasoning": "The finding cites specific, traceable artifacts from windows.malfind output: PID 8260, process name p.exe, memory address range 0x2be0000-0x2dc0fff, page protection PAGE_EXECUTE_READWRITE, 481 committed pages (~1.9MB), PrivateMemory=1, and no file backing. These are all standard malfind output fields. The hexdump observation (all underscores / paged out) is also a plausible and traceable artifact. The interpretation as 'reflective shellcode or staged payload' is a reasonable inference from the attributes. Confidence is 4 rather than 5 because the final claim that 'region attributes alone are conclusive' overstates certainty \u2014 RWX private VADs can have benign explanations \u2014 but the underlying artifact claims are traceable and the core finding is legitimate."
+    },
+    {
+      "agent_id": "F11",
+      "legitimate": true,
+      "confidence": 4,
+      "reasoning": "The finding cites a specific network tuple (52.16.55.11:443) and protocol (HTTPS/TCP) observable via windows.netscan output. A CLOSED connection with no PID attribution is a plausible and common artifact in netscan results where the owning process has terminated. The interpretive claims (payload staging, C2, cloud service) are appropriately hedged. The core artifact claim is traceable to netscan output. Confidence is 4 rather than 5 because we cannot independently verify the netscan output, but the specificity of the IP:port tuple and the acknowledgment of missing PID attribution are consistent with genuine tool output."
+    },
+    {
+      "agent_id": "F12",
+      "legitimate": true,
+      "confidence": 4,
+      "reasoning": "The finding cites a specific network tuple (172.16.6.14:65368 -> 172.16.6.11:445) with connection state (ESTABLISHED) and protocol (SMB/port 445), all of which are directly observable artifacts from windows.netscan output. The interpretation is appropriately hedged ('could be', 'cannot distinguish without additional context'). The claim is fully traceable to network connection enumeration tool output."
+    },
+    {
+      "agent_id": "F13",
+      "legitimate": true,
+      "confidence": 3,
+      "reasoning": "The finding cites specific, traceable artifacts: PID 8128, process name OUTLOOK.EXE, PAGE_EXECUTE_READWRITE memory protection flags, and a specific byte sequence (64 74 72 52 00 00 00 00 / ASCII 'dtrR'), all of which are directly observable from windows.malfind output. The absence of an MZ/PE header is also a standard malfind observable. The 'Distributed Transaction Record' interpretation is an analytical inference, but it flows from the cited byte pattern. Confidence is 3 rather than 5 because the specific byte sequence and its benign classification cannot be independently verified from the evidence provided \u2014 the claim that this is a 'known Outlook signature' is an interpretive assertion that goes slightly beyond what malfind alone would confirm, but the underlying artifact claims (PID, protection flags, byte sequence, no MZ header) are all traceable to tool output."
+    },
+    {
+      "agent_id": "F14",
+      "legitimate": true,
+      "confidence": 4,
+      "reasoning": "The finding cites specific, traceable artifacts: PID 9936 (conhost.exe), PPID 11552, an exit timestamp (2018-09-06 18:26:17 UTC), and the absence of PPID 11552 in psscan output. All of these are directly observable from windows.psscan output. The analyst appropriately hedges the interpretation, offering benign and malicious explanations without overclaiming. The only minor uncertainty is that we cannot independently verify the psscan output, but the artifact claims are entirely consistent with what psscan produces."
+    },
+    {
+      "agent_id": "F15",
+      "legitimate": true,
+      "confidence": 4,
+      "reasoning": "The finding cites specific, traceable artifacts: PID 1096, process name subject_srv.exe, file path C:\\windows\\subject_srv.exe, creation timestamp, remote host base-hunt.shieldbase.lan:5682, and local listening port 3262. All of these are observable via windows.cmdline and windows.netscan output. The identification of F-Response as the forensic collection tool is an interpretive conclusion, but it flows logically from the cited artifacts (specific port numbers and naming conventions associated with F-Response). The hedging is appropriate and the core claims are traceable. Confidence is 4 rather than 5 because we cannot independently verify the tool output, but the specificity of the artifacts cited is consistent with legitimate forensic tool output."
+    },
+    {
+      "agent_id": "F16",
+      "legitimate": true,
+      "confidence": 4,
+      "reasoning": "The finding cites a specific source IP (172.16.6.11), destination IP:port (172.16.4.5:3389), connection state (CLOSED), and a count (8+) derived from windows.netscan output. These are all artifacts directly observable in netscan tool output \u2014 network tuples and connection states are standard fields. The lateral movement interpretation is hedged ('could indicate') and flows from the artifacts. Confidence is 4 rather than 5 because the exact netscan output lines are not quoted verbatim, so the count and addresses cannot be independently verified from the finding alone, but the claim is structurally traceable to a real forensic tool."
+    },
+    {
+      "agent_id": "F17",
+      "legitimate": true,
+      "confidence": 4,
+      "reasoning": "The finding cites specific PIDs (1740 for conhost.exe, 8712 for powershell.exe) and a precise timestamp (2018-08-30 16:43:36 UTC), all of which are directly observable from pstree/psscan output. The parent-child relationship between conhost.exe and powershell.exe is a standard artifact visible in process tree enumeration. The interpretive leap \u2014 that this confirms a human operator rather than an automated script \u2014 is an overreach, as conhost.exe can be spawned by automated scripts as well, but the underlying artifact claims (PIDs, process names, parent-child relationship, timestamp) are traceable. Confidence is 4 rather than 5 because the conclusion about 'hands-on-keyboard' human activity goes beyond what the artifact strictly proves, though the artifacts themselves appear legitimate."
+    },
+    {
+      "agent_id": "FP02",
+      "legitimate": true,
+      "confidence": 3,
+      "reasoning": "The finding references a specific process name (UpdaterUI.exe), PID (6036), and a PAGE_EXECUTE_READWRITE memory region detected by windows.malfind \u2014 all traceable artifacts from malfind output. The analyst's conclusion that this is a false positive based on McAfee AV behavior is a reasonable interpretive judgment, and the hedging is appropriate. Confidence is 3 rather than 5 because the finding does not cite the specific memory address or virtual address range of the RWX region, which would normally appear in malfind output and would make the artifact fully traceable. The core claim is plausible and grounded, but the absence of the memory address means we cannot fully verify the artifact without the raw tool output."
+    }
+  ],
+  "precision_note": "Precision is count-based (unit weight per agent finding); recall is severity-weighted. weighted_f1 is their harmonic mean \u2014 mathematically valid but an asymmetric hybrid, not a single-scheme F1.",
+  "must_find_hit": 5,
+  "must_find_total": 5,
+  "must_find_missed": [],
+  "checklist": {
+    "steps": [
+      {
+        "id": 1,
+        "name": "psscan",
+        "status": "pass",
+        "plugin_found": "windows.psscan"
+      },
+      {
+        "id": 2,
+        "name": "pstree",
+        "status": "pass",
+        "plugin_found": "windows.pstree"
+      },
+      {
+        "id": 3,
+        "name": "cmdline",
+        "status": "pass",
+        "plugin_found": "windows.cmdline"
+      },
+      {
+        "id": 4,
+        "name": "netscan",
+        "status": "pass",
+        "plugin_found": "windows.netscan"
+      },
+      {
+        "id": 5,
+        "name": "malfind",
+        "status": "pass",
+        "plugin_found": "windows.malfind"
+      },
+      {
+        "id": 6,
+        "name": "filescan",
+        "status": "pass",
+        "plugin_found": "windows.filescan"
+      },
+      {
+        "id": 7,
+        "name": "getsids",
+        "status": "pass",
+        "plugin_found": "windows.getsids"
+      },
+      {
+        "id": 8,
+        "name": "dlllist",
+        "status": "missing",
+        "plugin_found": null
+      },
+      {
+        "id": 9,
+        "name": "persistence",
+        "status": "pass",
+        "plugin_found": "windows.registry.printkey"
+      }
+    ],
+    "passed": 8,
+    "total": 9,
+    "coverage": 0.8889,
+    "note": null
+  },
+  "self_correction": {
+    "pre_finding_count": 16,
+    "post_finding_count": 19,
+    "pre_confirmed_count": 15,
+    "post_confirmed_count": 16,
+    "net_change": 1,
+    "findings_retracted": [
+      "FP01",
+      "FP02"
+    ],
+    "retracted_count": 2,
+    "silent_removals": [],
+    "findings_added": [
+      "F17",
+      "FP01",
+      "FP02"
+    ],
+    "added_count": 3,
+    "additions_tp": [
+      "F17",
+      "FP01",
+      "FP02"
+    ],
+    "additions_fp": [],
+    "fp_traps_retracted": [
+      {
+        "trap_id": "FP001",
+        "trap_name": "Outlook dtrR injection false positive",
+        "finding_id": "F13"
+      },
+      {
+        "trap_id": "FP003",
+        "trap_name": "PowerShell CLR heap false positive",
+        "finding_id": "FP01"
+      },
+      {
+        "trap_id": "FP002",
+        "trap_name": "McAfee UpdaterUI false positive",
+        "finding_id": "FP02"
+      }
+    ],
+    "fp_traps_retracted_count": 3,
+    "f1_delta_note": "Not computed automatically. Run scorer on pre-correction findings to obtain pre-F1; post-F1 is in <run>_score.json.",
+    "gt_provided": true
+  }
+}
