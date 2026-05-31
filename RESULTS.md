@@ -26,7 +26,7 @@ key-free reproduction. Full prediction evaluation in `analysis/v05_rescoring/pre
 | 2   | + `dlllist` + persistence check | 0.8598 | 0.7541 | 1.0000 | 4/5 ✗F005 | 2/3 | 10/14 | ✓ primary |
 | 3   | + output schema pin | 0.9107 | 0.8361 | 1.0000 | **5/5** | 3/3 | 10/14 | ✗ (genuine gap) |
 | 4   | + MCP server | 0.8909 | 0.8033 | 1.0000 | **5/5** | 3/3 | 9/14  | ✓ primary |
-| 5   | + strengthened prohibitions (gate failed) | 0.8269 | 0.7049 | 1.0000 | 4/5 ✗F005 | 3/3 | 9/14  | ✓ primary |
+| 5   | + strengthened prohibitions (gate failed) | 0.8269 | 0.7049 | 1.0000 | 4/5 ✗F003 | 3/3 | 9/14  | ✓ primary |
 | 6   | gate met — MCP tools live | **0.9833** | 0.9672 | 1.0000 | **5/5** | 3/3 | 12/14 | ✓ primary |
 
 ¹ Severity-weighted (critical=4, high=2, medium=1, low=0.5); total GT weight = 30.5.
@@ -187,8 +187,8 @@ Behaviors present in all three runs under v0.4 scoring:
 
 ## Stable misses — v0.4
 
-- **F008** (high): Full attack chain process tree — missed in all four runs. The agent describes the chain narratively but does not produce a structured finding with the parent-child sequence as the primary subject.
-- **F011** (low): spsql NTUSER.DAT in memory — missed in all four runs. No methodology step explicitly checks loaded user hives. The v0.3 "weak score-2 match" in run 3 (agent F07 via keyword overlap) was the false positive GT F011/F07 described in the design doc; v0.4 correctly does not credit it.
+- **F008** (high): Full attack chain process tree — a stable miss through Run 5, recovered in Run 6 via the primary pass. In Runs 1–5 the agent described the chain narratively but did not produce a structured finding with the parent-child sequence as the primary subject.
+- **F011** (low): spsql NTUSER.DAT in memory — missed in all six runs. No methodology step explicitly checks loaded user hives. The v0.3 "weak score-2 match" in run 3 (agent F07 via keyword overlap) was the false positive GT F011/F07 described in the design doc; v0.4 correctly does not credit it.
 
 ---
 
