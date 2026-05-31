@@ -256,7 +256,7 @@ The judge verdict cache (`scorer_cache/judge_verdicts.json`) is committed to the
 ## Known limitations
 
 - **Restricted evidence image:** The SRL-2018 memory image is not redistributed. Reviewers can inspect committed run outputs and rerun the scorer using cached judge verdicts without it.
-- **v0.4 precision approximation:** Scorer v0.4 approximates precision at 1.0, so v0.4 scores are recall-weighted benchmark scores, not true F1. Scorer v0.5 (implemented in this repo; pending re-scoring) adds evidence-traceability precision via LLM judge.
+- **v0.4 precision approximation:** Scorer v0.4 approximates precision at 1.0, so v0.4 scores are recall-weighted benchmark scores, not true F1. Scorer v0.5 (now the active scorer; all six runs re-scored 2026-05-29) adds evidence-traceability precision via LLM judge.
 - **Stable miss — F011** (`spsql` NTUSER.DAT loaded in memory): missed across all runs. No methodology step explicitly checks loaded user hives. Recoverable with an additional `windows.registry.hivescan` step.
 - **Small sample size:** Post-tuning variance is based on N=2 runs; larger N would provide tighter confidence intervals (currently σ = 0.030).
 - **Single case:** The benchmark has one hand-authored case. The design supports additional cases; they are not yet included.
