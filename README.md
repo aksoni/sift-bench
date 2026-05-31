@@ -125,7 +125,7 @@ python scorer.py \
 python -m unittest discover -s tests
 ```
 
-Expected score for the run6 command: `v0.4_score: 0.9391, recall: 0.8852, critical: 5/5, fp_traps: 3/3, negative_assertions: 3/5, matched: 11/14` (bit-identical from committed cache).
+Expected score for the run6 command: `weighted_f1: 0.9833, recall: 0.9672, precision: 1.0, critical: 5/5, fp_traps: 3/3, negative_assertions: 3/5, matched: 12/14` (bit-identical from committed cache).
 
 Also inspect:
 - [`ground_truth/base-rd01-v1.1.json`](ground_truth/base-rd01-v1.1.json) — hand-authored ground truth with version history
