@@ -17,7 +17,7 @@ Solo submission to the [Find Evil! hackathon](https://findevil.devpost.com) (Apr
 
 - **Problem:** DFIR agents can produce plausible but unsupported findings.
 - **Solution:** SIFT-Bench evaluates evidence-backed findings, false-positive retractions, negative assertions, and methodology coverage — not keyword matches.
-- **Demo result:** Best run (Run 6) found all 5 critical findings, caught all 3 false-positive traps, and scored 0.9391 on the v0.4 benchmark metric.
+- **Demo result:** Best run (Run 6) found all 5 critical findings, caught all 3 false-positive traps, and scored 0.9833 on the v0.5 benchmark metric.
 - **What to inspect:** [`RESULTS.md`](RESULTS.md), [`ground_truth/base-rd01-v1.1.json`](ground_truth/base-rd01-v1.1.json), [`cases/srl-2018/run6_reports/`](cases/srl-2018/run6_reports/), [`scorer/`](scorer/).
 - **No dataset?** The memory image is not redistributable, but committed run outputs, cached judge verdicts, and unit tests allow full review without it — see [Reviewing without the memory image](#reviewing-without-the-memory-image) below.
 
@@ -91,21 +91,21 @@ The scorer uses an LLM judge for semantic matching, but reruns are deterministic
 
 Benchmark: SANS FOR508 Stark Research Labs case SRL-2018, base-rd01 memory image. Ground truth v1.1: 14 findings (5 critical), 3 false-positive traps, 5 negative assertions.
 
-Scored by **scorer v0.4** (LLM-as-judge semantic matching, `claude-sonnet-4-6`, verdicts cached in `scorer_cache/`). Under v0.4, precision is approximated at 1.0, so scores should be read as **recall-weighted benchmark scores** rather than true F1. Scorer v0.5 (evidence-traceability precision, per-pair fallback) is implemented and pending re-scoring.
+Scored by **scorer v0.5** (LLM-as-judge semantic matching, `claude-sonnet-4-6`, verdicts cached in `scorer_cache/`), which adds real evidence-traceability precision and per-pair fallback matching. The **v0.5 F1** column is the current headline metric; the **v0.4 Score** column is retained alongside it as the prior scorer iteration, for comparison. Under v0.4, precision was approximated at 1.0, so v0.4 numbers read as **recall-weighted benchmark scores** rather than true F1; the remaining columns (recall, critical must-find, FP traps, negative assertions, matched) report the v0.5 re-scoring.
 
-| Run | Config | v0.4 Score | Recall¹ | Critical (must-find) | FP traps | Neg. assertions | Matched |
-|-----|--------|---:|-------:|---------------------:|---------:|----------------:|--------:|
-| 1 | Baseline CLAUDE.md | 0.8704 | 0.7705 | **5/5** | 3/3 | 3/5 | 8/14 |
-| 2 | + `dlllist` + persistence check | 0.8598 | 0.7541 | 4/5 ✗F005 | 2/3 | 3/5 | 10/14 |
-| 3 | + output schema pin | 0.9204 | 0.8525 | **5/5** | 3/3 | 3/5 | 11/14 |
-| 4 | + MCP server (hash_file + yara_scan) | 0.8909 | 0.8033 | **5/5** | 3/3 | 3/5 | 9/14 |
-| 5 | + strengthened MCP prohibitions (gate² failed) | 0.8598 | 0.7541 | 4/5 ✗F003 | 3/3 | 4/5 | 10/14 |
-| 6 | gate met — MCP tools live | **0.9391** | 0.8852 | **5/5** | 3/3 | 3/5 | 11/14 |
+| Run | Config | v0.4 Score | v0.5 F1 | Recall¹ | Critical (must-find) | FP traps | Neg. assertions | Matched |
+|-----|--------|---:|---:|-------:|---------------------:|---------:|----------------:|--------:|
+| 1 | Baseline CLAUDE.md | 0.8704 | 0.8704 | 0.7705 | **5/5** | 3/3 | 3/5 | 8/14 |
+| 2 | + `dlllist` + persistence check | 0.8598 | 0.8598 | 0.7541 | 4/5 ✗F005 | 2/3 | 3/5 | 10/14 |
+| 3 | + output schema pin | 0.9204 | 0.9107 | 0.8361 | **5/5** | 3/3 | 3/5 | 10/14 |
+| 4 | + MCP server (hash_file + yara_scan) | 0.8909 | 0.8909 | 0.8033 | **5/5** | 3/3 | 3/5 | 9/14 |
+| 5 | + strengthened MCP prohibitions (gate² failed) | 0.8598 | 0.8269 | 0.7049 | 4/5 ✗F003 | 3/3 | 4/5 | 9/14 |
+| 6 | gate met — MCP tools live | **0.9391** | **0.9833** | 0.9672 | **5/5** | 3/3 | 3/5 | 12/14 |
 
 ¹ Recall is severity-weighted (critical=4, high=2, medium=1, low=0.5) so it does not increase monotonically with raw matched count.  
 ² **Gate** = the pre-run check confirming Claude Code had loaded the MCP server and could call the enrichment tools. Run 5 gate failed: `.mcp.json` was at the wrong path; server not loaded.
 
-**Best result: Run 6, score = 0.9391** — first run with MCP enrichment tools live end-to-end. All 5 critical findings, all FP traps caught. Post-tuning baseline (N=2, runs 2+3): mean score = 0.890 ± 0.030. See [`RESULTS.md`](RESULTS.md) for full E1–E6 evaluation, run-by-run breakdown, and scorer evolution.
+**Best result: Run 6, v0.5 F1 = 0.9833** (v0.4 score 0.9391 under the prior scorer; the v0.5 gain is recall-driven, with precision now computed = 1.0 rather than stubbed) — first run with MCP enrichment tools live end-to-end. All 5 critical findings, all FP traps caught. Post-tuning baseline (N=2, runs 2+3): mean v0.4 score = 0.890 ± 0.030. See [`RESULTS.md`](RESULTS.md) for full E1–E6 evaluation, run-by-run breakdown, and scorer evolution.
 
 v0.4 scores are lower than v0.3 (0.971 post-tuning mean) because the LLM judge removes false credits that keyword overlap was granting. The lower number is the more honest one.
 
