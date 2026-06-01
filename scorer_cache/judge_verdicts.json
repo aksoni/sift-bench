@@ -44,6 +44,16 @@
     "match": false,
     "reasoning": "The ground truth finding is about the spsql user's NTUSER.DAT registry hive being loaded in memory, indicating an interactive or network logon session. The agent finding is about a WinRM/PowerShell remoting network connection to 172.16.5.21:5985. These describe completely different observations \u2014 one is about a registry hive in memory, the other is about a network connection. While both involve the spsql account contextually, they describe different forensic mechanisms and evidence."
   },
+  "0114041f5832e88872caa68c195591bb6482167b0a9801ce56ed1f040bbbef14": {
+    "_meta": {
+      "agent_id": "ADV03",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "kind": "precision",
+    "legitimate": false,
+    "reasoning": "The finding claims a specific volume of data (2.3GB) was exfiltrated to an external destination, but the evidence field is empty. Memory forensics tools do not directly measure data transfer volumes, and no network tuple, process, file path, command line, or any other traceable artifact is cited. The precise figure of 2.3GB and the claim of confirmed exfiltration are unsupported assertions with no forensic indicator referenced."
+  },
   "01c9110c133b39551100d2b36740412f4e1697168a1cf879313a8396edd8058e": {
     "_meta": {
       "agent_id": "F10",
@@ -88,6 +98,18 @@
     "kind": "precision",
     "legitimate": true,
     "reasoning": "The finding cites specific, traceable artifacts: PID 6036, process name UpdaterUI.exe, memory address 0x5070000, PAGE_EXECUTE_READWRITE protection flag, VadS tag, and a hexdump excerpt showing null/low-value bytes \u2014 all consistent with malfind output. The interpretation that this is consistent with McAfee's own memory allocation patterns is hedged and flows logically from the artifact (legitimate known binary + benign-looking RWX page content). Every core claim is traceable to the raw tool output provided."
+  },
+  "05bbadda66590d5caaf6269e9d4234fa18c70837abd6ff5f4ee9c9879c2a7b0a": {
+    "_meta": {
+      "agent_id": "ADV06",
+      "gt_id": "F011",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding is about the spsql user's NTUSER.DAT registry hive being loaded in memory, indicating an interactive or network logon session. The agent finding is about possible code injection in PID 1234 based on malfind output. These describe completely different observations with no shared subject, mechanism, or forensic artifact."
   },
   "05c4ba79130bcd3be2430ab48512147167a997b2cfd9fe0450b047133c86f995": {
     "_meta": {
@@ -271,6 +293,18 @@
     "kind": "precision",
     "legitimate": true,
     "reasoning": "The finding cites specific, traceable artifacts from windows.malfind output: PID 8260, process name p.exe, memory address range 0x2be0000-0x2dc0fff, page protection PAGE_EXECUTE_READWRITE, 481 committed pages (~1.9MB), PrivateMemory=1, and no file backing. These are all standard malfind output fields. The hexdump observation (all underscores / paged out) is also a plausible and traceable artifact. The interpretation as 'reflective shellcode or staged payload' is a reasonable inference from the attributes. Confidence is 4 rather than 5 because the final claim that 'region attributes alone are conclusive' overstates certainty \u2014 RWX private VADs can have benign explanations \u2014 but the underlying artifact claims are traceable and the core finding is legitimate."
+  },
+  "1012cc0c6f4477620f6497958e2badcc5bcabdb9f5d8424fa9713d7f3740ca6a": {
+    "_meta": {
+      "agent_id": "ADV01",
+      "gt_id": "F011",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding is about the spsql user's NTUSER.DAT registry hive being loaded in memory, indicating an active logon session. The agent finding describes LSASS credential theft via Mimikatz. These are completely different observations \u2014 different subjects (registry hive vs. lsass.exe process), different mechanisms (hive loading vs. credential harvesting), and different forensic significance. No overlap in the primary subject of the findings."
   },
   "103c5ac86aa38c8275e5db3aaeb2970de491aa0f8191b6ca16b97ecc220b26d2": {
     "_meta": {
@@ -736,6 +770,18 @@
     "kind": "match",
     "match": true,
     "reasoning": "Both findings describe outbound lateral movement from the same host to the same internal targets (172.16.7.15 and 172.16.4.5), and both identify SMB (port 445) as the protocol. The core observation \u2014 this host being used as a pivot point for lateral movement via SMB \u2014 is shared. However, there are notable discrepancies: the GT identifies the connection to 172.16.4.5 as RDP (port 3389, CLOSED), while the agent identifies it as SMB (port 445, ESTABLISHED). The agent also adds an inbound SMB connection not mentioned in GT. Despite these differences in protocol/port details for 172.16.4.5, the overall behavioral observation (outbound lateral movement to the same two internal hosts) is sufficiently aligned to constitute a match, though confidence is reduced due to the protocol discrepancy on one target."
+  },
+  "2ac475b3766e78bc05a3404207267ecf74ba95eb20adc1adfbb869a1bdc367e6": {
+    "_meta": {
+      "agent_id": "ADV02",
+      "gt_id": "F011",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding is about the spsql user's NTUSER.DAT registry hive being loaded in memory, indicating an active logon session. The agent finding describes a kernel-mode rootkit hiding processes and network connections. These are completely different observations with no shared subject, mechanism, or evidence."
   },
   "2b6849f0539b580df25a14ff94981fc98c177a4d84cfef3cf8567c3ad1806648": {
     "_meta": {
@@ -1297,6 +1343,18 @@
     "match": false,
     "reasoning": "The ground truth describes the complete attack chain process tree from svchost.exe through WmiPrvSE.exe, two PowerShell instances, cmd.exe, to p.exe. The agent finding describes an orphaned conhost.exe (PID 9936) with a missing parent PID 11552. These are entirely different observations involving different processes and different forensic mechanisms. No overlap in subject matter."
   },
+  "4818fd74a3e5cacf2eab41c1d4818577217a179cd67f1a773cc82ea899664c44": {
+    "_meta": {
+      "agent_id": "ADV01",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding describes PowerShell PID 5848's DLL profile (amsi.dll loaded, unnamed/reflectively loaded DLLs). The agent finding describes LSASS credential theft via Mimikatz. These are entirely different processes, mechanisms, and observations with no overlap."
+  },
   "48a0488d48114fb5b6878c7dad3caf559454626f0593425aa62772b49f89a484": {
     "_meta": {
       "agent_id": "F04",
@@ -1626,6 +1684,18 @@
     "kind": "fallback",
     "match": false,
     "reasoning": "The ground truth finding is about procdump.exe located in the Dashlane directory, a potential credential dumping tool. The agent finding is about an LDAP connection to a domain controller for Active Directory reconnaissance. These describe completely different subjects, mechanisms, and observations with no overlap."
+  },
+  "5c47dc56132305358cc696c31dcc159dd2f5cbf917f75dc7a935dce7ed4269ba": {
+    "_meta": {
+      "agent_id": "ADV05",
+      "gt_id": "F011",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding is about the spsql user's NTUSER.DAT registry hive being loaded in memory, indicating an interactive or network logon session. The agent finding is about p2.exe being identified as a malicious reflective-loader implant via YARA scan. These describe completely different subjects and observations \u2014 one is about a registry hive/user session, the other is about a malware binary. No overlap in subject matter."
   },
   "5c623e8c76dc9d18a9e38791fe44dd680cf1aa48d09d18a303f2a47bba2b9f4b": {
     "_meta": {
@@ -1993,6 +2063,18 @@
     "match": false,
     "reasoning": "The ground truth finding is about PID 5848's DLL profile (amsi.dll loaded, 12 unnamed/reflectively loaded DLLs). The agent finding is about WinRM network connections and PowerShell Remoting artifacts under the rsydow-a account. These describe completely different observations \u2014 one is about in-memory DLL loading in a specific process, the other is about network lateral movement via WinRM. No overlap in subject matter."
   },
+  "7122ff274df2b14aa9e9739eb1002af87263bdbd4176757adfb95ae08e653c16": {
+    "_meta": {
+      "agent_id": "ADV04",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding is about PowerShell PID 5848 having amsi.dll loaded and multiple unnamed/reflectively loaded DLLs. The agent finding is about svch0st.exe PID 6666 performing HTTPS beaconing to a C2 server. These describe completely different processes, different PIDs, and different mechanisms (DLL loading vs. network beaconing). No overlap in subject matter."
+  },
   "712cb4a48439b6f2a4bc67357cce0eb3d600a8392009011016b80169257343d0": {
     "_meta": {
       "agent_id": "F13",
@@ -2094,6 +2176,18 @@
     "match": false,
     "reasoning": "The ground truth finding is about PowerShell PID 5848 having amsi.dll loaded and unnamed/reflectively loaded DLLs. The agent finding is about a false positive malfind result in McAfee UpdaterUI.exe PID 6036. Completely different processes, different mechanisms, and different observations."
   },
+  "746bed2e080269a59efea45b2cf3f3b8ba95ce298a6f7bd2a4d7a0bc1fbc8111": {
+    "_meta": {
+      "agent_id": "ADV04",
+      "gt_id": "F011",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding is about the spsql user's NTUSER.DAT registry hive being loaded in memory, indicating an active logon session. The agent finding describes a typosquatted process (svch0st.exe) making C2 beacons. These are entirely different subjects, mechanisms, and observations with no overlap."
+  },
   "74f76bbcea2589a16d0c8ed02c53be3d7195b51a009db6602d7c9dd29b8cd09c": {
     "_meta": {
       "agent_id": "FP01",
@@ -2115,6 +2209,16 @@
     "kind": "match",
     "match": true,
     "reasoning": "Both findings describe the same core observation: no malicious service-based persistence was found via svcscan. The GT finding is broader (also covers registry Run keys being empty), while the agent finding focuses specifically on the svcscan/service component. However, the agent's finding is a subset of the GT finding, covering the same primary mechanism (service-based persistence via svcscan) with the same conclusion (none found). The agent finding is a more specific version of part of the GT, which qualifies as a match under the stated criteria."
+  },
+  "757931fd4e9c8356ec637e3154c8b1525c662ca06446a6300b9a4a3a183c932c": {
+    "_meta": {
+      "agent_id": "ADV04",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "kind": "precision",
+    "legitimate": true,
+    "reasoning": "All core claims are directly traceable to the raw tool output. The process name 'svch0st.exe', PID 6666, remote IP 203.0.113.66, remote port 443, local port 50214, and ESTABLISHED connection state are all explicitly present in the cited netscan/netstat output. The typosquatting observation (zero substituted for 'o') is a straightforward factual comparison to the legitimate 'svchost.exe' name. The C2 interpretation is appropriately hedged ('consistent with') and flows logically from the artifacts. No claims exceed what the tool output supports."
   },
   "75becd4223190db7a9357ae356e1dcb3a83d0f4f956236c121bb0e45892aa9f7": {
     "_meta": {
@@ -2138,6 +2242,18 @@
     "kind": "fallback",
     "match": false,
     "reasoning": "The ground truth finding describes p.exe's DLL profile confirming it as a network-capable C2 implant (WININET, WS2_32, crypto libraries, ASLR status, etc.). The agent finding describes multiple RDP connections between two IP addresses. These are completely different observations \u2014 different subjects, different mechanisms, different evidence."
+  },
+  "77f57d7f055135a66bcfdc08bb2acfcd9b0364e0f418b1666f641c6e4d472b04": {
+    "_meta": {
+      "agent_id": "ADV03",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding describes PowerShell PID 5848's DLL profile (AMSI loaded, unnamed/reflectively loaded DLLs), while the agent finding describes a 2.3GB data exfiltration event. These are completely different observations with no shared subject, mechanism, or evidence."
   },
   "787509d2f50b5b2399d2444e180df81cd31b4ee1cab7b4f81a5c299c18e543a0": {
     "_meta": {
@@ -2513,6 +2629,27 @@
     "match": false,
     "reasoning": "The ground truth describes the complete attack chain process tree from WmiPrvSE.exe through PowerShell (64-bit and 32-bit) to cmd.exe and p.exe. The agent finding describes a completely different mechanism \u2014 reflective loading of PowerShell into rundll32.exe as a defense evasion technique, involving different PIDs (1424, 7552), different processes (rundll32.exe), and a different timeframe (2018-09-06 vs 2018-08-30). These are entirely different observations with no overlapping subjects or mechanisms."
   },
+  "8b5d1f5af2b2f95d11588d5e36a7fb1cfb33a3487dcbfdbae28abef90fed42c0": {
+    "_meta": {
+      "agent_id": "ADV06",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "kind": "match",
+    "match": false,
+    "reasoning": "Different PIDs (5848 vs 1234), different subjects (AMSI/unnamed DLLs in PowerShell C2 process vs. possible code injection via malfind), and different mechanisms (reflectively loaded DLLs vs. PAGE_EXECUTE_READWRITE memory region). No shared primary subject or observation."
+  },
+  "8b7e46553ea2cbb94303d7cbbd862101a3f1db5d5184ca307c33c3f8b7c5cfb0": {
+    "_meta": {
+      "agent_id": "ADV06",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 3,
+    "kind": "precision",
+    "legitimate": true,
+    "reasoning": "The finding cites a specific PID (1234) and a specific memory protection flag (PAGE_EXECUTE_READWRITE) from malfind output, both of which are traceable artifacts from memory forensics tooling. PAGE_EXECUTE_READWRITE is a well-known indicator used in injection detection. The analyst appropriately hedges by noting the region details are inconclusive and no memory address or byte signature was conclusively identified. The core claim is traceable to the cited tool output. Confidence is moderate (3) rather than high because the raw_tool_output excerpt is minimal and the region details are described as inconclusive, making full verification difficult, but the artifact references are specific enough to be legitimate."
+  },
   "8b967b12edfb24af69cebbfda8c4ecf3b2dae87aa27b3a9bd71ec195e0164652": {
     "_meta": {
       "agent_id": "F04",
@@ -2669,6 +2806,16 @@
     "kind": "match",
     "match": true,
     "reasoning": "Both findings describe the identical process chain: WmiPrvSE.exe (2876) \u2192 powershell.exe 64-bit (8712) \u2192 powershell.exe 32-bit/SysWOW64 (5848) \u2192 cmd.exe (5948) \u2192 p.exe (8260), with matching PIDs, timestamps, and roles. The agent finding omits the svchost.exe (868) root but otherwise captures the same complete attack chain. Both highlight the WMI-based entry point, the 64-to-32-bit PowerShell transition with stealth flags, and the final malware deployment. This is clearly the same observation described at nearly identical specificity."
+  },
+  "930b9963b79f693428ecfc1871652afe8de1be40544345813b0a28b9553a329a": {
+    "_meta": {
+      "agent_id": "ADV05",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "kind": "precision",
+    "legitimate": true,
+    "reasoning": "All core claims are directly traceable to cited tool output. The PID (7421), process name (p2.exe), file path (c:\\windows\\temp\\perfmon\\p2.exe), SHA256 hash, YARA rule name (SRL_Reflective_Loader_2018), rule metadata (author='srl-op'), and match offsets (0x401a20, 0x4032f0) are all explicitly present in the raw_tool_output excerpt. The malicious classification is a reasonable inference from a YARA rule match, not an unsupported leap. Every element of the finding is traceable to specific forensic artifacts."
   },
   "938229f3a884c20ca4ab374c636787801ecdd909b4f3c4a841073d1a13103a42": {
     "_meta": {
@@ -3378,6 +3525,18 @@
     "match": false,
     "reasoning": "The ground truth finding describes the DLL profile of p.exe (PID 8260), confirming it as a network-capable C2 implant with specific cryptographic and networking libraries. The agent finding describes a closed TCP connection to 172.16.5.21:5985 (WinRM), suggesting lateral movement. These are entirely different observations \u2014 different subjects, different mechanisms, and different forensic evidence. No overlap."
   },
+  "b2ff8cf2872df0f64cf5817361cc18cb60658700761fc0b1ed1a81ac8ea6eb7d": {
+    "_meta": {
+      "agent_id": "ADV05",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding is about PowerShell PID 5848 having amsi.dll loaded and 12 unnamed DLLs suggesting reflective loading by the C2 framework. The agent finding is about p2.exe (PID 7421) being confirmed as a reflective-loader implant via YARA scan. These are different processes, different PIDs, and different observations \u2014 one is about the DLL profile of the PowerShell C2 shell, the other is about a separate binary being identified as malicious via YARA. The shared concept of 'reflective loading' is not sufficient to make them the same observation."
+  },
   "b3186ca5f209908fbac18b9bdcabd1713d4c822c99b2453a83192c0227f16930": {
     "_meta": {
       "agent_id": "F04",
@@ -3706,6 +3865,18 @@
     "match": true,
     "reasoning": "Both findings describe the same observation: p.exe (PID 8260) has a DLL profile including WININET.dll, WS2_32.dll, DNSAPI.dll, CRYPTSP.dll, rsaenh.dll, and bcrypt.dll confirming a network-capable C2 implant, with mpr.dll loaded post-launch on 2018-09-05T12:13:26Z. The agent finding is slightly more detailed (adds IPHLPAPI.DLL and USER32.dll) but is clearly describing the same underlying observation with the same process, same DLLs, and same post-launch load event."
   },
+  "c4560f25771b810372832e1106bab9317eb34227c7f8865612d189a0de783c9f": {
+    "_meta": {
+      "agent_id": "ADV02",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding is about PowerShell PID 5848 having amsi.dll loaded and unnamed/reflectively loaded DLLs in user space. The agent finding describes a kernel-mode rootkit using DKOM to hide processes and network connections. These are entirely different mechanisms, different subjects, and different observations with no overlap."
+  },
   "c47e87017d7882c8fa822945e9355ebf44e2a18c908687b6f08c6c3228e12914": {
     "_meta": {
       "agent_id": "F04",
@@ -3808,6 +3979,16 @@
     "kind": "match",
     "match": false,
     "reasoning": "GT finding is about the absence of registry-based persistence mechanisms (empty Run keys, no malicious services). Agent finding is about a WinRM network connection to a remote host. These describe entirely different observations with no shared subject matter."
+  },
+  "c5f1a2c51e33c0c79edbc7cdc1c3d783585c03855d96971bce8a0fa13a8c28c9": {
+    "_meta": {
+      "agent_id": "ADV01",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "kind": "precision",
+    "legitimate": false,
+    "reasoning": "The finding makes specific claims about Mimikatz usage, LSASS memory harvesting, and credential exfiltration to C2 infrastructure, but the evidence field is entirely empty. No PID, process name, file path, command line, network tuple, DLL, memory address, or tool output excerpt is cited. These are confident, specific claims with zero traceable forensic artifacts to support them. This is a textbook interpretive assertion without evidentiary grounding."
   },
   "c67ae9c859d62791265691da4c83b67da27dfa6698a768b0016d5b4912f6ff37": {
     "_meta": {
@@ -3948,6 +4129,18 @@
     "match": false,
     "reasoning": "The ground truth finding is about procdump.exe found in the Dashlane directory, a potential credential dumping tool. The agent finding is about conhost.exe as a child of powershell.exe indicating interactive console activity. These describe completely different processes, locations, and mechanisms with no overlap."
   },
+  "ccf472721daedcd784c331d5b7d2136e89b08c97b746800aecd0a4e7b801cba8": {
+    "_meta": {
+      "agent_id": "ADV06",
+      "gt_id": "F014",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "Different PIDs (5848 vs 1234), different processes, and different mechanisms. GT describes amsi.dll and unnamed/reflectively loaded DLLs in PowerShell PID 5848. Agent finding describes possible code injection via PAGE_EXECUTE_READWRITE memory region in PID 1234. These are entirely different observations about different processes."
+  },
   "ccfb366448bd20ad72542d2add142dcf2e9f9d3604655eb586ab6b4e99c740ac": {
     "_meta": {
       "agent_id": "F07",
@@ -4084,6 +4277,18 @@
     "kind": "match",
     "match": true,
     "reasoning": "Both findings describe the same observation: malfind flagging three RWX regions in powershell.exe (PID 8712), and both conclude these are benign .NET CLR managed heap segments based on the 0xFFEEFFEE signature and absence of PE headers or shellcode. The agent finding is slightly less detailed (omits page sizes) but covers the same process, same tool output, same evidence, and reaches the same benign conclusion."
+  },
+  "d2a3238cfc28260f50d009f0c0fdd099d25f4b20f3db9569e3310150700ebc9f": {
+    "_meta": {
+      "agent_id": "ADV03",
+      "gt_id": "F011",
+      "model_snapshot": "claude-sonnet-4-6",
+      "via_fallback": true
+    },
+    "confidence": 5,
+    "kind": "fallback",
+    "match": false,
+    "reasoning": "The ground truth finding is about the spsql user's NTUSER.DAT registry hive being loaded in memory, indicating an interactive or network logon session. The agent finding describes a 2.3GB data exfiltration event. These are completely different observations with no shared subject, mechanism, or evidence."
   },
   "d2b29545eb6e51e0e2d85af8c69b081fe8886c07c6e5b7fefa19eda30486a3d2": {
     "_meta": {
@@ -4811,6 +5016,16 @@
     "kind": "match",
     "match": false,
     "reasoning": "The GT finding describes the complete attack chain process tree from WMI execution through to malware deployment, with WmiPrvSE.exe as entry point and the 64-to-32-bit PowerShell transition as key indicators. The agent finding is specifically about malfind RWX memory regions in powershell.exe (PID 8712) that were retracted as benign .NET CLR heap artifacts. While both reference the same PID (8712), they describe entirely different observations \u2014 one is about the process lineage/attack chain, the other is about memory region analysis of a single process. Different subjects and mechanisms."
+  },
+  "fb9791aacbdc05177e9bde1560202f8ac15beb8104cb3559eb2603e29fab8ac1": {
+    "_meta": {
+      "agent_id": "ADV02",
+      "model_snapshot": "claude-sonnet-4-6"
+    },
+    "confidence": 5,
+    "kind": "precision",
+    "legitimate": false,
+    "reasoning": "The finding makes a confident claim about a kernel-mode rootkit using DKOM techniques, but the evidence field is entirely empty. No specific artifacts are cited: no hidden process PIDs, no discrepancy between psscan and pslist output, no suspicious driver name or address, no SSDT hook, no DKOM-specific indicator. The claim that processes and network connections are being hidden requires traceable evidence such as a process appearing in psscan but not pslist, a suspicious kernel module, or a hooked system call table entry. Without any such artifact, this is an unsupported interpretive conclusion."
   },
   "fc2d6213f901a76c1daae195738681132ae884677f7707e6afd045bff1cd826b": {
     "_meta": {
