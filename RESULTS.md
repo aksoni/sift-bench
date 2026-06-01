@@ -91,6 +91,88 @@ v0.4's frozen cache on borderline pairs.
   way it is not a methodology regression: no critical finding or FP-trap outcome changes. Per-finding
   verdicts are in `analysis/v05_rescoring/run{N}_score.json`.
 
+### Adversarial precision calibration: is precision=1.0 a metric or a stub?
+
+Across all six agent runs, `weighted_precision = 1.0` and `count_fp = 0`. A value that
+never varies has no demonstrated discriminative power on its own — a computed 1.0 is
+observationally indistinguishable from the v0.4 hardcoded stub it replaced. To
+establish that the v0.5 precision pass is a live, discriminating metric rather than an
+inert one, we ran a pre-registered adversarial calibration
+(`design/scorer-v0.5-adversarial.md`, committed before the adversarial findings file
+was authored).
+
+**Method.** Run 6's real findings file (17 findings: 12 matched + 5 legitimately
+unmatched) was used as the base, with recall held as a control. Six fabricated
+findings were appended, graded into three tiers, each with a verdict predicted *before*
+scoring:
+
+- **Tier A — artifact-free conclusions (3):** malware/exfil/rootkit claims with empty
+  evidence, no PID/path/IP/hash/tool-output cited. Predicted: caught as false positive.
+- **Tier B — fabricated-but-cited (2):** internally coherent findings citing plausible
+  but entirely invented specifics (a fake PID + unroutable IP; a fake hash + fake YARA
+  match). Predicted: scored legitimate and passed through, because the judge is
+  image-blind and cannot verify cited artifacts against the image.
+- **Tier C — borderline (1):** a hedged injection claim citing a PID but no memory
+  address or byte signature. Predicted: hedged to uncertain (dropped from denominator).
+
+**Result — zero deviations from the pre-registration.**
+
+| Metric | Pre-registered | Observed |
+|---|---|---|
+| weighted_recall (control) | 0.9672 (must hold) | 0.9672 ✓ |
+| weighted_precision | 0.80 = 12/(12+3) | 0.80 ✓ |
+| count_fp | 3 (Tier A) | 3 ✓ |
+| count_legit_unmatched | 7 (5 real + 2 Tier-B) | 7 ✓ |
+| count_uncertain | 1 (Tier C) | 1 ✓ |
+
+Recall held exactly, confirming the injection did not disturb the match pass and the
+run is valid. Every per-tier verdict matched its prediction: Tier A → `legitimate=false`
+at confidence 5 (false positive); Tier B → `legitimate=true` at confidence 5 (dropped);
+Tier C → confidence 3 (uncertain, dropped).
+
+**What this establishes.**
+
+1. **Precision is live, not stubbed.** The metric drops to 0.80 when findings assert
+   conclusions with no traceable evidence. The 1.0 on the six real runs is therefore a
+   *computed, discriminating* result — the real findings are evidence-grounded — not a
+   carried-over stub.
+
+2. **The metric catches for the right reason.** Tier A was flagged specifically on
+   empty evidence ("no traceable artifact"), and the judge volunteered a domain-correct
+   rationale on the exfiltration claim — that memory forensics tools do not directly
+   measure data transfer volumes. The verdict reflects evidence-tracing, not surface
+   pattern-matching on what "looks fake."
+
+3. **The ceiling is characterized, not hidden.** Tier B passed through exactly as
+   predicted: coherent fabrications with cited (but invented) specifics read as
+   traceable, because the precision judge sees only the finding's self-reported
+   evidence and cannot check a cited PID, IP, or hash against the memory image. This is
+   the documented LLM-as-enricher failure mode — an internally coherent claim that
+   collapses only against external ground truth the model does not possess (cf. Carrier,
+   *DFIR+AI Primer: How to Combat Hallucinations*, 2026, on a model asserting a hostname
+   it could not source). **The benchmark measures evidence *traceability*, not evidence
+   *truth*** — and this run defines that boundary precisely.
+
+4. **Two complementary detection layers.** The strict findings validator independently
+   rejects all three Tier-A fabrications by structure (a CONFIRMED finding with empty
+   `tool_attribution` fails strict validation) before the judge is invoked. The judge
+   then catches the same class by evidence-tracing in permissive mode. Tier B passes
+   both layers and is the residual that neither a structural schema check nor an
+   image-blind LLM judge can catch. This mirrors the deterministic-check vs.
+   judging-LLM distinction in the hallucination literature.
+
+**The harden-it direction (future work, out of scope for this submission).** The
+residual Tier-B class is closable only by a structurally different mechanism: a
+deterministic query-for-item-existence pass that checks every cited PID / path / IP /
+hash against the run's actual tool output or the image — Carrier's verification method
+#1, distinct from the LLM-judge approach. This is recorded as the v-next direction; it
+is not a prompt refinement but a different verification layer, and it is deliberately
+not in the June 15 scope.
+
+**Reproducibility.** The adversarial findings file, the score JSON, and the
+freshly-generated judge verdicts are committed; the result reproduces from the cache
+without an API key, identically to the six agent runs.
+
 ---
 
 ## Headline (v0.4)
