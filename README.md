@@ -41,7 +41,7 @@ Most agentic DFIR demos run an agent and show the output. SIFT-Bench does three 
 
 Three-phase workflow defined in [`CLAUDE.md`](CLAUDE.md):
 
-1. **INVESTIGATE + ENRICH** — nine-step Volatility 3 methodology (psscan → pstree → cmdline → netscan → malfind → filescan → getsids → dlllist → registry/svcscan persistence check), with inline YARA scanning and file hashing via MCP tools when available.
+1. **INVESTIGATE + ENRICH** — nine-step Volatility 3 methodology (psscan → pstree → cmdline → netscan → malfind → filescan → getsids → dlllist → registry/svcscan persistence check), with YARA scanning and file hashing routed through MCP tools rather than ad hoc inline commands when the MCP gate is met.
 
 2. **SELF-CORRECT** — evidence audit (every finding must cite tool output), methodology check, consistency check, false-positive review against known patterns. Pre-correction findings saved before any changes.
 
@@ -109,6 +109,8 @@ Scored by **scorer v0.5** (LLM-as-judge semantic matching, `claude-sonnet-4-6`, 
 
 v0.4 scores are lower than v0.3 (0.971 post-tuning mean) because the LLM judge removes false credits that keyword overlap was granting. The lower number is the more honest one.
 
+Precision is 1.0 on all six real runs because the v0.5 judge found zero illegitimate unmatched findings. A pre-registered adversarial calibration that injected three artifact-free fabricated findings dropped precision to exactly **0.80**, confirming the precision judge penalizes unsupported claims rather than rubber-stamping them. Details in [`RESULTS.md`](RESULTS.md) and `design/scorer-v0.5-adversarial.md`.
+
 ---
 
 ## Reviewing without the memory image
@@ -116,6 +118,9 @@ v0.4 scores are lower than v0.3 (0.971 post-tuning mean) because the LLM judge r
 The SANS FOR508 SRL-2018 image is not redistributable. You can still review the benchmark without it:
 
 ```bash
+# Install dependencies (anthropic + jsonschema; no API key needed for cached reruns)
+python -m pip install -r requirements.txt
+
 # Re-score the best run from committed cache (no API key needed)
 python scorer.py \
   ground_truth/base-rd01-v1.1.json \
@@ -247,7 +252,7 @@ The judge verdict cache (`scorer_cache/judge_verdicts.json`) is committed to the
 
 - **F010 reclassification** was resolved via hexdump evidence review confirming the 0xFFEEFFEE .NET CLR heap signature, not AI inference.
 
-- **The scorer has been iterated four times** during development: v0.1 → v0.2 fixed double-matching, v0.2 → v0.3 fixed hash-seed nondeterminism, v0.3 → v0.4 replaced keyword overlap with LLM-as-judge for principled semantic matching. See [`RESULTS.md`](RESULTS.md) for the full evolution.
+- **The scorer has been iterated four times** during development: v0.1 → v0.2 fixed double-matching, v0.2 → v0.3 fixed hash-seed nondeterminism, v0.3 → v0.4 replaced keyword overlap with LLM-as-judge semantic matching, and v0.4 → v0.5 added evidence-traceability precision, per-pair fallback matching, and content-addressed cache keys. See [`RESULTS.md`](RESULTS.md) for the full evolution.
 
 - **Variance across runs is treated as signal, not noise.** Stable behaviors (all 5 critical findings, Outlook/CLR retractions, core attack chain) form the backbone of the demo. Unstable behaviors (which exact FPs get caught run-to-run) are reported with mean ± stdev. See [`RESULTS.md`](RESULTS.md) for the full breakdown.
 
@@ -256,11 +261,12 @@ The judge verdict cache (`scorer_cache/judge_verdicts.json`) is committed to the
 ## Known limitations
 
 - **Restricted evidence image:** The SRL-2018 memory image is not redistributed. Reviewers can inspect committed run outputs and rerun the scorer using cached judge verdicts without it.
-- **v0.4 precision approximation:** Scorer v0.4 approximates precision at 1.0, so v0.4 scores are recall-weighted benchmark scores, not true F1. Scorer v0.5 (now the active scorer; all six runs re-scored 2026-05-29) adds evidence-traceability precision via LLM judge.
+- **v0.4 precision approximation:** Scorer v0.4 approximated precision at 1.0, so v0.4 scores are recall-weighted benchmark scores, not true F1. Scorer v0.5 is now the active scorer and computes evidence-traceability precision; all six runs have been re-scored (2026-05-29).
+- **Precision measures traceability, not full artifact truth:** v0.5 penalizes unsupported findings — a pre-registered adversarial calibration that injected three artifact-free fabrications dropped precision to 0.80 exactly as predicted — but it does not yet deterministically verify that every cited artifact exists in the original image. Coherent fabrications citing invented-but-traceable specifics can pass; a cited-artifact existence check is future work. See [`RESULTS.md`](RESULTS.md).
 - **Stable miss — F011** (`spsql` NTUSER.DAT loaded in memory): missed across all runs. No methodology step explicitly checks loaded user hives. Recoverable with an additional `windows.registry.hivescan` step.
 - **Small sample size:** Post-tuning variance is based on N=2 runs; larger N would provide tighter confidence intervals (currently σ = 0.030).
 - **Single case:** The benchmark has one hand-authored case. The design supports additional cases; they are not yet included.
-- **K=3 pre-filter ceiling:** If the correct agent finding ranks below 3rd by keyword overlap, the judge never evaluates it. One likely instance identified in Run 6 (GT F006 scoring artifact).
+- **Keyword pre-filter ceiling:** The scorer uses a keyword pre-filter (top-K candidates) before LLM judging; if the correct agent finding is not surfaced as a candidate, the judge cannot recover it. Run 3's F006 miss is the clearest remaining example. A separate Run 6 F006 miss under v0.4 was later diagnosed as a cache-key collision (not a pre-filter ceiling) and is fixed in v0.5 by content-addressed cache keys.
 
 ---
 
