@@ -105,7 +105,7 @@ Scored by **scorer v0.5** (LLM-as-judge semantic matching, `claude-sonnet-4-6`, 
 ¹ Recall is severity-weighted (critical=4, high=2, medium=1, low=0.5) so it does not increase monotonically with raw matched count.  
 ² **Gate** = the pre-run check confirming Claude Code had loaded the MCP server and could call the enrichment tools. Run 5 gate failed: `.mcp.json` was at the wrong path; server not loaded.
 
-**Best result: Run 6, v0.5 F1 = 0.9833** (v0.4 score 0.9391 under the prior scorer; the v0.5 gain is recall-driven, with precision now computed = 1.0 rather than stubbed) — first run with MCP enrichment tools live end-to-end. All 5 critical findings, all FP traps caught. Post-tuning baseline (N=2, runs 2+3): mean v0.4 score = 0.890 ± 0.030. See [`RESULTS.md`](RESULTS.md) for full E1–E6 evaluation, run-by-run breakdown, and scorer evolution.
+**Best result: Run 6, v0.5 F1 = 0.9833** (v0.4 score 0.9391 under the prior scorer; the v0.5 gain is recall-driven, with precision now computed = 1.0 rather than stubbed — calibrated, see [`RESULTS.md`](RESULTS.md) and `design/scorer-v0.5-adversarial.md`) — first run with MCP enrichment tools live end-to-end. All 5 critical findings, all FP traps caught. Post-tuning baseline (N=2, runs 2+3): mean v0.4 score = 0.890 ± 0.030. See [`RESULTS.md`](RESULTS.md) for full E1–E6 evaluation, run-by-run breakdown, and scorer evolution.
 
 v0.4 scores are lower than v0.3 (0.971 post-tuning mean) because the LLM judge removes false credits that keyword overlap was granting. The lower number is the more honest one.
 
@@ -125,7 +125,7 @@ python scorer.py \
 python -m unittest discover -s tests
 ```
 
-Expected score for the run6 command: `weighted_f1: 0.9833, recall: 0.9672, precision: 1.0, critical: 5/5, fp_traps: 3/3, negative_assertions: 3/5, matched: 12/14` (bit-identical from committed cache).
+Expected score for the run6 command: `weighted_f1: 0.9833, recall: 0.9672, precision: 1.0, critical: 5/5, fp_traps: 3/3, negative_assertions: 3/5, matched: 12/14` (bit-identical from committed cache; `precision: 1.0` is calibrated, not a stub — see RESULTS.md).
 
 Also inspect:
 - [`ground_truth/base-rd01-v1.1.json`](ground_truth/base-rd01-v1.1.json) — hand-authored ground truth with version history
