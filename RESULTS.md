@@ -486,7 +486,7 @@ re-committed for key-free reproduction.
 
 ## Known limitations
 
-- **v0.4 precision approximation.** Precision is approximated at 1.0 under v0.4; v0.4 scores are recall-weighted benchmark scores, not true F1. Scorer v0.5 (implemented; pending re-scoring) adds evidence-traceability precision.
+- **v0.4 precision approximation.** Precision is approximated at 1.0 under v0.4; v0.4 scores are recall-weighted benchmark scores, not true F1. Scorer v0.5 (active; all 6 runs re-scored 2026-05-29 and adversarially calibrated) adds evidence-traceability precision.
 - **K=3 pre-filter ceiling.** If the correct agent finding ranks below 3rd by keyword overlap, the judge never sees it. This remains a genuine architectural constraint (Run 3 GT F006 is a real agent gap the pre-filter cannot rescue). Note: Run 6 GT F006 was **previously misattributed** to this ceiling — it was actually a v0.4 cache-key collision (agent F06 ranked 1st). See "F006 correction."
 - **N=2 post-tuning runs, single case.** Sufficient to characterize agent behavior on this image; generalization to other cases is a stretch goal. N=2 gives σ = 0.030 for the post-tuning mean.
 - **Near-determinism caveat.** `temperature=0` is near-deterministic, not bit-identical at the model level. The committed cache makes *reruns* bit-identical; first scoring of a new pair is subject to small floating-point variation in inference.
