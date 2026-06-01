@@ -6,7 +6,7 @@
 
 **Current scorer:** v0.5 — LLM-as-judge match gating + **real evidence-traceability precision** + per-pair fallback + content-addressed cache keys. All 6 runs re-scored 2026-05-29 (see "v0.5 re-scoring" below). v0.4 and v0.3 numbers retained for comparison. The v0.4 → v0.5 change also corrects the Run 6 F006 misdiagnosis (cache-key collision, not K=3 keyword competition — see "F006 correction" below).
 
-**Metric note (v0.5):** Precision is now *computed* via an evidence-traceability judge rather than stubbed. It came out **1.0 for all six runs** because the judge found zero illegitimate unclaimed findings — every unclaimed agent finding was either evidence-supported-but-out-of-GT-scope ("legit-unmatched") or below the confidence-4 bar ("uncertain"). So `weighted_f1` still tracks severity-weighted recall in practice, but the 1.0 precision is now substantiated, not assumed. Precision is count-based while recall is severity-weighted, so `weighted_f1` is a documented asymmetric hybrid, not a single-scheme F1.
+**Metric note (v0.5):** Precision is now *computed* via an evidence-traceability judge rather than stubbed. It came out **1.0 for all six runs** because the judge found zero illegitimate unclaimed findings — every unclaimed agent finding was either evidence-supported-but-out-of-GT-scope ("legit-unmatched") or below the confidence-4 bar ("uncertain"). So `weighted_f1` still tracks severity-weighted recall in practice, but the 1.0 precision is now substantiated by the adversarial calibration run (see "Adversarial precision calibration" below), not assumed. Precision is count-based while recall is severity-weighted, so `weighted_f1` is a documented asymmetric hybrid, not a single-scheme F1.
 
 ---
 
@@ -30,7 +30,7 @@ key-free reproduction. Full prediction evaluation in `analysis/v05_rescoring/pre
 | 6   | gate met — MCP tools live | **0.9833** | 0.9672 | 1.0000 | **5/5** | 3/3 | 12/14 | ✓ primary |
 
 ¹ Severity-weighted (critical=4, high=2, medium=1, low=0.5); total GT weight = 30.5.
-² Count-based evidence-traceability precision (computed, not stubbed). `count_fp = 0` for all runs.
+² Count-based evidence-traceability precision (computed, not stubbed; see "Adversarial precision calibration"). `count_fp = 0` for all runs.
 
 Each row passed two internal consistency checks: `count_tp + count_fp + legit-unmatched + uncertain
 == agent_finding_count`, and `Σ(matched severity weights) == weighted_tp`.
@@ -38,14 +38,18 @@ Each row passed two internal consistency checks: `count_tp + count_fp + legit-un
 ### Headline (v0.5)
 
 **Run 6 (best config — MCP tools live, gate verified): F1 = 0.9833, recall = 0.9672, precision = 1.0,
-5/5 critical, 3/3 FP traps, 12/14 matched.** GT F006 recovers at the **primary** pass once the v0.4
+5/5 critical, 3/3 FP traps, 12/14 matched.** (Precision = 1.0 is calibrated, not stubbed — see "Adversarial precision calibration" below.) GT F006 recovers at the **primary** pass once the v0.4
 cache-key collision is removed. Post-tuning runs (2+3) mean F1 = 0.885, recall = 0.795.
 
 The defining v0.5 finding is that **real precision = 1.0 for every run** (`count_fp = 0` throughout):
 the precision judge never found an illegitimate unclaimed finding. The agent's "extra" findings
 (beyond the 14-item GT) consistently cite verifiable artifacts — they are out-of-GT-scope, not
 hallucinated. The v0.4 precision stub of 1.0 turns out to have been coincidentally correct; v0.5
-substantiates it.
+substantiates it: the pre-registered adversarial calibration (see "Adversarial precision calibration"
+below; `design/scorer-v0.5-adversarial.md`) drives precision to **0.80** on artifact-free fabrications
+with **zero deviation** from the locked prediction, while recall holds at 0.9672 — establishing the
+metric as live and discriminating. The real runs score 1.0 because their findings are
+evidence-grounded, not because the value is stubbed.
 
 ### Pre-registered predictions E1–E4
 
@@ -460,7 +464,7 @@ The design commit locked expected verdicts for the three failure-mode pairs *bef
 pre-registered in `design/scorer-v0.5.md`. (1) *Real precision* — the v0.4 precision stub (hardcoded
 1.0) is replaced by an evidence-traceability judge that asks, per unclaimed agent finding, whether it
 cites verifiable artifacts; `precision = count_tp / (count_tp + count_fp)`. On this dataset
-`count_fp = 0` for all runs, so precision computes to 1.0 — the stub's value, now substantiated. (2)
+`count_fp = 0` for all runs, so precision computes to 1.0 — the stub's value, now substantiated by the adversarial calibration (see "Adversarial precision calibration"). (2)
 *Per-pair fallback* — unmatched GT findings get a second judge pass over all unclaimed agent findings;
 no recovery on the current 6 runs (insurance for future cases). (3) *Content-addressed cache keys* —
 keys hash finding *content* (`sha256(json.dumps(finding, sort_keys=True))`) with `match`/`fallback`/
