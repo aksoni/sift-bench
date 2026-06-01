@@ -5,6 +5,8 @@
 **Scope:** A single adversarial scoring run that injects deliberately-constructed fabricated findings into a known-good findings file to test whether the v0.5 evidence-traceability precision metric can drop below 1.0, and to characterize precisely which fabrications it can and cannot detect.
 **Frozen, do not touch:** `scorer/` (v0.5 ships as-is), the six committed run score JSONs, `scorer_cache/judge_verdicts.json` (the adversarial verdicts append; they do not modify existing entries).
 
+**Pre-registration correction (2026-06-01, before any verdict observed):** The Run 6 base file is **17 real findings** (12 matched recall-control + 5 legitimately-unmatched), not 12 as written below in places — the 5 extras already land in `count_legit_unmatched` (dropped from the precision denominator), so the recall control (0.9672) and the **0.80 precision prediction are both unchanged** (`12 / (12 + 3)` still holds). Scoring is run **permissive** (the mode `score()` uses) so the fabrications reach the precision judge; the strict validator's independent rejection of the Tier-A artifact-free CONFIRMED findings (`CONFIRMED → tool_attribution non-empty`) is reported as a **complementary deterministic layer**, not a substitute for the judge test.
+
 ---
 
 ## Why this run exists
