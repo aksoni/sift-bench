@@ -39,6 +39,11 @@ Most agentic DFIR demos run an agent and show the output. SIFT-Bench does three 
 
 ## Architecture
 
+> **Architecture & trust boundaries (Criterion 4): see [`ARCHITECTURE.md`](ARCHITECTURE.md)** — the
+> architectural patterns, the inherited-vs-built provenance boundary, the three trust boundaries,
+> and the prompt-based vs. architectural guardrail distinction (including the documented Run 4
+> bypass and which enforcement layer actually closed it).
+
 Three-phase workflow defined in [`CLAUDE.md`](CLAUDE.md):
 
 1. **INVESTIGATE + ENRICH** — nine-step Volatility 3 methodology (psscan → pstree → cmdline → netscan → malfind → filescan → getsids → dlllist → registry/svcscan persistence check), with YARA scanning and file hashing routed through MCP tools rather than ad hoc inline commands when the MCP gate is met.
