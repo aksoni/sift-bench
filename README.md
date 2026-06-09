@@ -132,6 +132,8 @@ python -m unittest discover -s tests
 
 Expected score for the run6 command: `weighted_f1: 0.9833, recall: 0.9672, precision: 1.0, critical: 5/5, fp_traps: 3/3, negative_assertions: 3/5, matched: 12/14` (bit-identical from committed cache; `precision: 1.0` is calibrated, not a stub — see RESULTS.md).
 
+These three steps were verified from a clean `python:3.12-slim` container on 2026-06-09 — full transcript in [`analysis/clean-vm-dryrun-2026-06-09.log`](analysis/clean-vm-dryrun-2026-06-09.log) (no API key present; both numbers reproduced from cache; 94 tests pass).
+
 Also inspect:
 - [`ground_truth/base-rd01-v1.1.json`](ground_truth/base-rd01-v1.1.json) — hand-authored ground truth with version history
 - [`cases/srl-2018/run6_reports/`](cases/srl-2018/run6_reports/) — best run investigative narrative and structured findings
