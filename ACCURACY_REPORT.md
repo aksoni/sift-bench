@@ -187,8 +187,9 @@ This was caught at scoring, disclosed in `RESULTS.md` (all of R4-E1/E2/E3 marked
 drove the next two runs: Run 5 strengthened the `CLAUDE.md` prohibitions (and surfaced a *second*
 failure — the `.mcp.json` was at the wrong path, so the server never loaded — itself disclosed
 rather than quietly fixed); Run 6 corrected the path and met E1/E2/E3, with both malware-class
-hashes finally MCP-attributed. The bypass is not an embarrassment buried in an appendix — it is
-the reason the architectural layer below exists.
+hashes finally MCP-attributed — a *prompt-level* fix (stronger prohibitions + the gate), not an
+architectural one. The bypass is not an embarrassment buried in an appendix — it is what motivated
+the layered enforcement model below, and the honest accounting of which layer actually closed it.
 
 ### The two layers
 
@@ -201,7 +202,9 @@ the reason the architectural layer below exists.
 **Layer 2 — architectural (does not depend on the agent cooperating).**
 - **Typed MCP tools instead of arbitrary shell.** `mcp__hash_file` / `mcp__yara_scan` expose a
   narrow, attributable surface; their output lands in `tool_attribution` with the MCP source
-  named, which is precisely what made the Run 4 bypass *detectable* in the first place.
+  named. The cooperation-independent property here is *attribution/detection* — the record is made
+  whichever path is used, which is precisely what made the Run 4 bypass *detectable*. It does
+  **not** force the agent to route through the server; that remains the Layer-1 prohibition.
 - **`tool_executor.py` — a subprocess guardrail** (`design/tool-executor-v1.md`): a stem-based
   command allowlist; `shell=False` enforced unconditionally (caller cannot re-enable it);
   evidence-directory writes blocked via `os.path.realpath()` (defeats symlink bypass) with
@@ -213,6 +216,16 @@ the reason the architectural layer below exists.
 - **Findings validator** (`scorer/validate_findings.py`): a pre-flight schema gate that enforces,
   among other rules, `CONFIRMED → tool_attribution` non-empty — a CONFIRMED finding with no
   cited tool is rejected before scoring.
+
+**Which layer actually closed Run 4 — stated plainly.** Enrichment *routing* (MCP vs. inline) is a
+**Layer-1 / prompt-based** control, not Layer 2. The typed MCP surface (Layer 2) provided
+*detection*; the Run 6 *prevention* was stronger prompting plus the gate — still prompt-level.
+`tool_executor.py` enforces a *different* boundary (evidence-read-only / safe shell): `python3` and
+the hash utilities are on its allowlist, so it would not, by itself, have blocked the inline
+computation. Forcing MCP as the only enrichment route is honest future work, not yet built. Net:
+**evidence integrity is architecturally enforced; enrichment routing is prompt-enforced** — with a
+documented failure (Run 4), a working prompt-level mitigation (Run 6), and a named, unbuilt
+architectural fix. This matches `ARCHITECTURE.md`.
 
 ### Honest scope note
 
