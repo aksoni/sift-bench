@@ -42,6 +42,13 @@ credentials/
 **/tmp/
 **/.tmp/
 
+# Ingest-check scratch dir (raw memory dumps + tool output; not a run snapshot)
+/cases/_ingest_check/
+
+# Stop-hook heartbeat log: a Claude Code Stop hook appends an (empty) timestamp
+# line on every session stop. Pure churn, no forensic content — untracked.
+analysis/forensic_audit.log
+
 # Backup files from earlier doc iterations
 *.run1
 *.run2
