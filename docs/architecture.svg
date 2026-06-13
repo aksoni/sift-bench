@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="1266" viewBox="0 0 980 1266" font-family="'DejaVu Sans Mono','Menlo','Consolas',monospace">
+  <rect x="0" y="0" width="980" height="1266" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="40" y="30" font-family="'DejaVu Sans','Helvetica',sans-serif" font-size="19" font-weight="bold" fill="#111">SIFT-Bench — Architecture &amp; Trust Boundaries</text>
+  <text x="40" y="50" font-family="'DejaVu Sans','Helvetica',sans-serif" font-size="13" font-weight="bold" fill="#111">Thesis: evidence integrity is <tspan fill="#1a7f37">architecturally enforced</tspan> <tspan fill="#1a7f37">[A]</tspan> — enrichment routing is <tspan fill="#bf8700">prompt-enforced</tspan> <tspan fill="#bf8700">[P]</tspan>.</text>
+
+  <!-- Legend -->
+  <rect x="40" y="62" width="900" height="124" rx="6" fill="#f6f7f9" stroke="#888"/>
+  <text x="55" y="82" font-size="12.5" font-weight="bold" fill="#111">LEGEND</text>
+  <rect x="55" y="92" width="14" height="14" rx="2" fill="#bf8700"/>
+  <text x="75" y="103" font-size="12" fill="#222"><tspan font-weight="bold">[P] prompt-based guardrail</tspan>  — enforced by instruction; the model CAN ignore it</text>
+  <rect x="55" y="110" width="14" height="14" rx="2" fill="#1a7f37"/>
+  <text x="75" y="121" font-size="12" fill="#222"><tspan font-weight="bold">[A] architectural guardrail</tspan> — enforced by construction; the model CANNOT bypass it</text>
+  <rect x="55" y="128" width="14" height="14" rx="2" fill="#8250df"/>
+  <text x="75" y="139" font-size="12" fill="#222"><tspan font-weight="bold">[*] mixed boundary</tspan> — the typed surface is [A]; routing to it is [P]</text>
+  <text x="55" y="157" font-size="12" fill="#222"><tspan font-weight="bold">«base»</tspan> inherited from Protocol SIFT (teamdfir installer)    <tspan font-weight="bold">«ext»</tspan> my authorship</text>
+  <text x="55" y="175" font-size="12" fill="#222"><tspan fill="#c0392b" font-weight="bold">═════</tspan> trust boundary    "(NOT in Run 1-6 path)" = forward-looking guardrail</text>
+
+  <!-- EVIDENCE -->
+  <rect x="40" y="200" width="900" height="44" rx="6" fill="#eef2f7" stroke="#444"/>
+  <text x="280" y="227" font-size="13" fill="#111" xml:space="preserve"><tspan font-weight="bold">EVIDENCE</tspan>    base-rd01-memory.img    (SANS FOR508 SRL-2018)</text>
+
+  <!-- TRUST BOUNDARY 1 -->
+  <text x="490" y="264" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#c0392b">═════════ TRUST BOUNDARY 1 — EVIDENCE READ-ONLY [A] ═════════</text>
+  <line x1="40" y1="272" x2="940" y2="272" stroke="#c0392b" stroke-width="2" stroke-dasharray="7 4"/>
+  <text x="490" y="289" font-size="11.5" text-anchor="middle" fill="#555">reads only ▼   no tool writes to the image, /cases/, /mnt/, …/evidence/</text>
+
+  <!-- AGENT box -->
+  <rect x="40" y="300" width="900" height="334" rx="6" fill="#faf7fd" stroke="#8250df" stroke-width="1.5"/>
+  <text x="55" y="320" xml:space="preserve" font-size="12.5" fill="#1d1d1d"><tspan font-weight="bold" fill="#5a2db5">AGENT — Direct Agent Extension (Claude Code)</tspan><tspan x="55" dy="34">Config  «base» ~/.claude/CLAUDE.md  global DFIR orchestrator</tspan><tspan x="55" dy="17">        «base» 5 skills: memory-analysis · plaso-timeline · sleuthkit ·</tspan><tspan x="55" dy="17">                         windows-artifacts · yara-hunting</tspan><tspan x="55" dy="17">        «ext»  project CLAUDE.md  (3 phases, tool prohibitions)</tspan><tspan x="55" dy="17">        «ext»  self-correction skill</tspan><tspan x="55" dy="34" font-weight="bold">Phase 1  INVESTIGATE + ENRICH</tspan><tspan x="55" dy="17">   ├─ Volatility 3 plugins  (psscan → pstree → … → svcscan)</tspan><tspan x="55" dy="17">   └─ enrichment → SHOULD route to MCP</tspan><tspan x="55" dy="17">        <tspan fill="#bf8700" font-weight="bold">[P]</tspan> CLAUDE.md prohibits inline hash/YARA   <tspan fill="#c0392b">(← bypassed in Run 4)</tspan></tspan><tspan x="55" dy="22" font-weight="bold">Phase 2  SELF-CORRECT</tspan><tspan x="55" dy="17">   <tspan fill="#bf8700" font-weight="bold">[P]</tspan> evidence-audit clause (cite tool output or retract)</tspan><tspan x="55" dy="17">   <tspan fill="#bf8700" font-weight="bold">[P]</tspan> status model: CONFIRMED / UNCONFIRMED / RETRACTED</tspan><tspan x="55" dy="17">        └─ the "backed by evidence" part is enforced downstream by the</tspan><tspan x="55" dy="17">           validator <tspan fill="#1a7f37" font-weight="bold">[A]</tspan> — see scorer box</tspan><tspan x="55" dy="22" font-weight="bold">Phase 3  REPORT → findings.json · narrative · execution_log.json</tspan></text>
+
+  <!-- enrichment routing note -->
+  <text x="300" y="652" font-size="11.5" fill="#555" xml:space="preserve">enrichment ▼  (routing here is <tspan fill="#bf8700" font-weight="bold">[P]</tspan>, not <tspan fill="#1a7f37" font-weight="bold">[A]</tspan> — an inline path still exists)</text>
+
+  <!-- TRUST BOUNDARY 2 -->
+  <text x="490" y="670" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#c0392b">═════════ TRUST BOUNDARY 2 — MCP ENRICHMENT [*] ═════════</text>
+  <line x1="40" y1="678" x2="940" y2="678" stroke="#c0392b" stroke-width="2" stroke-dasharray="7 4"/>
+
+  <!-- MCP SERVER box -->
+  <rect x="40" y="686" width="900" height="120" rx="6" fill="#f1f8f3" stroke="#1a7f37" stroke-width="1.5"/>
+  <text x="55" y="706" xml:space="preserve" font-size="12.5" fill="#1d1d1d"><tspan><tspan font-weight="bold">«ext»  MCP SERVER — sift-bench-enrichment (stdio)</tspan>            <tspan fill="#1a7f37" font-weight="bold">[A] surface</tspan></tspan><tspan x="55" dy="17">   hash_file(path) → md5·sha1·sha256·size    yara_scan(t, r) → matches</tspan><tspan x="55" dy="17">   typed args, no shell escape; every call attributable in</tspan><tspan x="55" dy="17">   tool_attribution — which is what made the Run 4 bypass DETECTABLE.</tspan><tspan x="55" dy="17">   NOT the exclusive enrichment path: inline shell remains available, so</tspan><tspan x="55" dy="17">   routing through the server is prompt-enforced <tspan fill="#bf8700" font-weight="bold">[P]</tspan>, not architectural.</tspan></text>
+
+  <!-- tool_executor box (forward-looking: dashed) -->
+  <rect x="40" y="820" width="900" height="137" rx="6" fill="#f1f8f3" stroke="#1a7f37" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="55" y="840" xml:space="preserve" font-size="12.5" fill="#1d1d1d"><tspan><tspan font-weight="bold">«ext»  tool_executor.py    </tspan><tspan fill="#1a7f37" font-weight="bold">[A]</tspan>    <tspan fill="#c0392b" font-weight="bold">(NOT in Run 1-6 path)</tspan></tspan><tspan x="55" dy="17">   allowlist · shell=False · realpath evidence-dir write-block ·</tspan><tspan x="55" dy="17">   output-flag inspection · JSONL audit log</tspan><tspan x="55" dy="17">   → enforces the EVIDENCE-READ-ONLY + SAFE-SHELL boundary (blocks rm /</tspan><tspan x="55" dy="17">     curl / writes into evidence). Does NOT force MCP routing — python3</tspan><tspan x="55" dy="17">     and the hash utils are on its allowlist — so <tspan fill="#c0392b" font-weight="bold">it would NOT, by itself,</tspan></tspan><tspan x="55" dy="17">     <tspan fill="#c0392b" font-weight="bold">have blocked the Run 4 inline-enrichment bypass.</tspan></tspan></text>
+
+  <!-- agent output note -->
+  <text x="490" y="975" font-size="11.5" text-anchor="middle" fill="#555">agent output ▼  (findings.json)</text>
+
+  <!-- TRUST BOUNDARY 3 -->
+  <text x="490" y="993" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#c0392b">═════ TRUST BOUNDARY 3 — EVALUATION (separate from the agent loop) ═════</text>
+  <line x1="40" y1="1001" x2="940" y2="1001" stroke="#c0392b" stroke-width="2" stroke-dasharray="7 4"/>
+
+  <!-- SCORER box -->
+  <rect x="40" y="1009" width="900" height="220" rx="6" fill="#f1f8f3" stroke="#1a7f37" stroke-width="1.5"/>
+  <text x="55" y="1029" xml:space="preserve" font-size="12.5" fill="#1d1d1d"><tspan font-weight="bold" fill="#14642b">«ext»  BENCHMARK / SCORER — Accuracy Benchmarking Framework</tspan><tspan x="55" dy="22">   validate_findings.py  <tspan fill="#1a7f37" font-weight="bold">[A]</tspan> — enforces the <tspan fill="#bf8700" font-weight="bold">[P]</tspan> status model:</tspan><tspan x="55" dy="17">                              CONFIRMED ⇒ tool_attribution non-empty</tspan><tspan x="55" dy="17">        (a CONFIRMED finding with no evidence is rejected here — the</tspan><tspan x="55" dy="17">         same shape as the Tier-A adversarial fabrications)</tspan><tspan x="55" dy="22">   scorer.py — LLM-as-judge match + evidence-traceability precision</tspan><tspan x="55" dy="17">        verdicts ⇄ content-addressed cache <tspan fill="#1a7f37" font-weight="bold">[A]</tspan>  (bit-identical replay;</tspan><tspan x="55" dy="17">        no API key needed)</tspan><tspan x="55" dy="22">   weighted F1 · recall · precision · FP-trap · negative-assertion ·</tspan><tspan x="55" dy="17">   methodology-coverage · self-correction-effectiveness</tspan><tspan x="55" dy="17">   ground truth v1.1   (authored before any agent run)</tspan></text>
+
+  <!-- Footer -->
+  <text x="40" y="1251" font-family="'DejaVu Sans','Helvetica',sans-serif" font-size="10.5" fill="#777">Faithful transcription of ARCHITECTURE.md §System diagram (same content, same caveats).  <tspan fill="#bf8700" font-weight="bold">[P]</tspan> prompt-based · <tspan fill="#1a7f37" font-weight="bold">[A]</tspan> architectural · <tspan fill="#8250df" font-weight="bold">[*]</tspan> mixed · <tspan fill="#c0392b">red</tspan> = trust boundary / honesty caveat.</text>
+</svg>

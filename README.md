@@ -1,6 +1,6 @@
 # SIFT-Bench
 
-> **Judges: no evidence image and no API key needed.** Run `make judge-fast` (or follow [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md)) — every published score replays deterministically from the committed judge-verdict cache. Full agent reproduction is available if you have the SANS FOR508 SRL-2018 image. Reproducibility verified on a clean container: [`analysis/clean-vm-dryrun-2026-06-09.log`](analysis/clean-vm-dryrun-2026-06-09.log).
+> **Judges — no private dependencies, no paid services, no API key.** The evidence is the **hackathon's provided SRL-2018 starter case** (SANS FOR508 `base-rd01`) — data entrants already have, not a private access barrier; it is omitted from this repo only to respect SANS course-material redistribution terms. The agent depends on **no proprietary or paid tools**: full runs use the open-source SIFT Workstation + Volatility 3 + Claude Code, and scoring needs no API key. **Every published score replays deterministically from the committed judge-verdict cache with no image and no key** — run `make judge-fast` (or follow [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md)). Reproducibility verified on a clean container: [`analysis/clean-vm-dryrun-2026-06-09.log`](analysis/clean-vm-dryrun-2026-06-09.log).
 
 SIFT-Bench tests whether an autonomous DFIR agent can investigate a compromised Windows memory image, explain its evidence, retract false leads, and verify that certain suspected behaviors did not occur — not just list IOCs.
 
@@ -45,6 +45,9 @@ Most agentic DFIR demos run an agent and show the output. SIFT-Bench does three 
 > architectural patterns, the inherited-vs-built provenance boundary, the three trust boundaries,
 > and the prompt-based vs. architectural guardrail distinction (including the documented Run 4
 > bypass and which enforcement layer actually closed it).
+>
+> **Rendered diagram: [`docs/architecture.svg`](docs/architecture.svg)** — the full trust-boundary
+> view (legend, three boundaries, `«base»`/`«ext»` provenance, Run 4 caveats) as a gallery-renderable image.
 
 Three-phase workflow defined in [`CLAUDE.md`](CLAUDE.md):
 

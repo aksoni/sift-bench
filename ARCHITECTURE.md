@@ -28,6 +28,10 @@ The benchmark is the contribution; the agent is its reference implementation.
 
 ## System diagram
 
+> **Rendered version: [`docs/architecture.svg`](docs/architecture.svg)** — a faithful visual
+> transcription of the ASCII diagram below (same content, same caveats, including the trust
+> boundaries, the `«base»`/`«ext»` provenance tags, and the Run 4 honesty markers).
+
 ```
 LEGEND
   [P] prompt-based guardrail   — enforced by instruction; the model CAN ignore it

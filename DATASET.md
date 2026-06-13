@@ -24,11 +24,13 @@ Every figure below is traceable to a committed file (`ground_truth/base-rd01-v1.
 | Acquisition tooling | Volatility 3 v2.27.0 (11 plugins) | `source_data` |
 
 **Redistribution:** The memory image is **not** included in this repository. The SANS
-FOR508 dataset is course material and is not redistributable. The benchmark is fully
-reviewable without it — committed run outputs, the hand-authored ground truth, the
-cached LLM-judge verdicts, and the unit tests reproduce all headline numbers with no
-image and no API key (see [`README.md`](README.md) § "Fast review without the memory
-image").
+FOR508 dataset is course material and is not redistributable. This is the SANS FOR508
+SRL-2018 starter case — the common case distributed to Find Evil! entrants — so it is
+data judges already have, not a private or paid dependency; it is omitted here solely to
+respect SANS course-material redistribution terms. The benchmark is fully reviewable
+without it — committed run outputs, the hand-authored ground truth, the cached LLM-judge
+verdicts, and the unit tests reproduce all headline numbers with no image and no API key
+(see [`README.md`](README.md) § "Fast review without the memory image").
 
 ## Incident summary
 
