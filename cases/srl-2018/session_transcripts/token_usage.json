@@ -1,0 +1,30 @@
+{
+  "description": "Per-run token usage for the SIFT-Bench reference agent, derived from committed Claude Code session transcripts.",
+  "source": "Claude Code session transcripts (~/.claude/projects/<project>/*.jsonl), copied verbatim into cases/srl-2018/session_transcripts/_raw/.",
+  "derivation": "Sum of the per-assistant-turn `usage` objects across each committed transcript (input + output + cache_creation + cache_read).",
+  "granularity": "Per assistant turn. Token counts are NOT recorded per tool call, so finding->tool token attribution is not available.",
+  "execution_log_note": "Token usage is not present in the per-run execution_log.json artifacts; it exists only in the session transcript.",
+  "run6_transcript_retained": false,
+  "run6_note": "The Run 6 agent-run session transcript was NOT retained (Claude Code session rotation; ~/.claude/.last-cleanup = 2026-06-13). A Run 6 token total is therefore not recoverable. The figures below are Run 4 and Run 5 \u2014 the same SRL-2018 agent workflow, different runs \u2014 offered as representative scale, not as Run 6 values.",
+  "generated_at_utc": "2026-06-13T00:45:36Z",
+  "runs": {
+    "run4": {
+      "session_file": "_raw/530dd005-05b9-41d6-85d1-a608bf98a176.jsonl",
+      "assistant_turns": 95,
+      "input_tokens": 106,
+      "output_tokens": 128915,
+      "cache_creation_input_tokens": 443778,
+      "cache_read_input_tokens": 7200930,
+      "total_tokens": 7773729
+    },
+    "run5": {
+      "session_file": "_raw/baae662b-3289-4661-82f4-b077bdf45cc8.jsonl",
+      "assistant_turns": 103,
+      "input_tokens": 126,
+      "output_tokens": 146196,
+      "cache_creation_input_tokens": 350240,
+      "cache_read_input_tokens": 6289432,
+      "total_tokens": 6785994
+    }
+  }
+}

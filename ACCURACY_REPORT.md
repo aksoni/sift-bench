@@ -244,6 +244,33 @@ construction for future runs, not by convention.
 
 ---
 
+## Execution logs & token accounting
+
+Each run ships a structured `execution_log.json` (`cases/srl-2018/run*_analysis/`) with
+per-step command, UTC timestamp, return code, output file, and MCP-tool invocation counts —
+giving a traceable command → output chain. These logs do **not** record token usage: Claude Code
+captures per-turn token counts in its own session transcript, not in the project's execution log.
+
+To close that gap, the raw agent-run session transcripts for **Run 4** and **Run 5** are committed
+verbatim at [`cases/srl-2018/session_transcripts/_raw/`](cases/srl-2018/session_transcripts/_raw/),
+and [`cases/srl-2018/session_transcripts/token_usage.json`](cases/srl-2018/session_transcripts/token_usage.json)
+sums their per-turn `usage` objects:
+
+| Run | Assistant turns | Output tokens | Cache-read tokens | Total tokens |
+|-----|----------------:|--------------:|------------------:|-------------:|
+| Run 4 | 95 | 128,915 | 7,200,930 | **7,773,729** |
+| Run 5 | 103 | 146,196 | 6,289,432 | **6,785,994** |
+
+Both totals are cache-read-dominated, as expected for a long agentic run. Two honest caveats:
+token counts are per *assistant turn*, not per tool call, so finding → tool token attribution is
+not available; and **the Run 6 session transcript was not retained** (Claude Code session rotation;
+`~/.claude/.last-cleanup` = 2026-06-13), so a Run 6 token total is not recoverable. The figures
+above are Run 4 and Run 5 — the *same* SRL-2018 agent workflow, different runs — offered as
+representative scale, not as Run 6 values. Asserting "token usage unavailable" would itself be an
+overclaim: the data exists in the transcripts; only the Run 6 file is gone.
+
+---
+
 ## Reproducibility
 
 The headline numbers are reproducible by a reviewer with no credentials and no API key.

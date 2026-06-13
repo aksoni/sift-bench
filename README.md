@@ -144,6 +144,7 @@ Also inspect:
 - [`cases/srl-2018/run6_reports/`](cases/srl-2018/run6_reports/) — best run investigative narrative and structured findings
 - [`RESULTS.md`](RESULTS.md) — full run-by-run breakdown with pre-registered expectation evaluation
 - [`design/judge_test_cases.json`](design/judge_test_cases.json) — locked LLM judge regression cases
+- [`cases/srl-2018/session_transcripts/`](cases/srl-2018/session_transcripts/) — raw Run 4 / Run 5 agent-run transcripts plus [`token_usage.json`](cases/srl-2018/session_transcripts/token_usage.json) (per-turn token totals; Run 6 transcript not retained — see the report's token-accounting note)
 
 ---
 
