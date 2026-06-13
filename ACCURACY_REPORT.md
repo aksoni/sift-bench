@@ -151,6 +151,38 @@ at the point of measurement — not reconstructed for a reviewer after the fact.
 
 ---
 
+## Known limitation — training-data contamination
+
+SRL-2018 (Stark Research Labs) is a documented SANS FOR508 teaching case and the common starter
+dataset distributed to entrants. Its attack chain — the `spsql` Domain Admin compromise, WMI
+lateral movement, `p.exe`, the C2 endpoint — is discussed publicly and may be present in LLM
+training data. **So the raw per-finding score is not a clean held-out measurement of pure
+reasoning.** An agent can draw on prior familiarity with a well-known scenario, and a skeptical
+reader should treat 0.9833-on-this-case as "the reference agent performs well on a known case,
+*with this caveat*," not as a clean generalization claim. This is real; we do not minimize it.
+
+What is more robust to recall-from-familiarity — though, to be clear, **more robust, not immune**:
+
+- **Independently authored ground truth.** The scoring target was hand-authored from the case with
+  a documented version history (`ground_truth/base-rd01-v1.1.json`); the agent is not scored against
+  its own output.
+- **The methodology rewards rigor that answer-recall does not trivially satisfy.** False-positive
+  traps require the agent to *retract* plausible-looking hits (recalling "the answer" does not help
+  you decline a wrong one); negative assertions require actively verifying *absence*; evidence
+  traceability requires every claim to be tied to a specific tool execution, not merely asserted;
+  and the pre-registered predictions make the eval discipline — not the headline number — the
+  contribution. The self-correction measurement (pre/post retraction scoring) tests *behavior*, not
+  answer-recall.
+- **The honest boundary:** these are *harder* for recall to satisfy, not impossible — a
+  heavily-documented case may have its false positives discussed online too. The claim is "more
+  robust to recall than raw accuracy," not "controls for" or "eliminates" contamination.
+
+The benchmark's durable value is the **measurement apparatus**, which is case-independent and would
+apply to any agent on any case. The specific 0.9833 should be read with the caveat above; the
+contribution is the instrument, not the number.
+
+---
+
 ## Evidence integrity & guardrails
 
 *(Hackathon Criterion 4. This is the report's centerpiece.)*
