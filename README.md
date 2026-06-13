@@ -120,7 +120,7 @@ Precision is 1.0 on all six real runs because the v0.5 judge found zero illegiti
 
 ## Reviewing without the memory image
 
-The SANS FOR508 SRL-2018 image is not redistributable. You can still review the benchmark without it:
+The SANS FOR508 SRL-2018 image is not redistributable. You can still review the benchmark without it. **Fastest path: `make judge-fast`** runs the whole no-image review (score + tests + evidence trace + retractions + MCP gate) in one command — see [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md). The explicit steps:
 
 ```bash
 # Install dependencies (anthropic + jsonschema; no API key needed for cached reruns)
