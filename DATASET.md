@@ -27,7 +27,7 @@ Every figure below is traceable to a committed file (`ground_truth/base-rd01-v1.
 FOR508 dataset is course material and is not redistributable. The benchmark is fully
 reviewable without it — committed run outputs, the hand-authored ground truth, the
 cached LLM-judge verdicts, and the unit tests reproduce all headline numbers with no
-image and no API key (see [`README.md`](README.md) § "Reviewing without the memory
+image and no API key (see [`README.md`](README.md) § "Fast review without the memory
 image").
 
 ## Incident summary

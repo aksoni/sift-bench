@@ -289,7 +289,7 @@ python -m unittest discover -s tests                            # → Ran 94 tes
 ```
 
 Determinism comes from the committed cache, not from model sampling: the scorer reads cached
-judge verdicts keyed on content hashes, so reruns are exact. See `README.md` §"Reviewing without
+judge verdicts keyed on content hashes, so reruns are exact. See `README.md` §"Fast review without
 the memory image."
 
 ---

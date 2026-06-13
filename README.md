@@ -19,7 +19,7 @@ Solo submission to the [Find Evil! hackathon](https://findevil.devpost.com) (Apr
 - **Solution:** SIFT-Bench evaluates evidence-backed findings, false-positive retractions, negative assertions, and methodology coverage — not keyword matches.
 - **Demo result:** Best run (Run 6) found all 5 critical findings, caught all 3 false-positive traps, and scored 0.9833 on the v0.5 benchmark metric.
 - **What to inspect:** [`DATASET.md`](DATASET.md), [`RESULTS.md`](RESULTS.md), [`ground_truth/base-rd01-v1.1.json`](ground_truth/base-rd01-v1.1.json), [`cases/srl-2018/run6_reports/`](cases/srl-2018/run6_reports/), [`scorer/`](scorer/).
-- **No dataset?** The memory image is not redistributable, but committed run outputs, cached judge verdicts, and unit tests allow full review without it — see [Reviewing without the memory image](#reviewing-without-the-memory-image) below.
+- **Reproducible without the image:** scores replay deterministically from committed run outputs, cached judge verdicts, and unit tests — no memory image and no API key required (`make judge-fast`). See [Fast review without the memory image](#fast-review-without-the-memory-image) below.
 
 ---
 
@@ -118,9 +118,11 @@ Precision is 1.0 on all six real runs because the v0.5 judge found zero illegiti
 
 ---
 
-## Reviewing without the memory image
+## Fast review without the memory image
 
-The SANS FOR508 SRL-2018 image is not redistributable. You can still review the benchmark without it. **Fastest path: `make judge-fast`** runs the whole no-image review (score + tests + evidence trace + retractions + MCP gate) in one command — see [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md). The explicit steps:
+**The published scores replay deterministically from committed artifacts — no memory image and no API key required.** The scorer reads cached LLM-judge verdicts (`scorer_cache/judge_verdicts.json`) keyed on content hashes, so every number below reproduces bit-for-bit, offline, on any reviewer's machine. This is a deliberate reproducibility property, not a fallback: the determinism comes from the committed cache, not from re-querying a model. (The SANS FOR508 SRL-2018 image itself is not redistributable — but you do not need it to verify the results.)
+
+**Fastest path: `make judge-fast`** runs the whole review (score + tests + evidence trace + retractions + MCP gate) in one command — see [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md). The explicit steps:
 
 ```bash
 # Install dependencies (anthropic + jsonschema; no API key needed for cached reruns)
@@ -206,7 +208,11 @@ sift-bench/
 
 ---
 
-## Reproducing
+## Full reproduction with the case image
+
+This path re-runs the agent end-to-end and requires the SRL-2018 image. It is the bonus
+path — the [fast review above](#fast-review-without-the-memory-image) verifies every
+published score without it.
 
 **Requirements:**
 - SANS SIFT Workstation 3.0 (Ubuntu 24.04, x86-64) — tested environment. Volatility 3 ≥ 2.27 available as `vol` on PATH via pipx.
