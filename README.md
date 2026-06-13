@@ -18,7 +18,7 @@ Solo submission to the [Find Evil! hackathon](https://findevil.devpost.com) (Apr
 - **Problem:** DFIR agents can produce plausible but unsupported findings.
 - **Solution:** SIFT-Bench evaluates evidence-backed findings, false-positive retractions, negative assertions, and methodology coverage — not keyword matches.
 - **Demo result:** Best run (Run 6) found all 5 critical findings, caught all 3 false-positive traps, and scored 0.9833 on the v0.5 benchmark metric.
-- **What to inspect:** [`RESULTS.md`](RESULTS.md), [`ground_truth/base-rd01-v1.1.json`](ground_truth/base-rd01-v1.1.json), [`cases/srl-2018/run6_reports/`](cases/srl-2018/run6_reports/), [`scorer/`](scorer/).
+- **What to inspect:** [`DATASET.md`](DATASET.md), [`RESULTS.md`](RESULTS.md), [`ground_truth/base-rd01-v1.1.json`](ground_truth/base-rd01-v1.1.json), [`cases/srl-2018/run6_reports/`](cases/srl-2018/run6_reports/), [`scorer/`](scorer/).
 - **No dataset?** The memory image is not redistributable, but committed run outputs, cached judge verdicts, and unit tests allow full review without it — see [Reviewing without the memory image](#reviewing-without-the-memory-image) below.
 
 ---
