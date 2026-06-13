@@ -1,5 +1,7 @@
 # SIFT-Bench
 
+> **Judges: no evidence image and no API key needed.** Run `make judge-fast` (or follow [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md)) — every published score replays deterministically from the committed judge-verdict cache. Full agent reproduction is available if you have the SANS FOR508 SRL-2018 image. Reproducibility verified on a clean container: [`analysis/clean-vm-dryrun-2026-06-09.log`](analysis/clean-vm-dryrun-2026-06-09.log).
+
 SIFT-Bench tests whether an autonomous DFIR agent can investigate a compromised Windows memory image, explain its evidence, retract false leads, and verify that certain suspected behaviors did not occur — not just list IOCs.
 
 **A benchmark and evaluation framework for autonomous DFIR agents, with a self-correcting reference implementation built on Claude Code + SIFT Workstation + Volatility 3.**

@@ -109,6 +109,124 @@ The three-phase workflow (Investigate+Enrich → Self-Correct → Report) is def
 
 ---
 
+## Trace any finding to its tool execution (the 3-claim trace)
+
+Criterion 5 (Audit Trail) asks you to trace findings to the tool executions that produced
+them. Here are three, traced — chosen to span a **hash chain**, a **Volatility plugin**, and
+the **MCP enrichment tools**, so the breadth of traceability is visible. Each command runs
+against the committed Run 6 artifacts (no image needed). The pattern is the same every time:
+`findings_post_correction.json` carries the claim + evidence; `execution_log.json` carries
+the tool call that produced that evidence, and the two agree.
+
+> **Token-usage note (log-quality):** Run 6's agent session transcript was not retained
+> (Claude Code session rotation), so a Run 6 token total is unavailable. The Run 4 and Run 5
+> token totals for the *identical* workflow are committed in
+> [`cases/srl-2018/session_transcripts/token_usage.json`](cases/srl-2018/session_transcripts/token_usage.json)
+> (~6.8M and ~7.8M tokens) as representative scale. Token counts are per assistant turn, not
+> per tool call, so finding→tool *token* attribution is not claimed; finding→tool *evidence*
+> attribution (below) is.
+
+### Trace 1 — F01 `p.exe` malware: SHA-256 hash chain (`mcp__hash_file`)
+
+The claim ("malicious implant p.exe") is malware-class, so the schema requires a hash from
+`mcp__hash_file`. Surface the finding's recorded hash:
+
+```bash
+jq '.findings[] | select(.id=="F01") | {id, title, sha256: .evidence.file_hash_sha256, tools: .tool_attribution}' \
+  cases/srl-2018/run6_analysis/findings_post_correction.json
+```
+
+```
+"sha256": "6f9d6ec7e1634f80de9fa5c0792806f7d63960c799be826f296d52af94a06fc0"
+"tools": [ ... "mcp__hash_file(path=run6_exports/dumpfiles/8260.p.exe.0x400000.dmp)" ... ]
+```
+
+Now surface the log entry for that exact tool call (seq 17):
+
+```bash
+jq '.execution_log[] | select(.seq==17) | {command, tool, timestamp_utc, notes}' \
+  cases/srl-2018/run6_analysis/execution_log.json
+```
+
+```
+"tool": "mcp__sift-bench-enrichment__hash_file"
+"notes": "SHA256: 6f9d6ec7e1634f80de9fa5c0792806f7d63960c799be826f296d52af94a06fc0 | MD5: ... | Size: 331776 bytes"
+```
+
+**Chain:** the SHA-256 in the finding equals the `mcp__hash_file` output in the log, which is
+the hash of the dumped artifact `run6_exports/dumpfiles/8260.p.exe.0x400000.dmp`. Claim →
+tool → evidence, closed.
+
+### Trace 2 — F04 C2 channel: Volatility `windows.netscan`
+
+A pure Volatility-plugin trace (no enrichment): the C2 endpoint claim comes straight from
+one plugin's output.
+
+```bash
+jq '.findings[] | select(.id=="F04") | {id, title, remote_ip: .evidence.remote_ip, remote_port: .evidence.remote_port, tools: .tool_attribution}' \
+  cases/srl-2018/run6_analysis/findings_post_correction.json
+```
+
+```
+"remote_ip": "172.16.4.10", "remote_port": 8080
+"tools": ["vol -f base-rd01-memory.img windows.netscan"]
+```
+
+```bash
+jq '.execution_log[] | select(.command | test("windows.netscan")) | {command, output_file, notes}' \
+  cases/srl-2018/run6_analysis/execution_log.json
+```
+
+```
+"command": "vol -f base-rd01-memory.img windows.netscan"
+"output_file": "run6_analysis/memory/netscan.txt"
+"notes": "C2: 172.16.4.10:8080 (ESTABLISHED+CLOSE_WAIT); SMB: 172.16.4.5:445 ESTABLISHED; ..."
+```
+
+**Chain:** `172.16.4.10:8080` in the finding appears verbatim in the `windows.netscan` log
+entry, whose raw output is saved to `run6_analysis/memory/netscan.txt`.
+
+### Trace 3 — F10 `procdump.exe`: MCP hash + YARA enrichment
+
+A second malware-adjacent claim (credential-dumping tool), enriched with **both** MCP tools.
+
+```bash
+jq '.findings[] | select(.id=="F10") | {id, title, sha256: .evidence.file_hash_sha256, tools: .tool_attribution}' \
+  cases/srl-2018/run6_analysis/findings_post_correction.json
+```
+
+```
+"sha256": "8b87ad368f48a2414834cedafa3caafb9b07d8710699cb6df105e5a8e2616821"
+"tools": [ ... "mcp__hash_file(...)", "mcp__yara_scan(target=procdump.exe.dat, rules=yara_rules/srl-2018-operative.yar)" ]
+```
+
+```bash
+jq '.execution_log[] | select(.seq==19 or .seq==20) | {seq, tool, notes}' \
+  cases/srl-2018/run6_analysis/execution_log.json
+```
+
+```
+{ "seq": 19, "tool": "mcp__sift-bench-enrichment__hash_file",
+  "notes": "SHA256: 8b87ad368f48a2414834cedafa3caafb9b07d8710699cb6df105e5a8e2616821 | ... | Size: 516096 bytes" }
+{ "seq": 20, "tool": "mcp__sift-bench-enrichment__yara_scan",
+  "notes": "0 matches. Scan duration: 2ms." }
+```
+
+**Chain:** the SHA-256 in the finding equals the `mcp__hash_file` output (seq 19); the
+`mcp__yara_scan` call (seq 20) is the recorded enrichment — `0 matches` is reported honestly
+(the target is a process data-section dump, not a raw PE), so the finding rests on the path,
+hash, and `filescan` location rather than a YARA hit. The enrichment ran and is logged.
+
+> **One-line chain check** (any finding ID): the hash in the finding should equal the hash in
+> the log entry whose tool call is named in the finding's `tool_attribution`. For F01:
+> ```bash
+> diff <(jq -r '.findings[]|select(.id=="F01").evidence.file_hash_sha256' cases/srl-2018/run6_analysis/findings_post_correction.json) \
+>      <(jq -r '.execution_log[]|select(.seq==17).notes' cases/srl-2018/run6_analysis/execution_log.json | grep -oE '[0-9a-f]{64}') \
+>   && echo "MATCH"
+> ```
+
+---
+
 ## What to inspect, by evaluation dimension
 
 Agent artifacts are listed first for the execution/accuracy dimensions; the benchmark is
