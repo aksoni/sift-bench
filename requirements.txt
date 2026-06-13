@@ -1,5 +1,7 @@
-anthropic>=0.30.0,<1.0.0
-mcp>=1.0.0,<2.0.0
-yara-python>=4.3.0,<5.0.0
-pytest>=9.0,<10.0
-jsonschema>=4.0.0,<5.0.0
+# Pinned to the versions resolved in the 2026-06-09 clean-container dry-run
+# (analysis/clean-vm-dryrun-2026-06-09.log) for bit-reproducible review.
+anthropic==0.107.1
+mcp==1.27.2
+yara-python==4.5.4
+pytest==9.0.3
+jsonschema==4.26.0

@@ -211,7 +211,7 @@ sift-bench/
 **Requirements:**
 - SANS SIFT Workstation 3.0 (Ubuntu 24.04, x86-64) — tested environment. Volatility 3 ≥ 2.27 available as `vol` on PATH via pipx.
 - Claude Code ≥ 2.1
-- Python 3.10+ with `pip install -r requirements.txt` (scorer requires `anthropic` and `jsonschema`; first-run API calls require `ANTHROPIC_API_KEY`)
+- Python 3.10+ with `pip install -r requirements.txt` (scorer requires `anthropic` and `jsonschema`; first-run API calls require `ANTHROPIC_API_KEY`). Direct dependencies are **pinned (`==`)** to the versions resolved in the 2026-06-09 clean-container dry-run ([`analysis/clean-vm-dryrun-2026-06-09.log`](analysis/clean-vm-dryrun-2026-06-09.log)) for reproducible installs.
 - A memory image to analyze (the SRL-2018 base-rd01 image is from the SANS FOR508 course and is not redistributable)
 
 > **Non-SIFT hosts:** If `vol` is not on PATH, install via `pipx install volatility3` or invoke directly as `python3 /opt/volatility3-*/vol.py`. Update the `vol` invocations accordingly. All other tools (`fls`, `icat`, `bulk_extractor`) are standard DFIR packages available via apt.
