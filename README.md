@@ -1,7 +1,5 @@
 # SIFT-Bench
 
-> **Judges — no private dependencies, no paid services, no API key.** Full runs use only the open-source SIFT Workstation + Volatility 3 + Claude Code. The test case is the **hackathon's provided SRL-2018 starter case** (SANS FOR508 `base-rd01`) — data entrants already have; it is omitted here only to respect SANS redistribution terms. **Every published score replays deterministically from the committed judge-verdict cache, with no image and no key** — run `make judge-fast` (or see [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md)). Reproducibility verified on a clean container: [`analysis/clean-vm-dryrun-2026-06-09.log`](analysis/clean-vm-dryrun-2026-06-09.log).
-
 SIFT-Bench tests whether an autonomous DFIR agent can investigate a compromised Windows memory image, explain its evidence, retract false leads, and verify that certain suspected behaviors did not occur — not just list IOCs.
 
 **A benchmark and evaluation framework for autonomous DFIR agents, with a self-correcting reference implementation built on Claude Code + SIFT Workstation + Volatility 3.**
@@ -17,11 +15,13 @@ Solo submission to the [Find Evil! hackathon](https://findevil.devpost.com) (Apr
 
 ## TL;DR for judges
 
+> **No private dependencies, no paid services, no API key.** Full runs use only the open-source SIFT Workstation + Volatility 3 + Claude Code. The test case is the **hackathon's provided SRL-2018 starter case** (SANS FOR508 `base-rd01`) — data entrants already have; it is omitted here only to respect SANS redistribution terms. **Every published score replays deterministically from the committed judge-verdict cache, with no image and no key** — run `make judge-fast` (or see [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md)). Reproducibility verified on a clean container: [`analysis/clean-vm-dryrun-2026-06-09.log`](analysis/clean-vm-dryrun-2026-06-09.log).
+
 - **Problem:** DFIR agents can produce plausible but unsupported findings.
 - **Solution:** SIFT-Bench evaluates evidence-backed findings, false-positive retractions, negative assertions, and methodology coverage — not keyword matches.
 - **Demo result:** Best run (Run 6) found all 5 critical findings, caught all 3 false-positive traps, and scored 0.9833 on the v0.5 benchmark metric.
 - **What to inspect:** [`DATASET.md`](DATASET.md), [`ACCURACY_REPORT.md`](ACCURACY_REPORT.md), [`RESULTS.md`](RESULTS.md), [`ground_truth/base-rd01-v1.1.json`](ground_truth/base-rd01-v1.1.json), [`cases/srl-2018/run6_reports/`](cases/srl-2018/run6_reports/), [`scorer/`](scorer/).
-- **Reproducible without the image:** scores replay deterministically from committed run outputs, cached judge verdicts, and unit tests — no memory image and no API key required (`make judge-fast`). See [Fast review without the memory image](#fast-review-without-the-memory-image) below.
+- **Reproducible without the image:** see [Fast review without the memory image](#fast-review-without-the-memory-image) below.
 
 ### Where each submission requirement lives
 
@@ -174,12 +174,25 @@ Also inspect:
 sift-bench/
 ├── README.md
 ├── RESULTS.md                   Full benchmark results + scorer evolution
+├── ACCURACY_REPORT.md           Findings accuracy + evidence-integrity self-assessment
+├── ARCHITECTURE.md              Architecture, patterns, trust boundaries
+├── DATASET.md                   Test case: source, ground truth, what the agent found
+├── JUDGE_GUIDE.md               ~3-min no-image / no-API-key review path
+├── LICENSE                      MIT
+├── Makefile                     judge-fast / judge review targets
+├── requirements.txt             Pinned (==) direct dependencies
 ├── CLAUDE.md                    Agent config (methodology + output schema pin)
+├── .mcp.json                    MCP server registration (repo root)
+├── docs/
+│   └── architecture.svg         Rendered trust-boundary diagram
+├── analysis/
+│   └── clean-vm-dryrun-2026-06-09.log  Clean-container reproduction transcript
 ├── skills/
 │   └── self-correction/SKILL.md Self-correction protocol
 ├── ground_truth/
 │   └── base-rd01-v1.1.json      Hand-authored ground truth + version history
 ├── scorer.py                    CLI entrypoint (delegates to scorer/ package)
+├── tool_executor.py             Subprocess guardrails (allowlist + evidence-dir blocking)
 ├── scorer/                      Scorer package
 │   ├── scorer.py                Matching logic + score() function
 │   ├── judge.py                 LLM-as-judge: judge_pair, judge_fallback_pair, judge_precision
@@ -221,7 +234,8 @@ sift-bench/
         ├── run5_analysis/       Strengthened prohibitions (gate failed — server absent)
         ├── run5_reports/
         ├── run6_analysis/       Gate met — MCP tools live (best result)
-        └── run6_reports/
+        ├── run6_reports/
+        └── session_transcripts/ Raw agent-run transcripts + token_usage.json
 ```
 
 ---
