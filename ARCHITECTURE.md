@@ -40,65 +40,65 @@ LEGEND
   «base» inherited from Protocol SIFT (teamdfir installer)    «ext» my authorship
   ═════  trust boundary        "(NOT in Run 1-6 path)" = forward-looking guardrail
 
-  ┌───────────────────────────────────────────────────────────────────────────┐
-  │  EVIDENCE    base-rd01-memory.img    (SANS FOR508 SRL-2018)                 │
-  └───────────────────────────────────────────────────────────────────────────┘
-  ═════════════════ TRUST BOUNDARY 1 — EVIDENCE READ-ONLY [A] ══════════════════
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  EVIDENCE    base-rd01-memory.img    (SANS FOR508 SRL-2018)                  │
+  └──────────────────────────────────────────────────────────────────────────────┘
+  ══════════════════ TRUST BOUNDARY 1 — EVIDENCE READ-ONLY [A] ═══════════════════
         reads only ▼   no tool writes to the image, /cases/, /mnt/, …/evidence/
-  ┌───────────────────────────────────────────────────────────────────────────┐
-  │  AGENT — Direct Agent Extension (Claude Code)                               │
-  │                                                                             │
-  │  Config  «base» ~/.claude/CLAUDE.md  global DFIR orchestrator               │
-  │          «base» 5 skills: memory-analysis · plaso-timeline · sleuthkit ·    │
-  │                           windows-artifacts · yara-hunting                  │
-  │          «ext»  project CLAUDE.md  (3 phases, tool prohibitions)            │
-  │          «ext»  self-correction skill                                       │
-  │                                                                             │
-  │  Phase 1  INVESTIGATE + ENRICH                                              │
-  │     ├─ Volatility 3 plugins  (psscan → pstree → … → svcscan)                │
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  AGENT — Direct Agent Extension (Claude Code)                                │
+  │                                                                              │
+  │  Config  «base» ~/.claude/CLAUDE.md  global DFIR orchestrator                │
+  │          «base» 5 skills: memory-analysis · plaso-timeline · sleuthkit ·     │
+  │                           windows-artifacts · yara-hunting                   │
+  │          «ext»  project CLAUDE.md  (3 phases, tool prohibitions)             │
+  │          «ext»  self-correction skill                                        │
+  │                                                                              │
+  │  Phase 1  INVESTIGATE + ENRICH                                               │
+  │     ├─ Volatility 3 plugins  (psscan → pstree → … → svcscan)                 │
   │     └─ enrichment → SHOULD route to MCP                                      │
-  │          [P] CLAUDE.md prohibits inline hash/YARA   (← bypassed in Run 4)   │
+  │          [P] CLAUDE.md prohibits inline hash/YARA   (← bypassed in Run 4)    │
   │  Phase 2  SELF-CORRECT                                                       │
-  │     [P] evidence-audit clause (cite tool output or retract)                 │
+  │     [P] evidence-audit clause (cite tool output or retract)                  │
   │     [P] status model: CONFIRMED / UNCONFIRMED / RETRACTED                    │
   │          └─ the "backed by evidence" part is enforced downstream by the      │
   │             validator [A] — see scorer box                                   │
-  │  Phase 3  REPORT → findings.json · narrative · execution_log.json           │
-  └───────────────────────────────────────────────────────────────────────────┘
+  │  Phase 3  REPORT → findings.json · narrative · execution_log.json            │
+  └──────────────────────────────────────────────────────────────────────────────┘
         enrichment ▼  (routing here is [P], not [A] — an inline path still exists)
-  ═════════════════ TRUST BOUNDARY 2 — MCP ENRICHMENT [*] ══════════════════════
-  ┌───────────────────────────────────────────────────────────────────────────┐
-  │  «ext»  MCP SERVER — sift-bench-enrichment (stdio)            [A] surface   │
+  ════════════════════ TRUST BOUNDARY 2 — MCP ENRICHMENT [*] ═════════════════════
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  «ext»  MCP SERVER — sift-bench-enrichment (stdio)            [A] surface    │
   │     hash_file(path) → md5·sha1·sha256·size    yara_scan(t, r) → matches      │
-  │     typed args, no shell escape; every call attributable in                 │
+  │     typed args, no shell escape; every call attributable in                  │
   │     tool_attribution — which is what made the Run 4 bypass DETECTABLE.       │
   │     NOT the exclusive enrichment path: inline shell remains available, so    │
   │     routing through the server is prompt-enforced [P], not architectural.    │
-  └───────────────────────────────────────────────────────────────────────────┘
-  ┌───────────────────────────────────────────────────────────────────────────┐
-  │  «ext»  tool_executor.py    [A]    (NOT in Run 1-6 path)                    │
+  └──────────────────────────────────────────────────────────────────────────────┘
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  «ext»  tool_executor.py    [A]    (NOT in Run 1-6 path)                     │
   │     allowlist · shell=False · realpath evidence-dir write-block ·            │
-  │     output-flag inspection · JSONL audit log                                │
-  │     → enforces the EVIDENCE-READ-ONLY + SAFE-SHELL boundary (blocks rm /      │
-  │       curl / writes into evidence). Does NOT force MCP routing — python3      │
-  │       and the hash utils are on its allowlist — so it would NOT, by itself,   │
-  │       have blocked the Run 4 inline-enrichment bypass.                        │
-  └───────────────────────────────────────────────────────────────────────────┘
+  │     output-flag inspection · JSONL audit log                                 │
+  │     → enforces the EVIDENCE-READ-ONLY + SAFE-SHELL boundary (blocks rm /     │
+  │       curl / writes into evidence). Does NOT force MCP routing — python3     │
+  │       and the hash utils are on its allowlist — so it would NOT, by itself,  │
+  │       have blocked the Run 4 inline-enrichment bypass.                       │
+  └──────────────────────────────────────────────────────────────────────────────┘
         agent output ▼  (findings.json)
-  ════════════ TRUST BOUNDARY 3 — EVALUATION (separate from the agent loop) ═════
-  ┌───────────────────────────────────────────────────────────────────────────┐
-  │  «ext»  BENCHMARK / SCORER — Accuracy Benchmarking Framework                │
-  │     validate_findings.py  [A] — enforces the [P] status model:              │
-  │            ▼                    CONFIRMED ⇒ tool_attribution non-empty        │
-  │            ▼   (a CONFIRMED finding with no evidence is rejected here — the   │
+  ═════════ TRUST BOUNDARY 3 — EVALUATION (separate from the agent loop) ═════════
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  «ext»  BENCHMARK / SCORER — Accuracy Benchmarking Framework                 │
+  │     validate_findings.py  [A] — enforces the [P] status model:               │
+  │            ▼                    CONFIRMED ⇒ tool_attribution non-empty       │
+  │            ▼   (a CONFIRMED finding with no evidence is rejected here — the  │
   │                same shape as the Tier-A adversarial fabrications)            │
-  │     scorer.py — LLM-as-judge match + evidence-traceability precision          │
-  │            ▼   verdicts ⇄ content-addressed cache [A]  (bit-identical replay; │
+  │     scorer.py — LLM-as-judge match + evidence-traceability precision         │
+  │            ▼   verdicts ⇄ content-addressed cache [A]  (bit-identical replay;│
   │                no API key needed)                                            │
-  │     weighted F1 · recall · precision · FP-trap · negative-assertion ·         │
-  │     methodology-coverage · self-correction-effectiveness                    │
-  │     ground truth v1.1   (authored before any agent run)                     │
-  └───────────────────────────────────────────────────────────────────────────┘
+  │     weighted F1 · recall · precision · FP-trap · negative-assertion ·        │
+  │     methodology-coverage · self-correction-effectiveness                     │
+  │     ground truth v1.1   (authored before any agent run)                      │
+  └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
