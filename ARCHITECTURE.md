@@ -11,18 +11,21 @@
 
 ## Architectural pattern(s)
 
-SIFT-Bench is a **hybrid of three** of the hackathon's named approaches:
+SIFT-Bench combines **two of the hackathon's four named architectural patterns**, plus a
+benchmarking framework that is the project's own contribution (not one of the four):
 
-1. **Direct Agent Extension** — Claude Code runs the three-phase DFIR workflow
+1. **Direct Agent Extension** (named pattern) — Claude Code runs the three-phase DFIR workflow
    (`CLAUDE.md`), driving Volatility 3 and the enrichment tools. No custom agent loop.
-2. **Custom MCP Server** — `sift-bench-enrichment` exposes two typed enrichment tools
-   (`hash_file`, `yara_scan`) over stdio, replacing ad-hoc inline shell with an attributable
-   surface.
-3. **Accuracy Benchmarking Framework** — hand-authored ground truth + an LLM-as-judge scorer
-   with content-addressed cached verdicts evaluates the agent's output independently of the
-   agent loop.
+2. **Custom MCP Server** (named pattern) — `sift-bench-enrichment` exposes two typed enrichment
+   tools (`hash_file`, `yara_scan`) over stdio, replacing ad-hoc inline shell with an
+   attributable surface.
+3. **Accuracy benchmarking framework** (the project's contribution, not one of the four) —
+   hand-authored ground truth + an LLM-as-judge scorer with content-addressed cached verdicts
+   evaluates the agent's output independently of the agent loop.
 
-The benchmark is the contribution; the agent is its reference implementation.
+The other two named patterns are not used: no **Multi-Agent Framework** (single agent) and no
+**Alternative Agentic IDE** (Claude Code is the harness). The benchmark is the contribution;
+the agent is its reference implementation.
 
 ---
 

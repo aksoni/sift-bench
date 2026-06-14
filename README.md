@@ -8,7 +8,7 @@ It includes a hand-authored ground truth, a deterministic replayable scorer with
 
 Solo submission to the [Find Evil! hackathon](https://findevil.devpost.com) (Apr 15 – Jun 15, 2026).
 
-[![tests](https://github.com/aksoni/sift-bench/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/aksoni/sift-bench/actions/workflows/tests.yml)
+[![tests](https://github.com/aksoni/sift-bench/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/aksoni/sift-bench/actions/workflows/tests.yml)
 ![tested-on-sift](https://img.shields.io/badge/tested%20on-SIFT%203.0%20%28Ubuntu%2024.04%29-blue)
 
 ---
