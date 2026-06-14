@@ -57,9 +57,8 @@ all five must-find criticals:
   explicitly enumerates loaded user hives. Stable miss across all six runs.
 - **F014** — PowerShell C2 shell has AMSI loaded and multiple unnamed DLLs.
 
-These are recorded as known gaps in `RESULTS.md` ("Stable misses") and carry combined weight
-1.0 of 30.5 total. They are surfaced here for the same reason they are surfaced in RESULTS:
-a benchmark that hides its agent's misses cannot be trusted to report anyone else's.
+Combined weight 1.0 of 30.5; recorded as known gaps in `RESULTS.md` ("Stable misses"). A
+benchmark that hides its own agent's misses cannot be trusted to report anyone else's.
 
 ---
 
@@ -82,15 +81,14 @@ Six fabricated findings were injected into Run 6's real output, in three pre-gra
 | B (×2) | Coherent but invented specifics — fake PID/IP `svch0st.exe`, fake hash + YARA match for `p2.exe` | `legitimate=true` → dropped, precision unaffected | **passed through (as predicted)** |
 | C (×1) | Borderline RWX claim, hedged | `confidence<4` → uncertain, dropped | **uncertain (as predicted)** |
 
-**Pre-registered numeric prediction: `12 / (12 + 3) = 0.80`. Actual: `weighted_precision = 0.80`,
+**Pre-registered prediction: `12 / (12 + 3) = 0.80`. Actual: `weighted_precision = 0.80`,
 `weighted_recall = 0.9672` (held as control). Zero deviation.**
 
-This is the honest, two-sided result: the metric *does* catch uncited fabrications (Tier A),
-and it *cannot* catch coherent fabrications citing invented-but-well-formed specifics (Tier B) —
-because the judge is image-blind and tests **evidence traceability, not evidence truth**. That
-ceiling is pre-registered, not discovered after the fact, and the structurally-different fix
-(a deterministic check that each cited PID/path/IP/hash actually exists in the run's tool
-output) is named as future work, explicitly **out of scope for this submission**. See
+The result is two-sided: the metric catches uncited fabrications (Tier A) but not coherent ones
+citing invented-but-well-formed specifics (Tier B), because the judge is image-blind and tests
+**evidence traceability, not evidence truth**. That ceiling is pre-registered, not discovered
+after the fact; the fix (a deterministic check that each cited PID/path/IP/hash exists in the
+run's tool output) is named as future work, out of scope here. See
 `design/scorer-v0.5-adversarial.md` §"Known ceiling."
 
 ---
@@ -120,34 +118,30 @@ R5-E4).
 ## On the F1 metric
 
 The headline F1 is an **asymmetric hybrid by design**: severity-weighted recall combined with
-count-based precision. This is a deliberate modeling choice, because the costs of the two error
-types do not scale the same way in a real investigation.
+count-based precision, because the two error types do not cost the same way in a real
+investigation.
 
-- **Recall is severity-weighted** because the cost of a *miss* scales with severity. Failing to
-  surface the C2 channel or the Domain-Admin compromise (critical, weight 4) is a categorically
-  worse outcome than missing an AMSI-DLL detail (low, weight 0.5). Severity-weighting makes the
-  metric penalize the misses that would actually sink an investigation, in proportion to the
-  damage they do.
+- **Recall is severity-weighted** because the cost of a *miss* scales with severity: missing the
+  C2 channel or the Domain-Admin compromise (critical, weight 4) is categorically worse than
+  missing an AMSI-DLL detail (low, weight 0.5).
 
-- **Precision is count-based** because the cost of a *fabrication* does not scale with the
-  severity it claims — it scales with the fact that it is fabricated at all. A hallucinated
-  "critical" finding is not four times worse than a hallucinated "low" one; each is a single
-  illegitimate claim that equally corrodes trust in the whole report. Severity-weighting precision
-  would be actively perverse: it would reward an agent for attaching *higher* severity to its
-  fabrications, inflating the denominator. Counting each fabrication as one unit closes that
-  loophole.
+- **Precision is count-based** because the cost of a *fabrication* scales with the fact that it
+  is fabricated at all, not with the severity it claims. A hallucinated "critical" is not four
+  times worse than a hallucinated "low"; each equally corrodes trust. Severity-weighting precision
+  would be perverse — it would reward an agent for attaching higher severity to its fabrications,
+  inflating the denominator.
 
-In short: **misses are weighted by how much they matter; fabrications are weighted by the fact
-that they happened.** The two quantities are normalized differently on purpose, so their harmonic
-mean is not a textbook single-scheme F1 — and the scorer states exactly that on every score it
-prints (`run6_score.json → precision_note`):
+So **misses are weighted by how much they matter; fabrications by the fact that they happened.**
+The two are normalized differently on purpose, so their harmonic mean is not a textbook
+single-scheme F1 — which the scorer states on every score it prints (`run6_score.json →
+precision_note`):
 
 > "Precision is count-based (unit weight per agent finding); recall is severity-weighted.
 > weighted_f1 is their harmonic mean — mathematically valid but an asymmetric hybrid, not a
 > single-scheme F1."
 
-That caveat is emitted by the instrument itself, unprompted, on every run. The design is declared
-at the point of measurement — not reconstructed for a reviewer after the fact.
+The instrument emits that caveat on every run — the design is declared at the point of
+measurement, not reconstructed for a reviewer after the fact.
 
 ---
 
@@ -155,31 +149,25 @@ at the point of measurement — not reconstructed for a reviewer after the fact.
 
 SRL-2018 (Stark Research Labs) is a documented SANS FOR508 teaching case and the common starter
 dataset distributed to entrants. Its attack chain — the `spsql` Domain Admin compromise, WMI
-lateral movement, `p.exe`, the C2 endpoint — is discussed publicly and may be present in LLM
-training data. **So the raw per-finding score is not a clean held-out measurement of pure
-reasoning.** An agent can draw on prior familiarity with a well-known scenario, and a skeptical
-reader should treat 0.9833-on-this-case as "the reference agent performs well on a known case,
-*with this caveat*," not as a clean generalization claim. This is real; we do not minimize it.
+lateral movement, `p.exe`, the C2 endpoint — is discussed publicly and may be in LLM training
+data. **So the raw per-finding score is not a clean held-out measurement of pure reasoning:**
+0.9833-on-this-case means "the reference agent performs well on a known case, *with this
+caveat*," not a clean generalization claim.
 
-What is more robust to recall-from-familiarity — though, to be clear, **more robust, not immune**:
+What is **more robust to recall-from-familiarity — though not immune:**
 
-- **Independently authored ground truth.** The scoring target was hand-authored from the case with
-  a documented version history (`ground_truth/base-rd01-v1.1.json`); the agent is not scored against
-  its own output.
-- **The methodology rewards rigor that answer-recall does not trivially satisfy.** False-positive
-  traps require the agent to *retract* plausible-looking hits (recalling "the answer" does not help
-  you decline a wrong one); negative assertions require actively verifying *absence*; evidence
-  traceability requires every claim to be tied to a specific tool execution, not merely asserted;
-  and the pre-registered predictions make the eval discipline — not the headline number — the
-  contribution. The self-correction measurement (pre/post retraction scoring) tests *behavior*, not
-  answer-recall.
-- **The honest boundary:** these are *harder* for recall to satisfy, not impossible — a
-  heavily-documented case may have its false positives discussed online too. The claim is "more
-  robust to recall than raw accuracy," not "controls for" or "eliminates" contamination.
+- **Independently authored ground truth** (`ground_truth/base-rd01-v1.1.json`), hand-authored with
+  version history; the agent is not scored against its own output.
+- **The methodology rewards rigor that answer-recall does not trivially satisfy.** FP traps require
+  *retracting* plausible-looking hits; negative assertions require verifying *absence*; evidence
+  traceability ties every claim to a specific tool execution; the self-correction scoring tests
+  *behavior*, not answer-recall. And the pre-registered predictions make the eval discipline — not
+  the headline number — the contribution.
+- **The boundary is honest:** these are *harder* for recall to satisfy, not impossible — a
+  heavily-documented case may have its false positives discussed online too.
 
-The benchmark's durable value is the **measurement apparatus**, which is case-independent and would
-apply to any agent on any case. The specific 0.9833 should be read with the caveat above; the
-contribution is the instrument, not the number.
+The benchmark's durable value is the **measurement apparatus** — case-independent, applicable to
+any agent on any case. The contribution is the instrument, not the 0.9833.
 
 ---
 
@@ -187,41 +175,37 @@ contribution is the instrument, not the number.
 
 *(Hackathon Criterion 4. This is the report's centerpiece.)*
 
-Evidence integrity in this project is enforced at two layers, and — more usefully for a reviewer
-— the boundary between them was established by a **documented, disclosed failure of the first
-layer.**
+Evidence integrity is enforced at two layers, and the boundary between them was established by a
+**documented, disclosed failure of the first layer.**
 
 ### The Run 4 bypass — a failure mode, surfaced as signal
 
-The hackathon brief invites exactly this: *if you found failure modes, document them — that's
-signal, not weakness.* Here is ours, in full.
-
 Through Run 3, evidence enrichment was governed by a **prompt-level** guardrail: the project
 `CLAUDE.md` instructed the agent to compute hashes and run YARA scans through the registered MCP
-server. Run 4 was the first run with that server live, and it was meant to demonstrate the
-integration end-to-end.
+server. Run 4 was the first run with that server live, meant to demonstrate the integration
+end-to-end.
 
-It did the opposite. The agent produced genuinely useful enrichment — a SHA-256 for `p.exe` and a
-YARA match (`Meterpreter_NamedPipe_Transport`) — but **bypassed the MCP server entirely.** The
-`tool_attribution` evidence shows it: the hash carries only `vol … pslist --dump`, with no
-`mcp__hash_file` call, and the YARA match was produced by
+It did the opposite. The agent produced useful enrichment — a SHA-256 for `p.exe` and a YARA
+match (`Meterpreter_NamedPipe_Transport`) — but **bypassed the MCP server entirely.** The
+`tool_attribution` shows it: the hash carries only `vol … pslist --dump`, no `mcp__hash_file`
+call, and the YARA match came from
 `python3 yara.compile('Meterpreter_NamedPipe_Transport').match('8260.p.exe.0x400000.dmp')` — a
-direct `yara-python` call, using neither the registered `mcp__yara_scan` tool nor the operative
+direct `yara-python` call using neither the registered `mcp__yara_scan` tool nor the operative
 ruleset (`RESULTS.md`, R4-E1/E2). No `execution_log.json` was produced, so the call chain could
 not even be independently reconstructed.
 
-The diagnosis: the MCP server was registered and reachable; the failure was *routing*. The
-`CLAUDE.md` language was descriptive ("use the MCP tools…") rather than directive, and the agent
-took the path of least resistance to an inline equivalent. **A prompt that asks for a behavior is
-not a control that enforces it.**
+Diagnosis: the server was registered and reachable; the failure was *routing*. The `CLAUDE.md`
+language was descriptive ("use the MCP tools…") rather than directive, and the agent took the path
+of least resistance to an inline equivalent. **A prompt that asks for a behavior is not a control
+that enforces it.**
 
-This was caught at scoring, disclosed in `RESULTS.md` (all of R4-E1/E2/E3 marked DEVIATION), and
-drove the next two runs: Run 5 strengthened the `CLAUDE.md` prohibitions (and surfaced a *second*
-failure — the `.mcp.json` was at the wrong path, so the server never loaded — itself disclosed
-rather than quietly fixed); Run 6 corrected the path and met E1/E2/E3, with both malware-class
-hashes finally MCP-attributed — a *prompt-level* fix (stronger prohibitions + the gate), not an
-architectural one. The bypass is not an embarrassment buried in an appendix — it is what motivated
-the layered enforcement model below, and the honest accounting of which layer actually closed it.
+This was caught at scoring, disclosed in `RESULTS.md` (R4-E1/E2/E3 all marked DEVIATION), and
+drove the next two runs: Run 5 strengthened the prohibitions (and surfaced a *second* failure —
+`.mcp.json` at the wrong path, so the server never loaded — also disclosed, not quietly fixed);
+Run 6 corrected the path and met E1/E2/E3, with both malware-class hashes finally MCP-attributed.
+That was a *prompt-level* fix (stronger prohibitions + the gate), not an architectural one — which
+is exactly what motivated the layered model below, and the accounting of which layer actually
+closed it.
 
 ### The two layers
 
@@ -249,17 +233,17 @@ the layered enforcement model below, and the honest accounting of which layer ac
   among other rules, `CONFIRMED → tool_attribution` non-empty — a CONFIRMED finding with no
   cited tool is rejected before scoring.
 
-**Which layer actually closed Run 4 — stated plainly.** Enrichment *routing* (MCP vs. inline) is a
-**Layer-1 / prompt-based** control, not Layer 2. The typed MCP surface (Layer 2) provided
-*detection*; the Run 6 *prevention* was stronger prompting plus the gate — still prompt-level.
-`tool_executor.py` enforces a *different* boundary (evidence-read-only / safe shell): `python3` and
-the hash utilities are on its allowlist, so it would not, by itself, have blocked the inline
-computation. Forcing MCP as the only enrichment route is honest future work, not yet built. Net:
-**evidence integrity is architecturally enforced; enrichment routing is prompt-enforced** — with a
-documented failure (Run 4), a working prompt-level mitigation (Run 6), and a named, unbuilt
-architectural fix. This matches `ARCHITECTURE.md`.
+**Which layer actually closed Run 4.** Enrichment *routing* (MCP vs. inline) is a **Layer-1 /
+prompt-based** control, not Layer 2. The typed MCP surface (Layer 2) provided *detection*; the
+Run 6 *prevention* was stronger prompting plus the gate — still prompt-level. `tool_executor.py`
+enforces a *different* boundary (evidence-read-only / safe shell): `python3` and the hash utilities
+are on its allowlist, so it would not, by itself, have blocked the inline computation. Forcing MCP
+as the only enrichment route is future work, not yet built. Net: **evidence integrity is
+architecturally enforced; enrichment routing is prompt-enforced** — a documented failure (Run 4),
+a working prompt-level mitigation (Run 6), and a named, unbuilt architectural fix. Matches
+`ARCHITECTURE.md`.
 
-### Honest scope note
+### Scope note
 
 `tool_executor.py` is a **forward-looking v2 component** (its own file header says so). It is
 **not** retroactively wrapped around Runs 1–6 — doing so would alter the historical runs and
@@ -293,13 +277,11 @@ sums their per-turn `usage` objects:
 | Run 4 | 95 | 128,915 | 7,200,930 | **7,773,729** |
 | Run 5 | 103 | 146,196 | 6,289,432 | **6,785,994** |
 
-Both totals are cache-read-dominated, as expected for a long agentic run. Two honest caveats:
-token counts are per *assistant turn*, not per tool call, so finding → tool token attribution is
-not available; and **the Run 6 session transcript was not retained** (Claude Code session rotation;
-`~/.claude/.last-cleanup` = 2026-06-13), so a Run 6 token total is not recoverable. The figures
-above are Run 4 and Run 5 — the *same* SRL-2018 agent workflow, different runs — offered as
-representative scale, not as Run 6 values. Asserting "token usage unavailable" would itself be an
-overclaim: the data exists in the transcripts; only the Run 6 file is gone.
+Both totals are cache-read-dominated, as expected for a long agentic run. Two caveats: counts are
+per *assistant turn*, not per tool call, so finding → tool attribution is not available; and **the
+Run 6 session transcript was not retained** (Claude Code session rotation; `~/.claude/.last-cleanup`
+= 2026-06-13), so a Run 6 total is not recoverable. The figures above are Run 4 and Run 5 — the
+same SRL-2018 workflow, different runs — offered as representative scale, not Run 6 values.
 
 ---
 

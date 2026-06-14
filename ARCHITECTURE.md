@@ -148,11 +148,13 @@ not in the enforcement path.
 | Findings validator | `scorer/validate_findings.py` | Deterministic pre-flight schema gate; a CONFIRMED finding with empty `tool_attribution` is rejected before it can be scored — this is what enforces that the `[P]` status model is backed by evidence |
 | Replayable verdicts | content-addressed cache | Judge verdicts keyed on content hashes → bit-identical re-score, auditable by any reviewer without an API key |
 
-### Where enforcement is still prompt-based (the honest scope)
+### Where enforcement is still prompt-based — the Run 4 bypass
 
 One boundary is **not** architecturally enforced, and stating that plainly is the stronger
-Criterion-4 answer (the brief: *if you're using prompt-based restrictions rather than architectural
-enforcement, document what happens when the model ignores the restriction*).
+Criterion-4 answer (the brief: *document what happens when the model ignores a prompt-based
+restriction*, and *if you found failure modes, document them — that's signal*). The two-layer
+model exists precisely because the first layer **demonstrably failed**, disclosed rather than
+buried. Through Run 3, enrichment was governed only by the prompt-based prohibition.
 
 **Enrichment routing** — using the MCP tools instead of computing hashes/YARA inline — is governed
 by a `CLAUDE.md` prohibition, i.e. it is **prompt-based `[P]`**. The agent retains an inline path:
@@ -169,38 +171,16 @@ route enrichment through the typed surface. The enforcement timeline is:
   wall.
 - **Architectural closure — not built.** Forcing MCP as the *only* enrichment route (removing the
   inline path) is honest future work, scoped out of this submission.
+- **`tool_executor` does not close it.** It hardens a *related but distinct* boundary
+  (evidence-read-only / safe-shell) and allowlists `python3` and the hash utilities, so it would
+  not, by itself, have blocked the inline bypass.
 
 So the truthful Criterion-4 position — the same thesis stated in [`ACCURACY_REPORT.md`](ACCURACY_REPORT.md):
 **evidence integrity is architecturally enforced; enrichment routing is prompt-enforced**.
 Evidence integrity is held by `tool_executor`, the typed MCP surface, the validator, and the cache;
 enrichment routing has a documented failure (Run 4), a working prompt-level mitigation (Run 6), and
-a named architectural fix that is not yet built.
-
-### Why the distinction is the centerpiece: the Run 4 bypass
-
-The two layers exist because the first one **demonstrably failed**, and the failure was disclosed
-rather than buried (the hackathon brief: *if you found failure modes, document them — that's
-signal*).
-
-Through Run 3, enrichment was governed only by the **prompt-based** prohibition: `CLAUDE.md` told
-the agent to route hashing/YARA through the MCP server. Run 4 was the first run with the server
-live. The agent produced real enrichment — a SHA-256 and a `Meterpreter_NamedPipe_Transport` YARA
-match — but **bypassed the MCP server**, computing both inline
-(`python3 yara.compile(...).match('8260.p.exe.0x400000.dmp')`, no `mcp__hash_file`/`mcp__yara_scan`
-in `tool_attribution`). A prompt that asks for a behavior is not a control that enforces it.
-
-The response splits cleanly by enforcement type, and naming which is which is the point:
-
-- **Detection** came from the typed MCP surface — the inline-vs-MCP distinction is visible in
-  `tool_attribution`, so the bypass was caught at scoring and disclosed in `RESULTS.md`
-  (R4-E1/E2/E3 all DEVIATION).
-- **Prevention** in Run 6 came from strengthened **prompt-based** prohibitions plus the gate —
-  still a prompt-level control, now demonstrated working.
-- **Architectural closure** of the routing path (making MCP the only route) is named future work.
-- `tool_executor.py` hardens a *related but distinct* boundary — evidence-read-only / safe-shell —
-  and does **not**, by itself, force routing (it allowlists `python3` and the hash utilities).
-
-Full narrative in [`ACCURACY_REPORT.md`](ACCURACY_REPORT.md).
+a named architectural fix that is not yet built. Full narrative in
+[`ACCURACY_REPORT.md`](ACCURACY_REPORT.md).
 
 ---
 
@@ -222,23 +202,14 @@ Full narrative in [`ACCURACY_REPORT.md`](ACCURACY_REPORT.md).
 
 ---
 
-## Honest scope note
+## Scope note
 
 `tool_executor.py` is a **forward-looking architectural guardrail** — implemented and tested (19
-tests), but **not retroactively wrapped around Runs 1-6** (its file header states this). It is
-marked `(NOT in Run 1-6 path)` in the diagram for two reasons:
-
-1. **It did not gate the historical runs.** Wrapping it around Runs 1-6 after the fact would alter
-   them and invalidate the variance methodology, so the historical results stand as produced and
-   the executor is the control going forward.
-2. **It enforces evidence integrity, not enrichment routing.** It blocks non-allowlisted/
-   destructive commands and writes into the evidence image — but `python3` and the hashing
-   utilities are on its allowlist, so it would **not**, by itself, have blocked the Run 4
-   inline-enrichment bypass. Attributing the routing fix to it would be an overclaim; the routing
-   control is prompt-based (above).
-
-Same disclosure discipline as the rest of the project: claim only what the artifacts support — a
-claim of enforcement is checked against what the code actually enforces.
+tests), but **not retroactively wrapped around Runs 1-6** (its file header states this), hence the
+`(NOT in Run 1-6 path)` marker in the diagram. Wrapping it around the historical runs after the
+fact would alter them and invalidate the variance methodology, so those results stand as produced
+and the executor is the control going forward. It enforces evidence integrity, not enrichment
+routing (see the Run 4 timeline above) — claim only what the artifacts support.
 
 ---
 

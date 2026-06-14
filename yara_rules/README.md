@@ -40,14 +40,12 @@ work, so it does not relicense the repository.
 |--------|---------|--------|
 | Yara-Rules/rules | GPLv2 | Aggregated (data input; mere aggregation, not relicensed) |
 
-Three CC BY-NC 4.0 community rules were removed to keep the bundled ruleset
-fully permissive; they were inert (0 matches) in all committed runs, so
-detection results are unaffected, and the novel rules are the detection
-contribution. Removed on 2026-06-13: `HKTL_Meterpreter_inMemory`,
-`HKTL_CobaltStrike_Beacon_Strings`, `SUSP_PowerShell_Param_Combo` (all
-Neo23x0/signature-base, CC BY-NC 4.0). The one remaining community rule (GPLv2)
-is aggregated, not relicensed. SIFT-Bench's own code and the novel rules in
-`srl-2018-novel.yar` are MIT-licensed.
+On 2026-06-13, three CC BY-NC 4.0 community rules were removed to keep the bundled
+ruleset fully permissive: `HKTL_Meterpreter_inMemory`, `HKTL_CobaltStrike_Beacon_Strings`,
+`SUSP_PowerShell_Param_Combo` (all Neo23x0/signature-base). They were inert (0 matches) in
+all committed runs, so detection results are unaffected. The one remaining community rule
+(GPLv2) is aggregated, not relicensed; SIFT-Bench's own code and the `srl-2018-novel.yar`
+rules are MIT.
 
 ---
 

@@ -86,10 +86,9 @@ cat cases/srl-2018/run6_analysis/mcp_verification.txt
 
 ## Full reproduction — only if you have the SRL-2018 image (~17 min)
 
-The SRL-2018 `base-rd01` memory image is a **SANS FOR508 course dataset and is not
-redistributed in this repository.** **If** you have access to it, you can reproduce the
-full agent run end-to-end. (You do not need this to evaluate the project — the fast
-review above covers all committed results.)
+The SRL-2018 `base-rd01` image is a SANS FOR508 course dataset, not redistributed here.
+**If** you have it, you can reproduce the full agent run end-to-end — but you do not need
+this to evaluate the project; the fast review above covers all committed results.
 
 Requirements: SANS SIFT Workstation, Claude Code, the image placed at `./evidence/`, and
 `ANTHROPIC_API_KEY` (needed only for *fresh* judge verdicts; cached scoring needs none).
