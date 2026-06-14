@@ -1,6 +1,6 @@
 # SIFT-Bench
 
-> **Judges — no private dependencies, no paid services, no API key.** The evidence is the **hackathon's provided SRL-2018 starter case** (SANS FOR508 `base-rd01`) — data entrants already have, not a private access barrier; it is omitted from this repo only to respect SANS course-material redistribution terms. The agent depends on **no proprietary or paid tools**: full runs use the open-source SIFT Workstation + Volatility 3 + Claude Code, and scoring needs no API key. **Every published score replays deterministically from the committed judge-verdict cache with no image and no key** — run `make judge-fast` (or follow [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md)). Reproducibility verified on a clean container: [`analysis/clean-vm-dryrun-2026-06-09.log`](analysis/clean-vm-dryrun-2026-06-09.log).
+> **Judges — no private dependencies, no paid services, no API key.** Full runs use only the open-source SIFT Workstation + Volatility 3 + Claude Code. The test case is the **hackathon's provided SRL-2018 starter case** (SANS FOR508 `base-rd01`) — data entrants already have; it is omitted here only to respect SANS redistribution terms. **Every published score replays deterministically from the committed judge-verdict cache, with no image and no key** — run `make judge-fast` (or see [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md)). Reproducibility verified on a clean container: [`analysis/clean-vm-dryrun-2026-06-09.log`](analysis/clean-vm-dryrun-2026-06-09.log).
 
 SIFT-Bench tests whether an autonomous DFIR agent can investigate a compromised Windows memory image, explain its evidence, retract false leads, and verify that certain suspected behaviors did not occur — not just list IOCs.
 
@@ -20,8 +20,21 @@ Solo submission to the [Find Evil! hackathon](https://findevil.devpost.com) (Apr
 - **Problem:** DFIR agents can produce plausible but unsupported findings.
 - **Solution:** SIFT-Bench evaluates evidence-backed findings, false-positive retractions, negative assertions, and methodology coverage — not keyword matches.
 - **Demo result:** Best run (Run 6) found all 5 critical findings, caught all 3 false-positive traps, and scored 0.9833 on the v0.5 benchmark metric.
-- **What to inspect:** [`DATASET.md`](DATASET.md), [`RESULTS.md`](RESULTS.md), [`ground_truth/base-rd01-v1.1.json`](ground_truth/base-rd01-v1.1.json), [`cases/srl-2018/run6_reports/`](cases/srl-2018/run6_reports/), [`scorer/`](scorer/).
+- **What to inspect:** [`DATASET.md`](DATASET.md), [`ACCURACY_REPORT.md`](ACCURACY_REPORT.md), [`RESULTS.md`](RESULTS.md), [`ground_truth/base-rd01-v1.1.json`](ground_truth/base-rd01-v1.1.json), [`cases/srl-2018/run6_reports/`](cases/srl-2018/run6_reports/), [`scorer/`](scorer/).
 - **Reproducible without the image:** scores replay deterministically from committed run outputs, cached judge verdicts, and unit tests — no memory image and no API key required (`make judge-fast`). See [Fast review without the memory image](#fast-review-without-the-memory-image) below.
+
+### Where each submission requirement lives
+
+| Requirement | Location |
+|---|---|
+| Open-source license (MIT) | [`LICENSE`](LICENSE) |
+| Setup & run instructions | [Full reproduction with the case image](#full-reproduction-with-the-case-image) |
+| Architecture diagram + trust boundaries | [`ARCHITECTURE.md`](ARCHITECTURE.md) · [`docs/architecture.svg`](docs/architecture.svg) |
+| Dataset documentation | [`DATASET.md`](DATASET.md) |
+| Accuracy report (false positives, misses, evidence integrity) | [`ACCURACY_REPORT.md`](ACCURACY_REPORT.md) |
+| Try it out (run locally) | [Fast review](#fast-review-without-the-memory-image) · [Full reproduction](#full-reproduction-with-the-case-image) |
+| Execution logs + token usage | [`cases/srl-2018/run6_analysis/execution_log.json`](cases/srl-2018/run6_analysis/execution_log.json) · [`session_transcripts/`](cases/srl-2018/session_transcripts/) |
+| Demo video | Linked on the [Devpost project page](https://findevil.devpost.com) |
 
 ---
 
@@ -101,7 +114,7 @@ The scorer uses an LLM judge for semantic matching, but reruns are deterministic
 
 Benchmark: SANS FOR508 Stark Research Labs case SRL-2018, base-rd01 memory image. Ground truth v1.1: 14 findings (5 critical), 3 false-positive traps, 5 negative assertions.
 
-Scored by **scorer v0.5** (LLM-as-judge semantic matching, `claude-sonnet-4-6`, verdicts cached in `scorer_cache/`), which adds real evidence-traceability precision and per-pair fallback matching. The **v0.5 F1** column is the current headline metric; the **v0.4 Score** column is retained alongside it as the prior scorer iteration, for comparison. Under v0.4, precision was approximated at 1.0, so v0.4 numbers read as **recall-weighted benchmark scores** rather than true F1; the remaining columns (recall, critical must-find, FP traps, negative assertions, matched) report the v0.5 re-scoring.
+Scored by **scorer v0.5** (LLM-as-judge semantic matching, `claude-sonnet-4-6`, verdicts cached in `scorer_cache/`), which adds evidence-traceability precision and per-pair fallback matching. **v0.5 F1** is the current headline metric; **v0.4 Score** is retained for comparison — v0.4 approximated precision at 1.0, so those numbers are recall-weighted, not true F1. All other columns report the v0.5 re-scoring.
 
 | Run | Config | v0.4 Score | v0.5 F1 | Recall¹ | Critical (must-find) | FP traps | Neg. assertions | Matched |
 |-----|--------|---:|---:|-------:|---------------------:|---------:|----------------:|--------:|
