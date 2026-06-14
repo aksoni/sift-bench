@@ -308,6 +308,6 @@ the memory image."
 
 ---
 
-*All figures sourced from committed artifacts as of the latest `master` and verified against the
+*All figures sourced from committed artifacts as of the latest `main` and verified against the
 score JSONs and `RESULTS.md`. Scores reproduce from the committed judge cache without an API key
 (`analysis/clean-vm-dryrun-2026-06-09.log`).*
