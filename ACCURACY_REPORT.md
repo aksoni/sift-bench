@@ -33,6 +33,11 @@ invoked end-to-end; both malware-class hashes are MCP-attributed (p.exe
 
 ## Correct findings / Missed artifacts
 
+> *Finding IDs here and in `run6_score.json` are **ground-truth** IDs (F001–F014). The agent's own
+> report (`investigative_narrative.md`) numbers its findings independently (F01–F17); the scorer's
+> LLM judge maps agent findings to ground-truth findings semantically, not by ID — the agent never
+> sees the ground-truth IDs.*
+
 **12 of 14 ground-truth findings matched** (`run6_score.json → findings_matched`), including
 all five must-find criticals:
 
