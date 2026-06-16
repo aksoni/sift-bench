@@ -26,7 +26,8 @@ Every figure below is traceable to a committed file (`ground_truth/base-rd01-v1.
 **Redistribution:** The memory image is **not** included in this repository. It is the
 SRL-2018 starter case distributed to Find Evil! entrants — data judges already have, not a
 private or paid dependency — omitted here only to respect SANS course-material redistribution
-terms. The benchmark is fully reviewable without it: committed run outputs, the hand-authored
+terms. **The SRL-2018 starter case is distributed to all Find Evil! entrants and judges; no
+separate access request is needed** — this is not proprietary or access-gated data. The benchmark is fully reviewable without it: committed run outputs, the hand-authored
 ground truth, the cached LLM-judge verdicts, and the unit tests reproduce all headline numbers
 with no image and no API key (see [`README.md`](README.md) § "Fast review without the memory
 image").

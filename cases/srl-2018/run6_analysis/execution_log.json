@@ -3,6 +3,12 @@
   "run": "run6",
   "analyst": "claude-code-sift-bench",
   "evidence_image": "base-rd01-memory.img",
+  "token_usage": {
+    "scored_run_token_total_available": false,
+    "note": "Token usage for this scored run (Run 6) is UNAVAILABLE: the Run 6 Claude Code session transcript was not retained (session rotation; ~/.claude/.last-cleanup = 2026-06-13), and token counts are not recorded in execution_log.json (they exist only in the per-session transcript). Token usage is NOT recoverable for Run 6.",
+    "representative_scale": "Use the retained Run 4 and Run 5 totals as representative scale for the same SRL-2018 agent workflow: Run 4 = 7,773,729 total tokens (95 assistant turns); Run 5 = 6,785,994 total tokens (103 assistant turns).",
+    "source": "cases/srl-2018/session_transcripts/token_usage.json"
+  },
   "execution_log": [
     {
       "seq": 1,
