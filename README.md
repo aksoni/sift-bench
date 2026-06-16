@@ -34,7 +34,7 @@ Solo submission to the [Find Evil! hackathon](https://findevil.devpost.com) (Apr
 | Accuracy report (false positives, misses, evidence integrity) | [`ACCURACY_REPORT.md`](ACCURACY_REPORT.md) |
 | Try it out (run locally) | [Fast review](#fast-review-without-the-memory-image) · [Full reproduction](#full-reproduction-with-the-case-image) |
 | Execution logs + token usage | [`cases/srl-2018/run6_analysis/execution_log.json`](cases/srl-2018/run6_analysis/execution_log.json) · [`session_transcripts/`](cases/srl-2018/session_transcripts/) |
-| Demo video | **[youtu.be/-w-vIyDu5AI](https://youtu.be/-w-vIyDu5AI)** — also embedded on the [Devpost project page](https://devpost.com/software/sift-bench-cross-examine-your-dfir-agent-s-findings) |
+| Demo video | **[youtu.be/-w-vIyDu5AI](https://youtu.be/-w-vIyDu5AI)** (4:33; live self-correction at [2:50](https://youtu.be/-w-vIyDu5AI?t=170)) — also embedded on the [Devpost project page](https://devpost.com/software/sift-bench-cross-examine-your-dfir-agent-s-findings) |
 
 ---
 
